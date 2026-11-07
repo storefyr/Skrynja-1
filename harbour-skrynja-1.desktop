@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Name=Skrynja-1
+Icon=harbour-skrynja-1
+Exec=harbour-skrynja-1
+Comment=ACP-klient til Sailfish OS
+Categories=Network;Chat;
+
+[X-Sailjail]
+Sandboxing=Disabled

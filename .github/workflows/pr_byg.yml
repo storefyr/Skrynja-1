@@ -1,0 +1,106 @@
+name: pr_byg
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  SAILFISH_RELEASE: '5.2.0.20'
+
+jobs:
+  enhedstests:
+    name: Enhedstests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Installer Qt5
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qtbase5-dev qtbase5-dev-tools qt5-qmake make g++
+      - name: Byg tests
+        run: |
+          export PATH=/usr/lib/qt5/bin:$PATH
+          cd tests
+          qmake tests.pro
+          make -j2
+      - name: Kør tests
+        run: cd tests && ./tst_skrynja_1
+
+  byg:
+    name: Byg RPM (aarch64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Byg RPM
+        uses: R1tschY/sailfish-build-rpm@v1
+        with:
+          arch: aarch64
+          release: ${{ env.SAILFISH_RELEASE }}
+          fix-version: false
+      - name: Tjek at RPM blev bygget
+        run: |
+          if [ -z "$(find RPMS -name '*.rpm' -type f)" ]; then
+            echo "Fejl: ingen RPM blev bygget"
+            exit 1
+          fi
+          ls -lh RPMS/*.rpm
+      - name: Upload RPM-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rpm-aarch64
+          path: RPMS/*.rpm
+      - name: Push RPM til pr-<nr>-rpm-gren
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          PR_NUM=${{ github.event.pull_request.number }}
+          BRANCH="pr-${PR_NUM}-rpm"
+          RPM_FILE=$(ls RPMS/harbour-skrynja-1-*.rpm | head -1)
+          RPM_NAME="skrynja-1-pr${PR_NUM}.rpm"
+          API="https://api.github.com/repos/${{ github.repository }}"
+          AUTH="Authorization: token ${GH_TOKEN}"
+
+          json_get() { tr ',' '\n' | grep "\"$1\"" | head -1 | cut -d'"' -f4; }
+
+          BRANCH_SHA=$(curl -s -H "$AUTH" "${API}/git/ref/heads/${BRANCH}" \
+            | json_get sha || true)
+          echo "Gren-SHA: ${BRANCH_SHA:-<ny gren>}"
+
+          printf '{"content":"' > /tmp/blob.json
+          base64 -w0 "$RPM_FILE" >> /tmp/blob.json
+          printf '","encoding":"base64"}' >> /tmp/blob.json
+          BLOB_SHA=$(curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+            -d @/tmp/blob.json "${API}/git/blobs" | json_get sha)
+          rm -f /tmp/blob.json
+
+          TREE_JSON=$(printf '{"tree":[{"path":"%s","mode":"100644","type":"blob","sha":"%s"}]}' \
+            "$RPM_NAME" "$BLOB_SHA")
+          NEW_TREE_SHA=$(curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+            -d "$TREE_JSON" "${API}/git/trees" | json_get sha)
+
+          MSG="RPM for PR #${PR_NUM} (aarch64) - ${{ github.sha }}"
+          if [ -n "$BRANCH_SHA" ]; then
+            COMMIT_JSON=$(printf '{"message":"%s","tree":"%s","parents":["%s"]}' \
+              "$MSG" "$NEW_TREE_SHA" "$BRANCH_SHA")
+          else
+            COMMIT_JSON=$(printf '{"message":"%s","tree":"%s"}' \
+              "$MSG" "$NEW_TREE_SHA")
+          fi
+          NEW_COMMIT_SHA=$(curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+            -d "$COMMIT_JSON" "${API}/git/commits" | json_get sha)
+
+          if [ -n "$BRANCH_SHA" ]; then
+            curl -sf -X PATCH -H "$AUTH" -H "Content-Type: application/json" \
+              -d "{\"sha\":\"${NEW_COMMIT_SHA}\",\"force\":true}" \
+              "${API}/git/refs/heads/${BRANCH}"
+          else
+            curl -sf -X POST -H "$AUTH" -H "Content-Type: application/json" \
+              -d "{\"ref\":\"refs/heads/${BRANCH}\",\"sha\":\"${NEW_COMMIT_SHA}\"}" \
+              "${API}/git/refs"
+          fi

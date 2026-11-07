@@ -1,0 +1,27 @@
+Name: harbour-skrynja-1
+Summary: ACP-klient til Sailfish OS
+Version: 0.1.0
+Release: 1
+Group: Applications/Internet
+URL: https://github.com/storefyr/Skrynja-1
+License: GPL-3.0-only
+Sources:
+  - '%{name}-%{version}.tar.bz2'
+Description: |
+  Skrynja-1 er en ACP-klient til Sailfish OS. Klienten starter en lokal
+  agent (vibe-acp) som underordnet proces og taler ACP med den over
+  standard-ind og -ud.
+
+Builder: qmake5
+PkgBR:
+  - pkgconfig(sailfishapp) >= 1.0.2
+  - pkgconfig(Qt5Core)
+  - pkgconfig(Qt5Qml)
+  - pkgconfig(Qt5Quick)
+  - desktop-file-utils
+Requires:
+  - sailfishsilica-qt5 >= 0.10.9
+Files:
+  - '%{_bindir}/%{name}'
+  - '%{_datadir}/%{name}'
+  - '%{_datadir}/applications/%{name}.desktop'

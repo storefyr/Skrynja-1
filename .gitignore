@@ -1,0 +1,63 @@
+# Qt
+*.pro.user
+*.pro.user.*
+*.qmlproject.user
+*.qmlproject.user.*
+Makefile*
+*build-*
+*.o
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+*.moc
+
+# Qt Creator
+*.autosave
+
+# Compilation
+*.a
+*.so
+*.so.*
+*.dll
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+harbour-skrynja-1
+
+# Build directories
+build/
+debug/
+release/
+
+# RPM build
+RPMS/
+SRPMS/
+BUILD/
+BUILDROOT/
+SOURCES/
+SPECS/
+
+# Sailfish SDK
+.mb2/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.bak
+*.tmp
+*.temp
+
+# User settings
+*.conf
