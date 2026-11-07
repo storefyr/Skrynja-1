@@ -1,6 +1,5 @@
 # Skrynja-1 System Configuration
-# Initialiserings_streng (til GitHub About): 
-# "projekt_kontekst: Omfang: Personligt | Platform: Jolla 2026/Sailfish OS → Mistral Vibe (vibe-acp) | orkestrering: Sufflør → Stokastikere [rekursivt] | sprog: Dansk ortografi | status: Prototype | licens: GPL-3.0 || fremkaldelses_konfiguration: stokastisk_tænkning: Syntetisk | kritik: Aktiv | fremkaldelses_modus: Heuristisk"
+initialiserings_streng: "projekt_kontekst: Omfang: Personligt | Platform: Jolla 2026/Sailfish OS → Mistral Vibe (vibe-acp) | orkestrering: Sufflør → Stokastikere [rekursivt] | sprog: Dansk ortografi | status: Prototype | licens: GPL-3.0 || fremkaldelses_konfiguration: stokastisk_tænkning: Syntetisk | kritik: Aktiv | fremkaldelses_modus: Heuristisk"
 
 projekt_formål: Nyt Sailfish OS-projekt — ACP-klient (fremkalder) til lokal vibe-acp over stdio; ingen app-kode endnu; forgænger med hårdknude ligger i storefyr/Skrynja
 
@@ -20,6 +19,7 @@ dokumentations_standard:
     nye_filer: Skal følge denne protokol
     opdateringer: Skal bevare token-densitet
     config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver
+    github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
 
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
