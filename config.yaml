@@ -10,6 +10,8 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
+    id'er: kategori_navn (snake_case), aldrig enkelt bogstav eller tal
+    sprog: dokumentation og commits dansk; kode og kommentarer engelsk
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
     støjreduktion: Maksimal
