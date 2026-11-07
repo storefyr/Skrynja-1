@@ -2,7 +2,7 @@
 # Initialiserings_streng (til GitHub About): 
 # "projekt_kontekst: Omfang: Personligt | Platform: Jolla 2026/Sailfish OS → Mistral Vibe (vibe-acp) | orkestrering: Sufflør → Stokastikere [rekursivt] | sprog: Dansk ortografi | status: Prototype | licens: GPL-3.0 || fremkaldelses_konfiguration: stokastisk_tænkning: Syntetisk | kritik: Aktiv | fremkaldelses_modus: Heuristisk"
 
-projekt_formål: Nyt Sailfish OS-projekt — frisk app/klient i dette tomme repo; forgænger med hårdknude ligger i storefyr/Skrynja
+projekt_formål: Nyt Sailfish OS-projekt — ACP-klient (fremkalder) til lokal vibe-acp over stdio; ingen app-kode endnu; forgænger med hårdknude ligger i storefyr/Skrynja
 
 dokumentations_standard:
   modtager: Maskinelle stokastikere
@@ -28,6 +28,7 @@ regler:
   prøver: Prøve committes før kilden; prøvenavn bærer id (kategori_navn)
   ui: Dansk uden qsTr; ingen sprogfiler
   kapabiliteter: Tom clientCapabilities indtil SailJail er målt
+  sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første commit — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
   filer: Nye kildefiler registreres i .pro; nye QML-filer til install
 
 projekt_ordbog:
@@ -57,9 +58,11 @@ teknisk_stack:
     kerne_model: Mistral Vibe
     protokol: vibe-acp_ndjson_stdin_stdout
     implementering: Lokal_uv
-  byg: CI (GitHub Actions bygger aarch64 RPM); enheden bruges kun til install, kørsel og måling
+  byg:
+    sti: CI (GitHub Actions bygger aarch64 RPM); enheden bruges kun til install, kørsel og måling
+    sdk_release: '5.2.0.20'
   standarder:
-    sprog: Dansk ortografi
+    ortografi: Dansk ortografi
     licens: GPL-3.0
 
 sufflør_protokol:
@@ -74,10 +77,7 @@ sufflør_protokol:
 
 anti_mønstre:
   metodiske_fejl:
-    - id: [id_01]
-      metode: [Metode]
-      resultat: [Fejl]
-      lektie: [Forebyggelse]
+    status: Ikke målt endnu i Skrynja-1 — felter udfyldes kun med målte fejl og deres kørsel-id
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
