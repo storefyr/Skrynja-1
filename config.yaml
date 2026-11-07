@@ -47,6 +47,7 @@ teknisk_stack:
     kerne_model: Mistral Vibe
     protokol: vibe-acp_ndjson_stdin_stdout
     implementering: Lokal_uv
+  byg: CI (GitHub Actions bygger aarch64 RPM); enheden bruges kun til install, kørsel og måling
   standarder:
     sprog: Dansk ortografi
     licens: GPL-3.0
@@ -68,11 +69,11 @@ anti_mønstre:
       resultat: [Fejl]
       lektie: [Forebyggelse]
   systemiske_hårdknuder:
-    - id: [hårdknude_01]
-      beskrivelse: [Beskrivelse af blindgyde]
-      løsning: [Hvordan den blev/skal løses]
+    - id: hårdknude_01
+      beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
+      løsning: To handlinger fra start — Stop sender session/cancel før cancelled; Afvis afviser kun den enkelte anmodning
 
 operationel_implementering:
-  workflow: "curl [URL].sh | bash → Verifikation"
-  verifikation: [Kommando/Test til bekræftelse af vibe-acp status]
-  succes_kriterium: [Definer præcis tilstand for funktionel implementering]
+  workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
+  verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; kørsel og måling på Jolla Phone 2026
+  succes_kriterium: CI grønt og prompt-tur målt på enheden — svar vist, app afslutter med exit-kode 0
