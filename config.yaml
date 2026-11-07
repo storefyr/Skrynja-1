@@ -2,6 +2,8 @@
 # Initialiserings_streng (til GitHub About): 
 # "projekt_kontekst: Omfang: Personligt | Platform: Jolla 2026/Sailfish OS → Mistral Vibe (vibe-acp) | orkestrering: Sufflør → Stokastikere [rekursivt] | sprog: Dansk ortografi | status: Prototype | licens: GPL-3.0 || fremkaldelses_konfiguration: stokastisk_tænkning: Syntetisk | kritik: Aktiv | fremkaldelses_modus: Heuristisk"
 
+projekt_formål: Nyt Sailfish OS-projekt — frisk app/klient i dette tomme repo; forgænger med hårdknude ligger i storefyr/Skrynja
+
 dokumentations_standard:
   modtager: Maskinelle stokastikere
   navngivnings_konvention:
