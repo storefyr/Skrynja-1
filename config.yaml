@@ -60,7 +60,8 @@ teknisk_stack:
     implementering: Lokal_uv
   byg:
     sti: CI (GitHub Actions bygger aarch64 RPM); enheden bruges kun til install, kørsel og måling
-    sdk_release: '5.2.0.20'
+    sdk_release: '4.5.0.18'
+    sdk_note: 5.2.0.20-aarch64 findes ikke i ghcr.io (manifest unknown, kørsel 42415397767); 4.5.0.18-aarch64 er grøn i forgængerens CI og kører på enhedens 5.2.0.20
   standarder:
     ortografi: Dansk ortografi
     licens: GPL-3.0
