@@ -9,7 +9,7 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
-    id'er: kategori_navn (snake_case), aldrig enkelt bogstav eller tal
+    id'er: kategori_navn (snake_case), aldrig enkelt bogstav eller tal; dansk ortografi (æøå) i dokumenter, engelsk i kode
     sprog: dokumentation og commits dansk; kode og kommentarer engelsk
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
@@ -90,10 +90,10 @@ operationel_implementering:
 
 vejkort:
   skive_byg: accept — pr_byg.yml grønt i Actions (unit tests + aarch64 RPM); enhed røres ikke
-  skive_spine: accept — på enheden måles prompt sendt, svar vist, exit-kode 0
-  skive_vaerktoejskald: accept — kald vist med ikon efter kind, titel og fuld sti
+  skive_rygrad: accept — på enheden måles prompt sendt, svar vist, exit-kode 0
+  skive_værktøjskald: accept — kald vist med ikon efter kind, titel og fuld sti
   skive_tilladelser: accept — dialog viser kind og fuld kommando; Stop sender session/cancel før cancelled
   skive_diff: accept — filændring som diff; kommando viser uddata
-  skive_konfig: accept — configOptions vises og kan ændres
-  skive_genoptag: accept — samtale vises korrekt efter genstart
+  skive_konfiguration: accept — configOptions vises og kan ændres
+  skive_genoptagelse: accept — samtale vises korrekt efter genstart
   skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner
