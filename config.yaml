@@ -87,11 +87,40 @@ sufflør_protokol:
 
 anti_mønstre:
   metodiske_fejl:
-    status: Ikke målt endnu i Skrynja-1 — felter udfyldes kun med målte fejl og deres kørsel-id
+    - id: mf_01
+      metode: QJsonParseError::ExtraData antaget (navn fra nyere Qt)
+      resultat: byg fejlede — ExtraData findes ikke i Qt 5.6 (kørsel 42489084980)
+      lektie: Qt 5.6 hedder det GarbageAtEnd, samme offset-semantik
+    - id: mf_02
+      metode: over-loft-linje satte discard-tilstand uden nulstilling ved linjeskift
+      resultat: næste gyldige linje blev også kasseret, prøve rygrad_cap fejlede (kørsel 42489244332)
+      lektie: tæller nulstilles når linjen er komplet; kun ufuldstændig buffer går i discard
+    - id: mf_03
+      metode: håndskrevet testlinje med en ekstra lukkeparentes
+      resultat: parser kasserede korrekt med illegal value, prøven fejlede (kørsel 42490284528)
+      lektie: test-JSON valideres maskinelt før commit
+    - id: mf_04
+      metode: EnterKey.onClicked sat til signal-kald sendButton.clicked() som udtryk
+      resultat: QML-fejl Insufficient arguments på Qt 5.6 (app-log 2026-11-08T15:26)
+      lektie: en handler kalder en funktion, ikke et signal som funktionsudtryk
+    - id: mf_05
+      metode: SDK-release valgt efter enhedens OS-version (5.2.0.20)
+      resultat: docker-image 5.2.0.20-aarch64 findes ikke, manifest unknown (kørsel 42415397767)
+      lektie: byg efter et SDK-image der faktisk findes i registret (4.5.0.18); enhedens OS er noget andet
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
       løsning: To handlinger fra start — Stop sender session/cancel før cancelled; Afvis afviser kun den enkelte anmodning
+
+målt_på_wire:
+  kilde: app-log /tmp/skrynja-1-app.log på Jolla Phone 2026, 2026-11-08T15:25-15:26
+  initialize_svar: protocolVersion 1, agentInfo @mistralai/mistral-vibe 3.0.2, authMethods inkl. browser-auth
+  session_new_svar: sessionId som UUID, currentModeId accept-edits, configOptions med mode/model/thinking, modes ask/accept-edits/smart-approve/auto-approve
+  update_typer: session/update med agent_message_chunk, agent_thought_chunk, user_message_chunk, usage_update, available_commands_update, tool_call — klienten viser pt. kun agent_message_chunk og tool_call
+  prompt_svar: svar med result stopReason end_turn og usage
+
+åbne_punkter:
+  ap_01: skive_værktøjskald — agenten kørte shell id -un på enheden (svar kom tilbage), men kaldet vises ikke i UI; wire-log skal tjekkes for tool_call-frame før der rettes
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -111,3 +140,4 @@ vejkort:
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
   skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
+  skive_værktøjskald: i gang — 13/13 prøver grønne i CI 42490502470/42490902511/42491841691; enhedstest afventer ap_01
