@@ -60,6 +60,7 @@ class TestVaerktoejskald : public QObject
 private slots:
     void vaerktoejskald_felter();
     void vaerktoejskald_tekstchunk();
+    void selvtest_verdict();
 };
 
 void TestVaerktoejskald::vaerktoejskald_felter()
@@ -80,6 +81,21 @@ void TestVaerktoejskald::vaerktoejskald_tekstchunk()
     QByteArray line = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"agent_message_chunk\",\"content\":{\"type\":\"text\",\"text\":\"Hej\"}}}}\n");
     acp.feedBytesForTest(line);
     QCOMPARE(acp.lastText(), QStringLiteral("Hej"));
+}
+
+void TestVaerktoejskald::selvtest_verdict()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    QByteArray tool = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"c1\",\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}}}}\n");
+    QByteArray done = QByteArray("{\"jsonrpc\":\"2.0\",\"id\":99,\"result\":{\"stopReason\":\"end_turn\"}}\n");
+    acp.feedBytesForTest(tool + done);
+    QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString v = QString::fromUtf8(f.readAll());
+    QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
+    QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
 }
 
 void TestRygradParser::rygrad_fixture_hoved()
