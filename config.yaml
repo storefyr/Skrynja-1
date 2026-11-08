@@ -9,7 +9,7 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
-    id'er: kategori_navn (snake_case), også filnavne; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk
+    id'er: kategori_navn (snake_case), også filnavne; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser
     sprog: dokumentation og commits dansk; kode og kommentarer engelsk
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
@@ -88,27 +88,27 @@ sufflør_protokol:
 
 anti_mønstre:
   metodiske_fejl:
-    - id: mf_01
+    - id: metodefejl_01
       metode: QJsonParseError::ExtraData antaget (navn fra nyere Qt)
       resultat: byg fejlede — ExtraData findes ikke i Qt 5.6 (kørsel 42489084980)
       lektie: Qt 5.6 hedder det GarbageAtEnd, samme offset-semantik
-    - id: mf_02
+    - id: metodefejl_02
       metode: over-loft-linje satte discard-tilstand uden nulstilling ved linjeskift
       resultat: næste gyldige linje blev også kasseret, prøve rygrad_cap fejlede (kørsel 42489244332)
       lektie: tæller nulstilles når linjen er komplet; kun ufuldstændig buffer går i discard
-    - id: mf_03
+    - id: metodefejl_03
       metode: håndskrevet testlinje med en ekstra lukkeparentes
       resultat: parser kasserede korrekt med illegal value, prøven fejlede (kørsel 42490284528)
       lektie: test-JSON valideres maskinelt før commit
-    - id: mf_04
+    - id: metodefejl_04
       metode: EnterKey.onClicked sat til signal-kald sendButton.clicked() som udtryk
       resultat: QML-fejl Insufficient arguments på Qt 5.6 (app-log 2026-11-08T15:26)
       lektie: en handler kalder en funktion, ikke et signal som funktionsudtryk
-    - id: mf_05
+    - id: metodefejl_05
       metode: SDK-release valgt efter enhedens OS-version (5.2.0.20)
       resultat: docker-image 5.2.0.20-aarch64 findes ikke, manifest unknown (kørsel 42415397767)
       lektie: byg efter et SDK-image der faktisk findes i registret (4.5.0.18); enhedens OS er noget andet
-    - id: mf_06
+    - id: metodefejl_06
       metode: selvtest læste uiToolCalls på view->rootObject() (vinduet) i stedet for Page
       resultat: ui_tool_calls=-1 og VERDICT=FAIL selvom UI viste kaldet (selvtest på enhed 2026-11-08)
       lektie: læs samme objekt som QML viser — findChild på side-id, ikke rootObject
@@ -125,8 +125,8 @@ målt_på_wire:
   prompt_svar: svar med result stopReason end_turn og usage
 
 åbne_punkter:
-  ap_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
-  ap_02: skive_værktøjskald UI — selvtest-verdict tjekker nu ui_tool_calls automatisk (læses fra QML efter end_turn); PASS kræver både klient- og UI-træf
+  åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
+  åbent_punkt_02: skive_værktøjskald UI — selvtest-verdict tjekker nu ui_tool_calls automatisk (læses fra QML efter end_turn); PASS kræver både klient- og UI-træf
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -146,4 +146,4 @@ vejkort:
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
   skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
-  skive_værktøjskald: i gang — 14/14 prøver grønne i CI 42492523298; selvtest PASS på enheden 2026-11-08 (tool_calls=1, ap_01 løst); kun UI-visning afventer ap_02
+  skive_værktøjskald: i gang — 14/14 prøver grønne i CI 42492523298; selvtest PASS på enheden 2026-11-08 (tool_calls=1, åbent_punkt_01 løst); kun UI-visning afventer åbent_punkt_02
