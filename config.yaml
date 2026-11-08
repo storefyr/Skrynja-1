@@ -50,13 +50,12 @@ arkitektonisk_logik:
 
 teknisk_stack:
   hardware:
-    enhed: Jolla Phone 2026
+    enhed: Jolla Phone 2026 — eneste enhed (sufflør 2026-11-07)
     os: Sailfish OS 5.2.0.20 (Finlayson)
     arch: aarch64
     kernel: 6.12.38-4k
   maskiner:
-    telefon: mistral_vibe 3.0.2 + agent_client_protocol 0.11.0; vibe-acp via uv (~/.local/bin/vibe-acp) — pr. forgængerens målelab (dokumenter/vibe-acp/README.md)
-    sandbox: målmaskine — vibe-acp 2.9.4, Qt 5.15.2 (unit tests lokalt), gh CLI autentificeret — pr. forgængerens målelab og denne sessions kørsler
+    eneste_enhed: Jolla Phone 2026 — al projektfremdrift, agent-kørsel og stokastiker-dialogen foregår på denne ene enhed (sufflør 2026-11-07); mistral_vibe 3.0.2 + agent_client_protocol 0.11.0; vibe-acp via uv (~/.local/bin/vibe-acp); ingen separat målmaskine eller udviklermaskine
     ci: GitHub Actions ubuntu-runners; Sailfish SDK-image 4.5.0.18-aarch64 — grøn i kørsel 42415519785
   integration:
     kerne_model: Mistral Vibe
@@ -71,9 +70,9 @@ teknisk_stack:
     licens: GPL-3.0
 
 lokal_opsaetning:
-  maskiner_og_programmel: se teknisk_stack.maskiner — det er hvad der er til rådighed (telefon, sandbox, CI)
-  testkørsel: kør_test.sh [run-id] — CI-artifact (rpm-aarch64) installeres på telefonen, resultatlog tilbage fra /tmp; forbindelse maskine↔telefon ikke angivet endnu (scriptet antager ssh/scp til $TELEFON_IP — antagelse, rettes når sufflør angiver den)
-  forbudt: RPM må ikke lægges på git-grene; ingen test_pr.sh; ingen fjern-pipes
+  maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
+  testkørsel: foregår på telefonen selv; kør_test.sh antager fejlagtigt ssh/scp fra ekstern maskine ($TELEFON_IP) — omskrives til kørsel direkte på enheden, når sufflør vælger artifact-kanal
+  forbudt: ingen fjern-pipes
 
 sufflør_protokol:
   interaktions_model:
