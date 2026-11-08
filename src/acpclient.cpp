@@ -153,10 +153,12 @@ void AcpClient::handlePermissionRequest(qint64 id, const QJsonObject &params)
         cmd = raw.value(QStringLiteral("path")).toString();
     p.insert(QStringLiteral("kommando"), cmd);
     QVariantList opts;
-    foreach (const QJsonValue &v, params.value(QStringLiteral("options")).toArray()) {
+    const QJsonArray arr = params.value(QStringLiteral("options")).toArray();
+    for (int i = 0; i < arr.size(); i++) {
+        const QJsonObject vo = arr.at(i).toObject();
         QVariantMap o;
-        o.insert(QStringLiteral("optionId"), v.toObject().value(QStringLiteral("optionId")).toString());
-        o.insert(QStringLiteral("name"), v.toObject().value(QStringLiteral("name")).toString());
+        o.insert(QStringLiteral("optionId"), vo.value(QStringLiteral("optionId")).toString());
+        o.insert(QStringLiteral("name"), vo.value(QStringLiteral("name")).toString());
         opts.append(o);
     }
     p.insert(QStringLiteral("options"), opts);
