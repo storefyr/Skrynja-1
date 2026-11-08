@@ -143,6 +143,7 @@ målt_på_wire:
   update_typer: session/update med agent_message_chunk, agent_thought_chunk, user_message_chunk, usage_update, available_commands_update, tool_call — klienten viser pt. kun agent_message_chunk og tool_call
   prompt_svar: svar med result stopReason end_turn og usage
   request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
+  set_config_option: målt i Skrynja-1 2026-11-08 (revision 2a9e328) — mode=ask sat via session/set_config_option virker; fil-skrivning i ask-mode udløste 1 request_permission; læsning (id -un) gjorde ikke (i accept-edits)
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
@@ -167,3 +168,4 @@ fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
   skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
   skive_værktøjskald: bestået 2026-11-08 — selvtest PASS på enheden, revision 7a3f52e (tool_calls=1, ui_tool_calls=1, exit 0); CI 42498254260 grøn, 15/15 prøver
+  skive_tilladelser: bestået 2026-11-08 — selvtest PASS på enheden, revision 2a9e328 (mode=ask via set_config_option, permission_requests=1, tool_calls=1, ui_tool_calls=1, exit 0); stop-rækkefølge (session/cancel før cancelled) unit-testet; CI 42500337915 grøn, 21/21 prøver
