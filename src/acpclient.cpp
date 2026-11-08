@@ -78,6 +78,13 @@ void AcpClient::onProcessFinished(int exitCode)
 void AcpClient::dispatch(const QJsonObject &obj)
 {
     if (obj.contains(QStringLiteral("method"))) {
+        if (obj.contains(QStringLiteral("id"))) {
+            const qint64 id = obj.value(QStringLiteral("id")).toVariant().toLongLong();
+            const QString method = obj.value(QStringLiteral("method")).toString();
+            if (method == QStringLiteral("session/request_permission"))
+                handlePermissionRequest(id, obj.value(QStringLiteral("params")).toObject());
+            return;
+        }
         if (obj.value(QStringLiteral("method")).toString() == QStringLiteral("session/update")) {
             const QJsonObject upd = obj.value(QStringLiteral("params")).toObject()
                     .value(QStringLiteral("update")).toObject();
@@ -123,21 +130,119 @@ void AcpClient::dispatch(const QJsonObject &obj)
     } else if (method == QStringLiteral("session/new")) {
         m_sessionId = result.value(QStringLiteral("sessionId")).toString();
         emit sessionIdChanged();
-        if (m_selvtest)
+        if (m_selvtest) {
+            sendSetConfigOption(QStringLiteral("mode"), QStringLiteral("ask"));
             sendPrompt(QStringLiteral("kør id -un i terminalen"));
+        }
     }
     if (m_selvtest && result.contains(QStringLiteral("stopReason")))
         emit promptDone();
 }
 
+void AcpClient::handlePermissionRequest(qint64 id, const QJsonObject &params)
+{
+    m_permissionRequests++;
+    QVariantMap p;
+    p.insert(QStringLiteral("id"), id);
+    const QJsonObject tc = params.value(QStringLiteral("toolCall")).toObject();
+    p.insert(QStringLiteral("kind"), tc.value(QStringLiteral("kind")).toString());
+    p.insert(QStringLiteral("title"), tc.value(QStringLiteral("title")).toString());
+    const QJsonObject raw = tc.value(QStringLiteral("rawInput")).toObject();
+    QString cmd = raw.value(QStringLiteral("command")).toString();
+    if (cmd.isEmpty())
+        cmd = raw.value(QStringLiteral("path")).toString();
+    p.insert(QStringLiteral("kommando"), cmd);
+    QVariantList opts;
+    foreach (const QJsonValue &v, params.value(QStringLiteral("options")).toArray()) {
+        QVariantMap o;
+        o.insert(QStringLiteral("optionId"), v.toObject().value(QStringLiteral("optionId")).toString());
+        o.insert(QStringLiteral("name"), v.toObject().value(QStringLiteral("name")).toString());
+        opts.append(o);
+    }
+    p.insert(QStringLiteral("options"), opts);
+    m_pendingPermission = p;
+    emit pendingPermissionChanged();
+    if (m_selvtest)
+        answerPermission(opts.isEmpty() ? QStringLiteral("allow")
+                                       : opts.first().toMap().value(QStringLiteral("optionId")).toString());
+}
+
+void AcpClient::answerPermission(const QString &optionId)
+{
+    if (m_pendingPermission.isEmpty())
+        return;
+    const qint64 id = m_pendingPermission.value(QStringLiteral("id")).toLongLong();
+    QJsonObject outcome;
+    outcome.insert(QStringLiteral("outcome"), QStringLiteral("selected"));
+    outcome.insert(QStringLiteral("optionId"), optionId);
+    QJsonObject result;
+    result.insert(QStringLiteral("outcome"), outcome);
+    sendResult(id, result);
+    m_pendingPermission.clear();
+    emit pendingPermissionChanged();
+}
+
+void AcpClient::dismissPermission()
+{
+    if (m_pendingPermission.isEmpty())
+        return;
+    const qint64 id = m_pendingPermission.value(QStringLiteral("id")).toLongLong();
+    QJsonObject outcome;
+    outcome.insert(QStringLiteral("outcome"), QStringLiteral("cancelled"));
+    QJsonObject result;
+    result.insert(QStringLiteral("outcome"), outcome);
+    sendResult(id, result);
+    m_pendingPermission.clear();
+    emit pendingPermissionChanged();
+}
+
+void AcpClient::stopAgent()
+{
+    QJsonObject params;
+    if (!m_sessionId.isEmpty())
+        params.insert(QStringLiteral("sessionId"), m_sessionId);
+    sendNotification(QStringLiteral("session/cancel"), params);
+    dismissPermission();
+}
+
+qint64 AcpClient::sendSetConfigOption(const QString &configId, const QVariant &value)
+{
+    QJsonObject params;
+    params.insert(QStringLiteral("sessionId"), m_sessionId);
+    params.insert(QStringLiteral("configId"), configId);
+    params.insert(QStringLiteral("value"), QJsonValue::fromVariant(value));
+    return sendRequest(QStringLiteral("session/set_config_option"), params);
+}
+
+void AcpClient::sendResult(qint64 id, const QJsonObject &result)
+{
+    QJsonObject resp;
+    resp.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+    resp.insert(QStringLiteral("id"), id);
+    resp.insert(QStringLiteral("result"), result);
+    writeFrame(resp);
+}
+
+void AcpClient::sendNotification(const QString &method, const QJsonObject &params)
+{
+    QJsonObject note;
+    note.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+    note.insert(QStringLiteral("method"), method);
+    if (!params.isEmpty())
+        note.insert(QStringLiteral("params"), params);
+    writeFrame(note);
+}
+
 void AcpClient::finishSelvtest()
 {
-    const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0;
-    qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls;
+    const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0 && m_permissionRequests > 0;
+    qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls
+             << " permission_requests=" << m_permissionRequests;
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
     if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         f.write("tool_calls=" + QByteArray::number(m_toolCalls.count()) + "\n");
         f.write("ui_tool_calls=" + QByteArray::number(m_uiToolCalls) + "\n");
+        f.write("permission_requests=" + QByteArray::number(m_permissionRequests) + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();

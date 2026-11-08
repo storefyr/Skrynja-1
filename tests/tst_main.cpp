@@ -83,11 +83,6 @@ private slots:
     void tilladelse_stop_raekkefoelge();
 };
 
-static QByteArray permissionRequestLine()
-{
-    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}},\"options\":[{\"optionId\":\"allow\",\"name\":\"Tillad\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
-}
-
 void TestTilladelser::tilladelse_anmodning()
 {
     AcpClient acp;
@@ -174,6 +169,11 @@ static QByteArray endTurnLine()
     return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":99,\"result\":{\"stopReason\":\"end_turn\"}}\n");
 }
 
+static QByteArray permissionRequestLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}},\"options\":[{\"optionId\":\"allow\",\"name\":\"Tillad\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
+}
+
 static QString readVerdict()
 {
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
@@ -189,10 +189,11 @@ void TestVaerktoejskald::selvtest_verdict()
     QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
     QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
     acp.uiToolCallsSeen(1);
-    acp.feedBytesForTest(toolCallLine() + endTurnLine());
+    acp.feedBytesForTest(permissionRequestLine() + toolCallLine() + endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
+    QVERIFY(v.contains(QStringLiteral("permission_requests=1")));
     QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
 }
 

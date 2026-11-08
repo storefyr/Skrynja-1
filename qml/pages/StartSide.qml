@@ -84,4 +84,69 @@ Page {
             }
         }
     }
+
+    Dialog {
+        id: permDialog
+        canAccept: false
+
+        Column {
+            width: parent.width
+            spacing: Theme.paddingMedium
+
+            DialogHeader {
+                title: "Tilladelse anmodet"
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                text: (acp.pendingPermission.kind || "") + ": " + (acp.pendingPermission.title || "")
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                color: Theme.secondaryColor
+                text: acp.pendingPermission.kommando || ""
+            }
+
+            Repeater {
+                model: acp.pendingPermission.options || []
+
+                Button {
+                    text: modelData.name
+                    onClicked: {
+                        acp.answerPermission(modelData.optionId)
+                        permDialog.reject()
+                    }
+                }
+            }
+
+            Button {
+                text: "Afvis"
+                onClicked: {
+                    acp.dismissPermission()
+                    permDialog.reject()
+                }
+            }
+
+            Button {
+                text: "Stop"
+                onClicked: {
+                    acp.stopAgent()
+                    permDialog.reject()
+                }
+            }
+        }
+    }
+
+    Connections {
+        target: acp
+        onPendingPermissionChanged: {
+            if (acp.hasPendingPermission)
+                permDialog.open()
+        }
+    }
 }

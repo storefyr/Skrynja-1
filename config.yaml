@@ -73,7 +73,7 @@ teknisk_stack:
 selvtest:
   tilstand: appen kører med --selvtest og sender selv probe-prompten (kør id -un i terminalen), venter på end_turn
   verdict_fil: /tmp/skrynja-1-selvtest.txt med tool_calls, ui_tool_calls, last_text, VERDICT og exit-kode
-  pass_kriterier: tool_calls større end 0 og ui_tool_calls større end 0 (ui sættes af QML via acp.uiToolCallsSeen)
+  pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen) og permission_requests større end 0 (selvtest sætter mode ask først)
   kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
 
 lokal_opsaetning:
