@@ -22,7 +22,7 @@ dokumentations_standard:
     github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
     ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
     ikke_i_config: Voksende log (samtaler, kørsler) hører i projektlogbog.yaml; samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
-    projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); id'er er kun henvisninger, ikke viden — væsentligt indhold hører i denne fil (se ny_viden)
+    projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden — væsentligt indhold hører i denne fil (se ny_viden)
 
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
