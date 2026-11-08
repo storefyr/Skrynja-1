@@ -96,7 +96,7 @@ void AcpFrameReader::parseAndDeliver(const QByteArray &line, bool fromTail)
                 emit lineDiscarded(QStringLiteral("top level is not an object"));
             break;
         }
-        if (err.error != QJsonParseError::ExtraData) {
+        if (err.error != QJsonParseError::GarbageAtEnd) {
             emit lineDiscarded(err.errorString());
             return;
         }
