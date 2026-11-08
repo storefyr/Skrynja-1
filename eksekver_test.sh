@@ -22,6 +22,12 @@ echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
 devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
 
-echo "--- app log (/tmp/skrynja-1-app.log) ---"
-cat /tmp/skrynja-1-app.log 2>/dev/null || echo "(no log yet)"
+LOG=/tmp/skrynja-1-app.log
+echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
+if [ -f "$LOG" ]; then
+    grep -E 'tool_call|[Ee]rror|[Ff]ejl' "$LOG" | tail -30 || true
+    echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer) ---"
+else
+    echo "(ingen log endnu)"
+fi
 echo "Installed. Start Skrynja-1 from the app grid."
