@@ -1,7 +1,9 @@
 #include <QtTest>
 #include <QFile>
 #include <QJsonObject>
+#include <QVariantMap>
 #include "acpframereader.h"
+#include "acpclient.h"
 
 class Collector : public QObject
 {
@@ -51,6 +53,34 @@ private slots:
     void rygrad_split();
     void rygrad_cap();
 };
+
+class TestVaerktoejskald : public QObject
+{
+    Q_OBJECT
+private slots:
+    void vaerktoejskald_felter();
+    void vaerktoejskald_tekstchunk();
+};
+
+void TestVaerktoejskald::vaerktoejskald_felter()
+{
+    AcpClient acp;
+    QByteArray line = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"call_0001\",\"title\":\"id -un\",\"kind\":\"shell\",\"status\":\"in_progress\",\"rawInput\":{\"command\":\"id -un\"}}}}}\n");
+    acp.feedBytesForTest(line);
+    QCOMPARE(acp.toolCalls().count(), 1);
+    QVariantMap tc = acp.toolCalls().first().toMap();
+    QCOMPARE(tc.value(QStringLiteral("kind")).toString(), QStringLiteral("shell"));
+    QCOMPARE(tc.value(QStringLiteral("title")).toString(), QStringLiteral("id -un"));
+    QCOMPARE(tc.value(QStringLiteral("detalje")).toString(), QStringLiteral("id -un"));
+}
+
+void TestVaerktoejskald::vaerktoejskald_tekstchunk()
+{
+    AcpClient acp;
+    QByteArray line = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"agent_message_chunk\",\"content\":{\"type\":\"text\",\"text\":\"Hej\"}}}}\n");
+    acp.feedBytesForTest(line);
+    QCOMPARE(acp.lastText(), QStringLiteral("Hej"));
+}
 
 void TestRygradParser::rygrad_fixture_hoved()
 {
@@ -154,5 +184,20 @@ void TestRygradParser::rygrad_cap()
     QCOMPARE(msgId(c.messages.first()), 41LL);
 }
 
-QTEST_APPLESS_MAIN(TestRygradParser)
+int main(int argc, char *argv[])
+{
+    QCoreApplication app(argc, argv);
+    int status = 0;
+    {
+        TestRygradParser t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    {
+        TestVaerktoejskald t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    return status;
+}
+
 #include "tst_main.moc"
+

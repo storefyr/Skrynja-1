@@ -8,6 +8,8 @@ CONFIG -= app_bundle
 INCLUDEPATH += ../src
 
 SOURCES += tst_main.cpp \
-    ../src/acpframereader.cpp
+    ../src/acpframereader.cpp \
+    ../src/acpclient.cpp
 
-HEADERS += ../src/acpframereader.h
+HEADERS += ../src/acpframereader.h \
+    ../src/acpclient.h
