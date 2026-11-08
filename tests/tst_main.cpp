@@ -65,7 +65,7 @@ private slots:
 void TestVaerktoejskald::vaerktoejskald_felter()
 {
     AcpClient acp;
-    QByteArray line = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"call_0001\",\"title\":\"id -un\",\"kind\":\"shell\",\"status\":\"in_progress\",\"rawInput\":{\"command\":\"id -un\"}}}}}\n");
+    QByteArray line = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"call_0001\",\"title\":\"id -un\",\"kind\":\"shell\",\"status\":\"in_progress\",\"rawInput\":{\"command\":\"id -un\"}}}}\n");
     acp.feedBytesForTest(line);
     QCOMPARE(acp.toolCalls().count(), 1);
     QVariantMap tc = acp.toolCalls().first().toMap();
