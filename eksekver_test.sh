@@ -1,6 +1,6 @@
 #!/bin/sh
 # Runs on the Jolla Phone 2026 itself (the only device).
-# Usage: sh run_test.sh
+# Usage: sh eksekver_test.sh
 # Downloads the newest test RPM (branch test-rpm, plain curl) and installs it.
 # Requires: curl, devel-su (preinstalled on Sailfish OS)
 set -e

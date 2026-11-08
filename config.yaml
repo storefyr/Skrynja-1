@@ -9,7 +9,7 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
-    id'er: kategori_navn (snake_case), aldrig enkelt bogstav eller tal; dansk ortografi (æøå) i dokumenter, engelsk i kode
+    id'er: kategori_navn (snake_case), også filnavne; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk
     sprog: dokumentation og commits dansk; kode og kommentarer engelsk
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
@@ -72,7 +72,7 @@ teknisk_stack:
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
-  testkørsel: run_test.sh kører på telefonen selv — henter skrynja-1-test.aarch64.rpm fra grenen test-rpm (anonym curl, fast URL) og installerer med pkcon; app-log vises fra /tmp
+  testkørsel: eksekver_test.sh kører på telefonen selv — henter skrynja-1-test.aarch64.rpm fra grenen test-rpm (anonym curl, fast URL) og installerer med pkcon; app-log vises fra /tmp
   forbudt: ingen fjern-pipes
 
 sufflør_protokol:
@@ -95,7 +95,7 @@ anti_mønstre:
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
-  verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; testkørsler på enheden selv via run_test.sh (test-rpm-gren, anonym curl, log fra /tmp)
+  verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; testkørsler på enheden selv via eksekver_test.sh (test-rpm-gren, anonym curl, log fra /tmp)
   succes_kriterium: CI grønt og prompt-tur målt på enheden — svar vist, app afslutter med exit-kode 0
 
 vejkort:
