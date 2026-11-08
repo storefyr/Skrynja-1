@@ -36,7 +36,7 @@ regler:
 
 
 inventar:
-  rod: [.gitignore, LICENSE, README.md, config.yaml, eksekver_test.sh, harbour-skrynja-1.desktop, harbour-skrynja-1.pro, harbour-skrynja-1.yaml, opslag.sh, projektlogbog.yaml]
+  rod: [.gitignore, LICENSE, README.md, config.yaml, eksekver_test.sh, tjek_config_synkronitet.sh, harbour-skrynja-1.desktop, harbour-skrynja-1.pro, harbour-skrynja-1.yaml, opslag.sh, projektlogbog.yaml]
   arbejdsgange: [.github/workflows/pr_byg.yml]
   ikoner: [icons/108x108/harbour-skrynja-1.png, icons/128x128/harbour-skrynja-1.png, icons/172x172/harbour-skrynja-1.png, icons/86x86/harbour-skrynja-1.png]
   qml: [qml/harbour-skrynja-1.qml, qml/pages/StartSide.qml]

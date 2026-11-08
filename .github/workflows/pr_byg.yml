@@ -74,3 +74,18 @@ jobs:
           git push --force origin test-rpm
           echo "Publiceret revision ${{ github.sha }} på test-rpm"
           echo "Publiceret: raw.githubusercontent.com/storefyr/Skrynja-1/test-rpm/skrynja-1-test.aarch64.rpm"
+
+  tjek_config:
+    name: Tjek config-synkronitet
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      - name: Tjek inventar (alle filer i træet nævnt i config.yaml)
+        run: ./tjek_config_synkronitet.sh
+      - name: Tjek synkronitet ved PR (src/qml skal også røre config.yaml)
+        if: github.event_name == 'pull_request'
+        run: ./tjek_config_synkronitet.sh "${{ github.event.pull_request.base.sha }}"
