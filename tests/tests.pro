@@ -5,4 +5,9 @@ QT += core testlib
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
-SOURCES += tst_main.cpp
+INCLUDEPATH += ../src
+
+SOURCES += tst_main.cpp \
+    ../src/acpframereader.cpp
+
+HEADERS += ../src/acpframereader.h
