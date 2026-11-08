@@ -8,6 +8,8 @@
 static QByteArray toolCallLine();
 static QByteArray endTurnLine();
 static QByteArray permissionRequestLine();
+static QByteArray diffToolCallLine();
+static QByteArray outputUpdateLine();
 static QString readVerdict();
 
 class Collector : public QObject
