@@ -4,6 +4,13 @@ import Sailfish.Silica 1.0
 Page {
     id: startSide
 
+    function sendPrompt() {
+        if (promptField.text.length > 0 && acp.sessionId.length > 0) {
+            acp.sendPrompt(promptField.text)
+            promptField.text = ""
+        }
+    }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
@@ -31,17 +38,14 @@ Page {
                 label: "Prompt"
                 placeholderText: "Skriv en prompt…"
                 EnterKey.enabled: text.length > 0
-                EnterKey.onClicked: sendButton.clicked()
+                EnterKey.onClicked: startSide.sendPrompt()
             }
 
             Button {
                 id: sendButton
                 text: "Send"
                 enabled: promptField.text.length > 0 && acp.sessionId.length > 0
-                onClicked: {
-                    acp.sendPrompt(promptField.text)
-                    promptField.text = ""
-                }
+                onClicked: startSide.sendPrompt()
             }
 
             Label {
