@@ -107,3 +107,7 @@ vejkort:
   skive_konfiguration: accept — configOptions vises og kan ændres
   skive_genoptagelse: accept — samtale vises korrekt efter genstart
   skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner
+
+fremdrift:
+  skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
+  skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
