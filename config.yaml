@@ -69,6 +69,12 @@ teknisk_stack:
     ortografi: Dansk ortografi
     licens: GPL-3.0
 
+selvtest:
+  tilstand: appen kører med --selvtest og sender selv probe-prompten (kør id -un i terminalen), venter på end_turn
+  verdict_fil: /tmp/skrynja-1-selvtest.txt med tool_calls, ui_tool_calls, last_text, VERDICT og exit-kode
+  pass_kriterier: tool_calls større end 0 og ui_tool_calls større end 0 (ui sættes af QML via acp.uiToolCallsSeen)
+  kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
+
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
@@ -112,6 +118,14 @@ anti_mønstre:
       metode: selvtest læste uiToolCalls på view->rootObject() (vinduet) i stedet for Page
       resultat: ui_tool_calls=-1 og VERDICT=FAIL selvom UI viste kaldet (selvtest på enhed 2026-11-08)
       lektie: læs samme objekt som QML viser — findChild på side-id, ikke rootObject
+    - id: metodefejl_07
+      metode: rootObject() brugt uden #include <QQuickItem>
+      resultat: RPM-byg fejlede med invalid use of incomplete type (kørsel 42495526218)
+      lektie: rootObject() returnerer QQuickItem*, som skal includes før brug
+    - id: metodefejl_08
+      metode: C++ læste QML-state via property-opslag og parent-kæde (Item.parent stopper før vinduet; QML-id'er er fil-scopede)
+      resultat: ui_tool_calls målte -1 så 0 og selvtest FAIL, selvom UI viste kaldet (målt på enhed 2026-11-08, revision 849c36b og 81d9955)
+      lektie: QML kalder selv tilbage til C++ via Q_INVOKABLE (acp.uiToolCallsSeen) — mål dér, ikke i QML-træet
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
@@ -123,6 +137,7 @@ målt_på_wire:
   session_new_svar: sessionId som UUID, currentModeId accept-edits, configOptions med mode/model/thinking, modes ask/accept-edits/smart-approve/auto-approve
   update_typer: session/update med agent_message_chunk, agent_thought_chunk, user_message_chunk, usage_update, available_commands_update, tool_call — klienten viser pt. kun agent_message_chunk og tool_call
   prompt_svar: svar med result stopReason end_turn og usage
+  request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
