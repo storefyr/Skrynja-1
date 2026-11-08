@@ -21,6 +21,7 @@ dokumentations_standard:
     config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver
     github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
     ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
+    journal: Samtaler og kørsler logges i journal.yaml med id (kategori_navn) — denne fil bærer regler og aktuel tilstand, ikke en voksende log
 
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
@@ -170,5 +171,3 @@ fremdrift:
   skive_værktøjskald: bestået 2026-11-08 — selvtest PASS på enheden, revision 7a3f52e (tool_calls=1, ui_tool_calls=1, exit 0); CI 42498254260 grøn, 15/15 prøver
   skive_tilladelser: bestået 2026-11-08 — selvtest PASS på enheden, revision 2a9e328 (mode=ask via set_config_option, permission_requests=1, tool_calls=1, ui_tool_calls=1, exit 0); stop-rækkefølge (session/cancel før cancelled) unit-testet; CI 42500337915 grøn, 21/21 prøver
 
-samtaler:
-  samtale_skrynja1_2026-11-08: Skrynja-1 grundlagt i denne samtale — formål, regler, vejkort, selvtest; fire skiver bestået (se fremdrift), metodefejl_01-09 og wire-fakta registreret; teknisk reference — første besked-id eed19c0c-c10b-4c15-9895-6964e0ad67d9 (omdøbning af selve dialogen sker i klientens UI på telefonen)

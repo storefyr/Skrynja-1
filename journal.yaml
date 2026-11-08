@@ -1,0 +1,6 @@
+# Journal for Skrynja-1 — samtaler og kørsler logges her med id (kategori_navn).
+# config.yaml bærer regler og aktuel tilstand, ikke voksende log.
+samtaler:
+  samtale_skrynja1_2026-11-08:
+    besked_id: eed19c0c-c10b-4c15-9895-6964e0ad67d9
+    resume: Skrynja-1 grundlagt — formål, regler, vejkort, selvtest; fire skiver bestået (se config.yaml fremdrift); omdøbning af dialogen sker i klientens UI
