@@ -68,7 +68,9 @@ jobs:
           git config user.name "pr_byg CI"
           git checkout -B test-rpm
           cp "$RPM_FILE" skrynja-1-test.aarch64.rpm
-          git add skrynja-1-test.aarch64.rpm
+          echo "${{ github.sha }}" > revision.txt
+          git add skrynja-1-test.aarch64.rpm revision.txt
           git commit -m "testkørsel ${{ github.sha }}"
           git push --force origin test-rpm
+          echo "Publiceret revision ${{ github.sha }} på test-rpm"
           echo "Publiceret: raw.githubusercontent.com/storefyr/Skrynja-1/test-rpm/skrynja-1-test.aarch64.rpm"

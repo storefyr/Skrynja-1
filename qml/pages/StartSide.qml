@@ -4,7 +4,10 @@ import Sailfish.Silica 1.0
 Page {
     id: startSide
 
-    property int uiToolCalls: toolRepeater.count
+    Connections {
+        target: acp
+        onToolCallsChanged: appWindow.uiToolCalls = acp.toolCalls.length
+    }
 
     function sendPrompt() {
         if (promptField.text.length > 0 && acp.sessionId.length > 0) {

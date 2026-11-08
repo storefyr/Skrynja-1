@@ -49,8 +49,7 @@ int main(int argc, char *argv[])
     if (selvtest) {
         QObject::connect(&acp, &AcpClient::promptDone, &acp, [view, &acp]() {
             QTimer::singleShot(800, &acp, [view, &acp]() {
-                QObject *page = view->rootObject()->findChild<QObject *>(QStringLiteral("startSide"));
-                const QVariant ui = page ? page->property("uiToolCalls") : QVariant();
+                const QVariant ui = view->rootObject()->property("uiToolCalls");
                 acp.finishSelvtest(ui.isValid() ? ui.toInt() : -1);
             });
         });

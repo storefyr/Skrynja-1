@@ -23,6 +23,14 @@ if ! curl -sSL --connect-timeout 10 -m 120 -o skrynja-1-test.aarch64.rpm "$URL";
 fi
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
+REV=""
+if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
+        "https://raw.githubusercontent.com/${REPO}/test-rpm/revision.txt" \
+        && [ -s "$TMP/revision.txt" ]; then
+    REV=$(cat "$TMP/revision.txt")
+fi
+echo "Testet revision: ${REV:-ukendt}"
+
 devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
 
 echo "Kører selvtest (appen åbner kort) ..."
@@ -48,6 +56,7 @@ else
 fi
 
 echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
+echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
     cat "$VERDICT"
     if grep -q 'VERDICT=PASS' "$VERDICT"; then
