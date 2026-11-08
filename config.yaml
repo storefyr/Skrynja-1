@@ -84,6 +84,7 @@ sufflør_protokol:
     format: Teknik fremfor narrativ
     filter: Ingen høflighedsfraser
     prioritet: Operationel løsning > Teoretisk perfektion
+    kommandoer: Blank linje før hver kommando-blok i svaret, så den er nem at kopiere (sufflør 2026-11-08)
 
 anti_mønstre:
   metodiske_fejl:
