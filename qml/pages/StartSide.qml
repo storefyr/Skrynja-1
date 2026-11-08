@@ -2,6 +2,8 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
+    id: startSide
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: column.height
@@ -19,7 +21,34 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WordWrap
-                text: "ACP-klient til lokal vibe-acp. Byg-skelet; første rigtige skive er rygraden."
+                color: Theme.secondaryColor
+                text: acp.sessionId.length > 0 ? "Session: " + acp.sessionId : "Starter agent…"
+            }
+
+            TextField {
+                id: promptField
+                width: parent.width
+                label: "Prompt"
+                placeholderText: "Skriv en prompt…"
+                EnterKey.enabled: text.length > 0
+                EnterKey.onClicked: sendButton.clicked()
+            }
+
+            Button {
+                id: sendButton
+                text: "Send"
+                enabled: promptField.text.length > 0 && acp.sessionId.length > 0
+                onClicked: {
+                    acp.sendPrompt(promptField.text)
+                    promptField.text = ""
+                }
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                text: acp.lastText
             }
         }
     }
