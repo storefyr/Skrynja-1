@@ -5,6 +5,11 @@
 #include "acpframereader.h"
 #include "acpclient.h"
 
+static QByteArray toolCallLine();
+static QByteArray endTurnLine();
+static QByteArray permissionRequestLine();
+static QString readVerdict();
+
 class Collector : public QObject
 {
     Q_OBJECT
