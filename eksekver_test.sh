@@ -9,13 +9,13 @@ REPO="storefyr/Skrynja-1"
 URL="https://raw.githubusercontent.com/${REPO}/test-rpm/skrynja-1-test.aarch64.rpm"
 TMP="/tmp/skrynja-1-test"
 
+echo "Henter ${URL} ..."
 rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
 
-if ! curl -sfL -o skrynja-1-test.aarch64.rpm "$URL"; then
-    echo "ERROR: could not download $URL" >&2
-    echo "Has the pr_byg workflow finished and pushed branch test-rpm?" >&2
+if ! curl -sSL --connect-timeout 10 -m 120 -o skrynja-1-test.aarch64.rpm "$URL"; then
+    echo "ERROR: download failed: $URL" >&2
     exit 1
 fi
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
