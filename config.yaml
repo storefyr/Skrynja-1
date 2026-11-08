@@ -127,6 +127,10 @@ anti_mønstre:
       metode: C++ læste QML-state via property-opslag og parent-kæde (Item.parent stopper før vinduet; QML-id'er er fil-scopede)
       resultat: ui_tool_calls målte -1 så 0 og selvtest FAIL, selvom UI viste kaldet (målt på enhed 2026-11-08, revision 849c36b og 81d9955)
       lektie: QML kalder selv tilbage til C++ via Q_INVOKABLE (acp.uiToolCallsSeen) — mål dér, ikke i QML-træet
+    - id: metodefejl_09
+      metode: Qt foreach-makroen brugt i app-kode
+      resultat: byg fejlede med lambda-expression in unevaluated context i Sailfish SDK (kørsel 42499995419)
+      lektie: brug almindelig for-løkke over QJsonArray i app-koden på denne platform
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
