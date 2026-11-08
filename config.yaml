@@ -108,6 +108,10 @@ anti_mønstre:
       metode: SDK-release valgt efter enhedens OS-version (5.2.0.20)
       resultat: docker-image 5.2.0.20-aarch64 findes ikke, manifest unknown (kørsel 42415397767)
       lektie: byg efter et SDK-image der faktisk findes i registret (4.5.0.18); enhedens OS er noget andet
+    - id: mf_06
+      metode: selvtest læste uiToolCalls på view->rootObject() (vinduet) i stedet for Page
+      resultat: ui_tool_calls=-1 og VERDICT=FAIL selvom UI viste kaldet (selvtest på enhed 2026-11-08)
+      lektie: læs samme objekt som QML viser — findChild på side-id, ikke rootObject
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
