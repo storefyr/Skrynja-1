@@ -1,6 +1,7 @@
 #include <sailfishapp.h>
 #include <QGuiApplication>
 #include <QQuickView>
+#include <QQuickItem>
 #include <QQmlContext>
 #include <QFile>
 #include <QDateTime>
