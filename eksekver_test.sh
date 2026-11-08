@@ -39,13 +39,22 @@ while [ $i -lt 90 ]; do
 done
 kill $APP_PID 2>/dev/null || true
 
-echo "--- selvtest-verdict ---"
-cat "$VERDICT" 2>/dev/null || echo "FEJL: intet verdict efter 180s"
-
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
     grep -E 'tool_call|[Ee]rror|[Ff]ejl' "$LOG" | tail -30 || true
     echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer) ---"
 else
     echo "(ingen log endnu)"
+fi
+
+echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
+if [ -f "$VERDICT" ]; then
+    cat "$VERDICT"
+    if grep -q 'VERDICT=PASS' "$VERDICT"; then
+        exit 0
+    fi
+    exit 1
+else
+    echo "FEJL: intet verdict efter 180s"
+    exit 1
 fi
