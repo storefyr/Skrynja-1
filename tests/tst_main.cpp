@@ -107,7 +107,8 @@ void TestVaerktoejskald::selvtest_verdict()
     AcpClient acp;
     acp.setSelvtest(true);
     QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
-    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(1); });
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
+    acp.uiToolCallsSeen(1);
     acp.feedBytesForTest(toolCallLine() + endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
@@ -120,7 +121,8 @@ void TestVaerktoejskald::selvtest_fail_uden_toolcall()
     AcpClient acp;
     acp.setSelvtest(true);
     QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
-    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(0); });
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
+    acp.uiToolCallsSeen(0);
     acp.feedBytesForTest(endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=0")));
