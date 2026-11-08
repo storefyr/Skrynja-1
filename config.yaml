@@ -9,7 +9,7 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
-    id'er: kategori_navn (snake_case), også filnavne; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser; entydige inden for kategorien — samme navn to steder er en fejl
+    id'er: kategori_navn (snake_case), også filnavne og egne nøgler; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser — undtaget produktnavne og veletablerede tekniske begreber (Qt, QML, Sailfish, GitHub, OS, SDK) samt eksisterende fil- og mappenavne (src, qml, rpm, .pro); entydige inden for kategorien — samme navn to steder er en fejl
     sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth)
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
@@ -27,12 +27,22 @@ dokumentations_standard:
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
   qml: QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript er ES5
-  arch: Kun aarch64
+  arkitektur: Kun aarch64
   prøver: Prøve committes før kilden; prøvenavn bærer id (kategori_navn)
-  ui: Dansk uden qsTr; ingen sprogfiler
+  brugerflade: Dansk uden qsTr; ingen sprogfiler
   kapabiliteter: Tom clientCapabilities indtil SailJail er målt
   sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første commit — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
   filer: Nye kildefiler registreres i .pro; nye QML-filer til install
+
+
+inventar:
+  rod: [.gitignore, LICENSE, README.md, config.yaml, eksekver_test.sh, harbour-skrynja-1.desktop, harbour-skrynja-1.pro, harbour-skrynja-1.yaml, opslag.sh, projektlogbog.yaml]
+  arbejdsgange: [.github/workflows/pr_byg.yml]
+  ikoner: [icons/108x108/harbour-skrynja-1.png, icons/128x128/harbour-skrynja-1.png, icons/172x172/harbour-skrynja-1.png, icons/86x86/harbour-skrynja-1.png]
+  qml: [qml/harbour-skrynja-1.qml, qml/pages/StartSide.qml]
+  rpm: [rpm/harbour-skrynja-1.spec]
+  src: [src/acpclient.cpp, src/acpclient.h, src/acpframereader.cpp, src/acpframereader.h, src/main.cpp]
+  tests: [tests/fixtures/fixture_rygrad.ndjson, tests/fixtures/fixture_rygrad_sammenklæbning.ndjson, tests/fixtures/fixture_rygrad_ugyldig.ndjson, tests/fixtures/fixture_rygrad_utf8_ugyldig.ndjson, tests/tests.pro, tests/tst_main.cpp]
 
 projekt_ordbog:
   sufflør: Det menneskelige led, der guider og korrigerer maskinelle stokastikere via præcise instruktioner.
@@ -55,11 +65,11 @@ teknisk_stack:
   hardware:
     enhed: Jolla Phone 2026 — eneste enhed (sufflør 2026-11-07)
     os: Sailfish OS 5.2.0.20 (Finlayson)
-    arch: aarch64
+    arkitektur: aarch64
     kernel: 6.12.38-4k
   maskiner:
     eneste_enhed: Jolla Phone 2026 — al projektfremdrift, agent-kørsel og stokastiker-dialogen foregår på denne ene enhed (sufflør 2026-11-07); mistral_vibe 3.0.2 + agent_client_protocol 0.11.0; vibe-acp via uv (~/.local/bin/vibe-acp); ingen separat målmaskine eller udviklermaskine
-    ci: GitHub Actions ubuntu-runners; Sailfish SDK-image 4.5.0.18-aarch64 — grøn i kørsel 42415519785
+    arbejdsgange: GitHub Actions ubuntu-runners; Sailfish SDK-image 4.5.0.18-aarch64 — grøn i kørsel 42415519785
   integration:
     kerne_model: Mistral Vibe
     protokol: vibe-acp_ndjson_stdin_stdout
@@ -84,6 +94,7 @@ lokal_opsaetning:
   klient_fremtid: Når Skrynja-1 overtager som klient, logges hver session automatisk i projektlogbogen ved session/new (sessionId + navn) — koblingen bliver stærk og automatisk, ikke manuel
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
   testkørsel: eksekver_test.sh kører på telefonen selv — henter og installerer seneste RPM fra test-rpm (anonym curl, fast URL) sammen med revision.txt (hvilken commit der blev testet), kører derefter automatisk appen med --selvtest (probe-prompt, verdict i /tmp/skrynja-1-selvtest.txt) og viser filtrerede loglinjer fra /tmp; ingen manuel start eller prompt nødvendig
+  ordbog_opslag: sh opslag.sh [ord] — henter config.yaml fra main og slår op i projekt_ordbogen (uden ord skrives hele ordbogen ud)
   forbudt: ingen fjern-pipes
 
 sufflør_protokol:
@@ -152,6 +163,8 @@ målt_på_wire:
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
   åbent_punkt_02: løst 2026-11-08 — selvtest PASS på revision 7a3f52e med tool_calls=1 og ui_tool_calls=1 (QML-callback uiToolCallsSeen målte, at UI-bindingen kørte)
+  åbent_punkt_03: selvtest tjekkede kun antal, ikke korrekthed — lukkes ved at selvtesten også læser probe-filen /tmp/skrynja-1-probe.txt og kræver indholdet OK (probe_fil=OK i verdict)
+  åbent_punkt_04: beviser uden for repoet forældes (app-log og verdict i /tmp på enheden, Actions-logs udløber) — kun kørsels-id og revision i git består; accepteret begrænsning
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -166,7 +179,7 @@ vejkort:
   skive_diff: accept — filændring som diff; kommando viser uddata
   skive_konfiguration: accept — configOptions vises og kan ændres
   skive_genoptagelse: accept — samtale vises korrekt efter genstart
-  skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner
+  skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar)
 
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
