@@ -61,6 +61,7 @@ private slots:
     void vaerktoejskald_felter();
     void vaerktoejskald_tekstchunk();
     void selvtest_verdict();
+    void selvtest_fail_uden_toolcall();
 };
 
 void TestVaerktoejskald::vaerktoejskald_felter()
@@ -83,19 +84,48 @@ void TestVaerktoejskald::vaerktoejskald_tekstchunk()
     QCOMPARE(acp.lastText(), QStringLiteral("Hej"));
 }
 
+static QByteArray toolCallLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"c1\",\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}}}}\n");
+}
+
+static QByteArray endTurnLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":99,\"result\":{\"stopReason\":\"end_turn\"}}\n");
+}
+
+static QString readVerdict()
+{
+    QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        return QString();
+    return QString::fromUtf8(f.readAll());
+}
+
 void TestVaerktoejskald::selvtest_verdict()
 {
     AcpClient acp;
     acp.setSelvtest(true);
     QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
-    QByteArray tool = QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s1\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"c1\",\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}}}}\n");
-    QByteArray done = QByteArray("{\"jsonrpc\":\"2.0\",\"id\":99,\"result\":{\"stopReason\":\"end_turn\"}}\n");
-    acp.feedBytesForTest(tool + done);
-    QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
-    QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
-    const QString v = QString::fromUtf8(f.readAll());
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(1); });
+    acp.feedBytesForTest(toolCallLine() + endTurnLine());
+    const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
+    QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
+}
+
+void TestVaerktoejskald::selvtest_fail_uden_toolcall()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(0); });
+    acp.feedBytesForTest(endTurnLine());
+    const QString v = readVerdict();
+    QVERIFY(v.contains(QStringLiteral("tool_calls=0")));
+    QVERIFY(v.contains(QStringLiteral("ui_tool_calls=0")));
+    QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
 }
 
 void TestRygradParser::rygrad_fixture_hoved()
