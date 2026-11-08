@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 env:
   SAILFISH_RELEASE: '4.5.0.18'
 
@@ -16,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Installer Qt5
         run: |
           sudo apt-get update
@@ -35,6 +40,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Byg RPM
         uses: R1tschY/sailfish-build-rpm@v1
         with:
@@ -53,3 +60,15 @@ jobs:
         with:
           name: rpm-aarch64
           path: RPMS/*.rpm
+      - name: Publicer RPM på test-rpm-grenen
+        run: |
+          set -e
+          RPM_FILE=$(ls RPMS/harbour-skrynja-1-*.rpm | head -1)
+          git config user.email "ci@skrynja-1.local"
+          git config user.name "pr_byg CI"
+          git checkout -B test-rpm
+          cp "$RPM_FILE" skrynja-1-test.aarch64.rpm
+          git add skrynja-1-test.aarch64.rpm
+          git commit -m "testkørsel ${{ github.sha }}"
+          git push --force origin test-rpm
+          echo "Publiceret: raw.githubusercontent.com/storefyr/Skrynja-1/test-rpm/skrynja-1-test.aarch64.rpm"
