@@ -10,7 +10,7 @@ dokumentations_standard:
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
     id'er: kategori_navn (snake_case), også filnavne; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser
-    sprog: dokumentation og commits dansk; kode og kommentarer engelsk
+    sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines)
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
     støjreduktion: Maksimal
@@ -84,7 +84,7 @@ sufflør_protokol:
     format: Teknik fremfor narrativ
     filter: Ingen høflighedsfraser
     prioritet: Operationel løsning > Teoretisk perfektion
-    kommandoer: Blank linje før hver kommando-blok i svaret, så den er nem at kopiere (sufflør 2026-11-08)
+    kommandoer: Blanke linjer før hver kommando-blok i svaret, så de er nemme at kopiere (sufflør 2026-11-08)
 
 anti_mønstre:
   metodiske_fejl:
