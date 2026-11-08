@@ -120,7 +120,8 @@ målt_på_wire:
   prompt_svar: svar med result stopReason end_turn og usage
 
 åbne_punkter:
-  ap_01: skive_værktøjskald — agenten kørte shell id -un på enheden (svar kom tilbage), men kaldet vises ikke i UI; wire-log skal tjekkes for tool_call-frame før der rettes
+  ap_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
+  ap_02: skive_værktøjskald UI — klienten har toolCalls, men listen skal bekræftes visuelt i QML ved næste eksekver_test.sh; hvis tom, rettes bindingen
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -140,4 +141,4 @@ vejkort:
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
   skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
-  skive_værktøjskald: i gang — 13/13 prøver grønne i CI 42490502470/42490902511/42491841691; enhedstest afventer ap_01
+  skive_værktøjskald: i gang — 14/14 prøver grønne i CI 42492523298; selvtest PASS på enheden 2026-11-08 (tool_calls=1, ap_01 løst); kun UI-visning afventer ap_02
