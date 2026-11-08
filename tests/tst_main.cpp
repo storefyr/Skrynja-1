@@ -64,6 +64,86 @@ private slots:
     void selvtest_fail_uden_toolcall();
 };
 
+class FrameCollector : public QObject
+{
+    Q_OBJECT
+public:
+    QStringList frames;
+public slots:
+    void onFrame(const QByteArray &f) { frames.append(QString::fromUtf8(f)); }
+};
+
+class TestTilladelser : public QObject
+{
+    Q_OBJECT
+private slots:
+    void tilladelse_anmodning();
+    void tilladelse_tillad_svar();
+    void tilladelse_afvis_svar();
+    void tilladelse_stop_raekkefoelge();
+};
+
+static QByteArray permissionRequestLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}},\"options\":[{\"optionId\":\"allow\",\"name\":\"Tillad\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
+}
+
+void TestTilladelser::tilladelse_anmodning()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(permissionRequestLine());
+    QVERIFY(acp.hasPendingPermission());
+    QCOMPARE(acp.permissionRequests(), 1);
+    QVariantMap p = acp.pendingPermission();
+    QCOMPARE(p.value(QStringLiteral("title")).toString(), QStringLiteral("id -un"));
+    QCOMPARE(p.value(QStringLiteral("kind")).toString(), QStringLiteral("shell"));
+    QCOMPARE(p.value(QStringLiteral("kommando")).toString(), QStringLiteral("id -un"));
+    QCOMPARE(p.value(QStringLiteral("options")).toList().count(), 2);
+}
+
+void TestTilladelser::tilladelse_tillad_svar()
+{
+    AcpClient acp;
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    acp.feedBytesForTest(permissionRequestLine());
+    acp.answerPermission(QStringLiteral("allow"));
+    QVERIFY(!acp.hasPendingPermission());
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"selected\"")));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"allow\"")));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"id\":7")));
+}
+
+void TestTilladelser::tilladelse_afvis_svar()
+{
+    AcpClient acp;
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    acp.feedBytesForTest(permissionRequestLine());
+    acp.dismissPermission();
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"cancelled\"")));
+}
+
+void TestTilladelser::tilladelse_stop_raekkefoelge()
+{
+    AcpClient acp;
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    acp.feedBytesForTest(permissionRequestLine());
+    acp.stopAgent();
+    int cancelIdx = -1;
+    int cancelledIdx = -1;
+    for (int i = 0; i < fc.frames.count(); i++) {
+        if (fc.frames.at(i).contains(QStringLiteral("session/cancel")))
+            cancelIdx = i;
+        if (fc.frames.at(i).contains(QStringLiteral("\"cancelled\"")))
+            cancelledIdx = i;
+    }
+    QVERIFY(cancelIdx >= 0);
+    QVERIFY(cancelledIdx >= 0);
+    QVERIFY(cancelIdx < cancelledIdx);
+}
+
 void TestVaerktoejskald::vaerktoejskald_felter()
 {
     AcpClient acp;
@@ -242,6 +322,10 @@ int main(int argc, char *argv[])
     }
     {
         TestVaerktoejskald t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    {
+        TestTilladelser t;
         status |= QTest::qExec(&t, argc, argv);
     }
     return status;
