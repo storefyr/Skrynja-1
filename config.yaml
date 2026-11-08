@@ -54,6 +54,10 @@ teknisk_stack:
     os: Sailfish OS 5.2.0.20 (Finlayson)
     arch: aarch64
     kernel: 6.12.38-4k
+  maskiner:
+    telefon: mistral_vibe 3.0.2 + agent_client_protocol 0.11.0; vibe-acp via uv (~/.local/bin/vibe-acp) — pr. forgængerens målelab (dokumenter/vibe-acp/README.md)
+    sandbox: målmaskine — vibe-acp 2.9.4, Qt 5.15.2 (unit tests lokalt), gh CLI autentificeret — pr. forgængerens målelab og denne sessions kørsler
+    ci: GitHub Actions ubuntu-runners; Sailfish SDK-image 4.5.0.18-aarch64 — grøn i kørsel 42415519785
   integration:
     kerne_model: Mistral Vibe
     protokol: vibe-acp_ndjson_stdin_stdout
@@ -67,9 +71,8 @@ teknisk_stack:
     licens: GPL-3.0
 
 lokal_opsaetning:
-  udviklermaskine: gh autentificeret; kør_test.sh henter CI-artifact (rpm-aarch64) og installerer på telefonen over ssh/scp
-  telefon: Jolla Phone 2026, Developer Mode (ssh over WLAN), bruger defaultuser, IP i TELEFON_IP
-  testkørsel: kør_test.sh [run-id] — seneste grønne kørsel på main; resultatlog hentes tilbage fra /tmp
+  maskiner_og_programmel: se teknisk_stack.maskiner — det er hvad der er til rådighed (telefon, sandbox, CI)
+  testkørsel: kør_test.sh [run-id] — CI-artifact (rpm-aarch64) installeres på telefonen, resultatlog tilbage fra /tmp; forbindelse maskine↔telefon ikke angivet endnu (scriptet antager ssh/scp til $TELEFON_IP — antagelse, rettes når sufflør angiver den)
   forbudt: RPM må ikke lægges på git-grene; ingen test_pr.sh; ingen fjern-pipes
 
 sufflør_protokol:
