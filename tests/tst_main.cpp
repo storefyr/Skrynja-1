@@ -95,12 +95,12 @@ void TestRygradParser::rygrad_ugyldig()
     QByteArray data = readFixture(QStringLiteral("fixture_rygrad_ugyldig.ndjson"));
     QVERIFY(!data.isEmpty());
     r.feed(data);
-    QCOMPARE(c.messages.count(), 2);
-    QCOMPARE(msgId(c.messages.at(0)), 11LL);
-    QCOMPARE(msgId(c.messages.at(1)), 12LL);
-    QVERIFY(c.discarded.count() >= 1);
+    // linje 1 og 2 har efter-garbage og kasseres hele (rollback); kun id 12 er ren
+    QCOMPARE(c.messages.count(), 1);
+    QCOMPARE(msgId(c.messages.first()), 12LL);
+    QVERIFY(c.discarded.count() >= 2);
     r.feedEof();
-    QCOMPARE(c.messages.count(), 2);
+    QCOMPARE(c.messages.count(), 1);
 }
 
 void TestRygradParser::rygrad_utf8_ugyldig()
