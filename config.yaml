@@ -30,10 +30,11 @@ regler:
   brugerflade: Dansk uden qsTr; ingen sprogfiler
   kapabiliteter: Tom clientCapabilities indtil SailJail er målt
   sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første commit — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
-  filer: Nye kildefiler registreres i .pro; nye QML-filer til install; nye filer i træet nævnes i inventar
+  filer: Nye kildefiler registreres i .pro; nye QML-filer til install; nye filer i træet nævnes i inventar (håndhæves i CI)
+  config_synkronitet: Håndhæves mekanisk af tjek_config_synkronitet.sh i pr_byg.yml — hver fil i træet skal nævnes i inventar i denne fil; en PR der rører src/ eller qml/ skal også røre config.yaml i samme PR (kumulativt over PR'ens commits; tests/ undtaget, så prøve-før-kilde stadig virker; enhver berøring tæller for tjekket — hvad der faktisk skrives, bestemmes af ny_viden)
 
 inventar:
-  rod: [config.yaml, README.md, LICENSE, .gitignore, eksekver_test.sh, harbour-skrynja-1.desktop, harbour-skrynja-1.pro, harbour-skrynja-1.yaml]
+  rod: [config.yaml, README.md, LICENSE, .gitignore, eksekver_test.sh, tjek_config_synkronitet.sh, harbour-skrynja-1.desktop, harbour-skrynja-1.pro, harbour-skrynja-1.yaml]
   arbejdsgange: [.github/workflows/pr_byg.yml]
   ikoner: [icons/86x86/harbour-skrynja-1.png, icons/108x108/harbour-skrynja-1.png, icons/128x128/harbour-skrynja-1.png, icons/172x172/harbour-skrynja-1.png]
   qml: [qml/harbour-skrynja-1.qml, qml/pages/StartSide.qml]
@@ -172,7 +173,7 @@ vejkort:
   skive_diff: accept — filændring som diff; kommando viser uddata
   skive_konfiguration: accept — configOptions vises og kan ændres
   skive_genoptagelse: accept — samtale vises korrekt efter genstart
-  skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar)
+  skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar); håndhæves mekanisk af tjek_config_synkronitet.sh i pr_byg.yml
 
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
