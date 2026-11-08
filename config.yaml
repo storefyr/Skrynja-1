@@ -163,7 +163,7 @@ målt_på_wire:
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
   åbent_punkt_02: løst 2026-11-08 — selvtest PASS på revision 7a3f52e med tool_calls=1 og ui_tool_calls=1 (QML-callback uiToolCallsSeen målte, at UI-bindingen kørte)
-  åbent_punkt_03: selvtest tjekkede kun antal, ikke korrekthed — adresseret i koden (selvtest læser nu probe-filen /tmp/skrynja-1-probe.txt og kræver probe_fil=OK); bekræftes på enheden ved næste eksekver_test.sh
+  åbent_punkt_03: løst 2026-11-08 — selvtest læser probe-filen og kræver probe_fil=OK; målt PASS på enheden, revision 760bc12 (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, mode=ask)
   åbent_punkt_04: beviser uden for repoet forældes (app-log og verdict i /tmp på enheden, Actions-logs udløber) — kun kørsels-id og revision i git består; accepteret begrænsning
 
 operationel_implementering:
