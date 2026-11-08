@@ -96,21 +96,50 @@ void AcpClient::dispatch(const QJsonObject &obj)
                     m_lastText += t;
                     emit lastTextChanged();
                 }
-            } else if (kind == QStringLiteral("tool_call")) {
-                QVariantMap tc;
-                tc.insert(QStringLiteral("toolCallId"), upd.value(QStringLiteral("toolCallId")).toString());
-                tc.insert(QStringLiteral("kind"), upd.value(QStringLiteral("kind")).toString());
-                tc.insert(QStringLiteral("title"), upd.value(QStringLiteral("title")).toString());
-                const QJsonObject raw = upd.value(QStringLiteral("rawInput")).toObject();
-                QString detalje = raw.value(QStringLiteral("command")).toString();
-                if (detalje.isEmpty())
-                    detalje = raw.value(QStringLiteral("path")).toString();
-                if (detalje.isEmpty())
-                    detalje = upd.value(QStringLiteral("location")).toObject()
-                            .value(QStringLiteral("path")).toString();
-                tc.insert(QStringLiteral("detalje"), detalje);
-                m_toolCalls.append(tc);
-                emit toolCallsChanged();
+            } else if (kind == QStringLiteral("tool_call") || kind == QStringLiteral("tool_call_update")) {
+                const QString toolCallId = upd.value(QStringLiteral("toolCallId")).toString();
+                if (kind == QStringLiteral("tool_call")) {
+                    QVariantMap tc;
+                    tc.insert(QStringLiteral("toolCallId"), toolCallId);
+                    tc.insert(QStringLiteral("kind"), upd.value(QStringLiteral("kind")).toString());
+                    tc.insert(QStringLiteral("title"), upd.value(QStringLiteral("title")).toString());
+                    const QJsonObject raw = upd.value(QStringLiteral("rawInput")).toObject();
+                    QString detalje = raw.value(QStringLiteral("command")).toString();
+                    if (detalje.isEmpty())
+                        detalje = raw.value(QStringLiteral("path")).toString();
+                    if (detalje.isEmpty())
+                        detalje = raw.value(QStringLiteral("file_path")).toString();
+                    if (detalje.isEmpty())
+                        detalje = upd.value(QStringLiteral("location")).toObject()
+                                .value(QStringLiteral("path")).toString();
+                    tc.insert(QStringLiteral("detalje"), detalje);
+                    m_toolCalls.append(tc);
+                    emit toolCallsChanged();
+                }
+                const QJsonArray content = upd.value(QStringLiteral("content")).toArray();
+                for (int i = 0; i < content.size(); i++) {
+                    const QJsonObject block = content.at(i).toObject();
+                    const QString type = block.value(QStringLiteral("type")).toString();
+                    if (type == QStringLiteral("diff")) {
+                        QVariantMap d;
+                        QString sti = block.value(QStringLiteral("path")).toString();
+                        if (sti.isEmpty())
+                            sti = block.value(QStringLiteral("file_path")).toString();
+                        d.insert(QStringLiteral("sti"), sti);
+                        QString diffText = block.value(QStringLiteral("newText")).toString();
+                        if (diffText.isEmpty())
+                            diffText = block.value(QStringLiteral("diff")).toString();
+                        d.insert(QStringLiteral("diff"), diffText);
+                        m_diffs.append(d);
+                        emit diffsChanged();
+                    } else {
+                        QVariantMap o;
+                        o.insert(QStringLiteral("toolCallId"), toolCallId);
+                        o.insert(QStringLiteral("tekst"), block.value(QStringLiteral("text")).toString());
+                        m_outputs.append(o);
+                        emit outputsChanged();
+                    }
+                }
             }
         }
         return;
@@ -251,7 +280,8 @@ void AcpClient::finishSelvtest()
     if (pf.open(QIODevice::ReadOnly | QIODevice::Text))
         probe = QString::fromUtf8(pf.readAll());
     const bool probeOk = probe.contains(QStringLiteral("OK"));
-    const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0 && m_permissionRequests > 0 && probeOk;
+    const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0 && m_permissionRequests > 0 && probeOk
+                      && (!m_diffs.isEmpty() || !m_outputs.isEmpty());
     qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls
              << " permission_requests=" << m_permissionRequests << " probe_fil=" << (probeOk ? "OK" : "mangler");
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
@@ -260,6 +290,8 @@ void AcpClient::finishSelvtest()
         f.write("ui_tool_calls=" + QByteArray::number(m_uiToolCalls) + "\n");
         f.write("permission_requests=" + QByteArray::number(m_permissionRequests) + "\n");
         f.write("probe_fil=" + QByteArray(probeOk ? "OK" : "mangler") + "\n");
+        f.write("diffs=" + QByteArray::number(m_diffs.count()) + "\n");
+        f.write("outputs=" + QByteArray::number(m_outputs.count()) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");

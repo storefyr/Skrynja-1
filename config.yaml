@@ -85,7 +85,7 @@ teknisk_stack:
 selvtest:
   tilstand: appen kører med --selvtest, sætter mode ask via session/set_config_option og sender selv probe-prompten (opret filen /tmp/skrynja-1-probe.txt med teksten OK), venter på end_turn
   verdict_fil: /tmp/skrynja-1-selvtest.txt med tool_calls, ui_tool_calls, last_text, VERDICT og exit-kode
-  pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen), permission_requests større end 0 (selvtest sætter mode ask først) og probe_fil=OK (probe-filen /tmp/skrynja-1-probe.txt skal indeholde OK — lukker åbent_punkt_03)
+  pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen), permission_requests større end 0 (selvtest sætter mode ask først), probe_fil=OK (probe-filen /tmp/skrynja-1-probe.txt skal indeholde OK) og diffs eller outputs større end 0 (skive_diff)
   kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
 
 lokal_opsaetning:

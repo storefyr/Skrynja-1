@@ -20,6 +20,8 @@ class AcpClient : public QObject
     Q_PROPERTY(QVariantList toolCalls READ toolCalls NOTIFY toolCallsChanged)
     Q_PROPERTY(QVariantMap pendingPermission READ pendingPermission NOTIFY pendingPermissionChanged)
     Q_PROPERTY(bool hasPendingPermission READ hasPendingPermission NOTIFY pendingPermissionChanged)
+    Q_PROPERTY(QVariantList diffs READ diffs NOTIFY diffsChanged)
+    Q_PROPERTY(QVariantList outputs READ outputs NOTIFY outputsChanged)
 public:
     explicit AcpClient(QObject *parent = nullptr);
 
@@ -46,6 +48,8 @@ public:
     bool hasPendingPermission() const { return !m_pendingPermission.isEmpty(); }
     int permissionRequests() const { return m_permissionRequests; }
     QString mode() const { return m_mode; }
+    QVariantList diffs() const { return m_diffs; }
+    QVariantList outputs() const { return m_outputs; }
 
 signals:
     void sessionIdChanged();
@@ -56,6 +60,8 @@ signals:
     void frameWritten(const QByteArray &frame);
     void promptDone();
     void pendingPermissionChanged();
+    void diffsChanged();
+    void outputsChanged();
 
 private slots:
     void onReadyRead();
@@ -76,6 +82,8 @@ private:
     QString m_sessionId;
     QString m_lastText;
     QVariantList m_toolCalls;
+    QVariantList m_diffs;
+    QVariantList m_outputs;
     QVariantMap m_pendingPermission;
     int m_uiToolCalls = 0;
     int m_permissionRequests = 0;

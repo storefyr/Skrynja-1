@@ -82,6 +82,50 @@ Page {
                           (modelData.detalje.length > 0 ? " — " + modelData.detalje : "")
                 }
             }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                color: Theme.secondaryColor
+                visible: acp.diffs.length > 0
+                text: "Ændringer:"
+            }
+
+            Repeater {
+                model: acp.diffs
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    wrapMode: Text.Wrap
+                    font.family: "monospace"
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: modelData.sti + "\n" + modelData.diff
+                }
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                color: Theme.secondaryColor
+                visible: acp.outputs.length > 0
+                text: "Udoutput:"
+            }
+
+            Repeater {
+                model: acp.outputs
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    wrapMode: Text.Wrap
+                    font.family: "monospace"
+                    font.pixelSize: Theme.fontSizeSmall
+                    text: modelData.tekst
+                }
+            }
         }
     }
 
