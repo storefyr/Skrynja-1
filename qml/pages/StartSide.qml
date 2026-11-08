@@ -50,6 +50,28 @@ Page {
                 wrapMode: Text.WordWrap
                 text: acp.lastText
             }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
+                color: Theme.secondaryColor
+                visible: acp.toolCalls.length > 0
+                text: "Værktøjskald:"
+            }
+
+            Repeater {
+                model: acp.toolCalls
+
+                Label {
+                    x: Theme.horizontalPageMargin
+                    width: parent.width - 2 * Theme.horizontalPageMargin
+                    wrapMode: Text.WordWrap
+                    color: Theme.secondaryColor
+                    text: modelData.kind + ": " + modelData.title +
+                          (modelData.detalje.length > 0 ? " — " + modelData.detalje : "")
+                }
+            }
         }
     }
 }

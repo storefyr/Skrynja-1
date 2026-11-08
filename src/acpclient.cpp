@@ -79,13 +79,29 @@ void AcpClient::dispatch(const QJsonObject &obj)
         if (obj.value(QStringLiteral("method")).toString() == QStringLiteral("session/update")) {
             const QJsonObject upd = obj.value(QStringLiteral("params")).toObject()
                     .value(QStringLiteral("update")).toObject();
-            if (upd.value(QStringLiteral("sessionUpdate")).toString() == QStringLiteral("agent_message_chunk")) {
+            const QString kind = upd.value(QStringLiteral("sessionUpdate")).toString();
+            if (kind == QStringLiteral("agent_message_chunk")) {
                 const QString t = upd.value(QStringLiteral("content")).toObject()
                         .value(QStringLiteral("text")).toString();
                 if (!t.isEmpty()) {
                     m_lastText += t;
                     emit lastTextChanged();
                 }
+            } else if (kind == QStringLiteral("tool_call")) {
+                QVariantMap tc;
+                tc.insert(QStringLiteral("toolCallId"), upd.value(QStringLiteral("toolCallId")).toString());
+                tc.insert(QStringLiteral("kind"), upd.value(QStringLiteral("kind")).toString());
+                tc.insert(QStringLiteral("title"), upd.value(QStringLiteral("title")).toString());
+                const QJsonObject raw = upd.value(QStringLiteral("rawInput")).toObject();
+                QString detalje = raw.value(QStringLiteral("command")).toString();
+                if (detalje.isEmpty())
+                    detalje = raw.value(QStringLiteral("path")).toString();
+                if (detalje.isEmpty())
+                    detalje = upd.value(QStringLiteral("location")).toObject()
+                            .value(QStringLiteral("path")).toString();
+                tc.insert(QStringLiteral("detalje"), detalje);
+                m_toolCalls.append(tc);
+                emit toolCallsChanged();
             }
         }
         return;

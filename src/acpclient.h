@@ -5,6 +5,7 @@
 #include <QProcess>
 #include <QHash>
 #include <QJsonObject>
+#include <QVariantList>
 #include "acpframereader.h"
 
 // Lean ACP client for skive_rygrad: spawns the local agent (vibe-acp) over
@@ -16,6 +17,7 @@ class AcpClient : public QObject
     Q_OBJECT
     Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
     Q_PROPERTY(QString lastText READ lastText NOTIFY lastTextChanged)
+    Q_PROPERTY(QVariantList toolCalls READ toolCalls NOTIFY toolCallsChanged)
 public:
     explicit AcpClient(QObject *parent = nullptr);
 
@@ -26,10 +28,14 @@ public:
 
     QString sessionId() const { return m_sessionId; }
     QString lastText() const { return m_lastText; }
+    QVariantList toolCalls() const { return m_toolCalls; }
+
+    void feedBytesForTest(const QByteArray &d) { m_reader.feed(d); }
 
 signals:
     void sessionIdChanged();
     void lastTextChanged();
+    void toolCallsChanged();
     void started();
     void finished(int exitCode);
     void frameWritten(const QByteArray &frame);
@@ -49,6 +55,7 @@ private:
     QProcess m_process;
     QString m_sessionId;
     QString m_lastText;
+    QVariantList m_toolCalls;
     QString m_cwd;
     qint64 m_nextId = 1;
     QHash<qint64, QString> m_methods;
