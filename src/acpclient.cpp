@@ -130,9 +130,18 @@ void AcpClient::dispatch(const QJsonObject &obj)
     } else if (method == QStringLiteral("session/new")) {
         m_sessionId = result.value(QStringLiteral("sessionId")).toString();
         emit sessionIdChanged();
+        m_mode = result.value(QStringLiteral("modes")).toObject()
+                    .value(QStringLiteral("currentModeId")).toString();
         if (m_selvtest) {
             sendSetConfigOption(QStringLiteral("mode"), QStringLiteral("ask"));
-            sendPrompt(QStringLiteral("kør id -un i terminalen"));
+            sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
+        }
+    } else if (method == QStringLiteral("session/set_config_option")) {
+        const QJsonArray opts = result.value(QStringLiteral("configOptions")).toArray();
+        for (int i = 0; i < opts.size(); i++) {
+            const QJsonObject o = opts.at(i).toObject();
+            if (o.value(QStringLiteral("id")).toString() == QStringLiteral("mode"))
+                m_mode = o.value(QStringLiteral("currentValue")).toString();
         }
     }
     if (m_selvtest && result.contains(QStringLiteral("stopReason")))
@@ -245,6 +254,7 @@ void AcpClient::finishSelvtest()
         f.write("tool_calls=" + QByteArray::number(m_toolCalls.count()) + "\n");
         f.write("ui_tool_calls=" + QByteArray::number(m_uiToolCalls) + "\n");
         f.write("permission_requests=" + QByteArray::number(m_permissionRequests) + "\n");
+        f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();

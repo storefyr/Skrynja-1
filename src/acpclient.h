@@ -45,6 +45,7 @@ public:
     QVariantMap pendingPermission() const { return m_pendingPermission; }
     bool hasPendingPermission() const { return !m_pendingPermission.isEmpty(); }
     int permissionRequests() const { return m_permissionRequests; }
+    QString mode() const { return m_mode; }
 
 signals:
     void sessionIdChanged();
@@ -78,6 +79,7 @@ private:
     QVariantMap m_pendingPermission;
     int m_uiToolCalls = 0;
     int m_permissionRequests = 0;
+    QString m_mode;
     bool m_selvtest = false;
     QString m_cwd;
     qint64 m_nextId = 1;
