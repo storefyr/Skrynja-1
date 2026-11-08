@@ -66,6 +66,12 @@ teknisk_stack:
     ortografi: Dansk ortografi
     licens: GPL-3.0
 
+lokal_opsaetning:
+  udviklermaskine: gh autentificeret; kør_test.sh henter CI-artifact (rpm-aarch64) og installerer på telefonen over ssh/scp
+  telefon: Jolla Phone 2026, Developer Mode (ssh over WLAN), bruger defaultuser, IP i TELEFON_IP
+  testkørsel: kør_test.sh [run-id] — seneste grønne kørsel på main; resultatlog hentes tilbage fra /tmp
+  forbudt: RPM må ikke lægges på git-grene; ingen test_pr.sh; ingen fjern-pipes
+
 sufflør_protokol:
   interaktions_model:
     hierarki: Sufflør → Stokastiker
@@ -86,7 +92,7 @@ anti_mønstre:
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
-  verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; kørsel og måling på Jolla Phone 2026
+  verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; testkørsler på enheden via kør_test.sh (artifact over ssh/scp, log tilbage fra /tmp)
   succes_kriterium: CI grønt og prompt-tur målt på enheden — svar vist, app afslutter med exit-kode 0
 
 vejkort:
