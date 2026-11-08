@@ -126,7 +126,7 @@ målt_på_wire:
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
-  åbent_punkt_02: skive_værktøjskald UI — selvtest måler ui_tool_calls via QML-callback (acp.uiToolCallsSeen sættes fra onToolCallsChanged); PASS kræver både klient- og UI-træf
+  åbent_punkt_02: løst 2026-11-08 — selvtest PASS på revision 7a3f52e med tool_calls=1 og ui_tool_calls=1 (QML-callback uiToolCallsSeen målte, at UI-bindingen kørte)
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -146,4 +146,4 @@ vejkort:
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM), ikoner med i RPM, installeret på enheden via eksekver_test.sh
   skive_rygrad: bestået 2026-11-08 — sufflør målte på Jolla Phone 2026 (prompt sendt, svar vist); CI 42489420931 grøn, 9/9 parser-prøver
-  skive_værktøjskald: i gang — 14/14 prøver grønne i CI 42492523298; selvtest PASS på enheden 2026-11-08 (tool_calls=1, åbent_punkt_01 løst); kun UI-visning afventer åbent_punkt_02
+  skive_værktøjskald: bestået 2026-11-08 — selvtest PASS på enheden, revision 7a3f52e (tool_calls=1, ui_tool_calls=1, exit 0); CI 42498254260 grøn, 15/15 prøver
