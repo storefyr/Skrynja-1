@@ -47,6 +47,7 @@ while [ $i -lt 90 ]; do
 done
 kill $APP_PID 2>/dev/null || true
 
+echo ""
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
     grep -E 'tool_call|[Ee]rror|[Ff]ejl' "$LOG" | tail -30 || true
@@ -55,6 +56,7 @@ else
     echo "(ingen log endnu)"
 fi
 
+echo ""
 echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then

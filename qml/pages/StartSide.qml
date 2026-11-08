@@ -6,7 +6,12 @@ Page {
 
     Connections {
         target: acp
-        onToolCallsChanged: appWindow.uiToolCalls = acp.toolCalls.length
+        onToolCallsChanged: {
+            var w = startSide
+            while (w.parent !== null)
+                w = w.parent
+            w.uiToolCalls = acp.toolCalls.length
+        }
     }
 
     function sendPrompt() {
