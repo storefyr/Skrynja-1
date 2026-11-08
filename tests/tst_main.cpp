@@ -88,6 +88,33 @@ private slots:
     void tilladelse_stop_raekkefoelge();
 };
 
+class TestDiffUddata : public QObject
+{
+    Q_OBJECT
+private slots:
+    void diff_blokk_samles();
+    void uddata_blokk_samles();
+};
+
+void TestDiffUddata::diff_blokk_samles()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(diffToolCallLine());
+    QCOMPARE(acp.diffs().count(), 1);
+    QVariantMap d = acp.diffs().first().toMap();
+    QCOMPARE(d.value(QStringLiteral("sti")).toString(), QStringLiteral("/tmp/skrynja-1-probe.txt"));
+    QVERIFY(d.value(QStringLiteral("diff")).toString().contains(QStringLiteral("+OK")));
+}
+
+void TestDiffUddata::uddata_blokk_samles()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(toolCallLine() + outputUpdateLine());
+    QCOMPARE(acp.outputs().count(), 1);
+    QVERIFY(acp.outputs().first().toMap().value(QStringLiteral("tekst")).toString()
+            .contains(QStringLiteral("defaultuser")));
+}
+
 void TestTilladelser::tilladelse_anmodning()
 {
     AcpClient acp;
@@ -174,6 +201,16 @@ static QByteArray endTurnLine()
     return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":99,\"result\":{\"stopReason\":\"end_turn\"}}\n");
 }
 
+static QByteArray diffToolCallLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call\",\"toolCallId\":\"c1\",\"title\":\"Skriv fil\",\"kind\":\"edit\",\"status\":\"in_progress\",\"rawInput\":{\"file_path\":\"/tmp/skrynja-1-probe.txt\"},\"content\":[{\"type\":\"diff\",\"path\":\"/tmp/skrynja-1-probe.txt\",\"oldText\":\"\",\"newText\":\"+OK\"}]}}}\n");
+}
+
+static QByteArray outputUpdateLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call_update\",\"toolCallId\":\"c9\",\"status\":\"completed\",\"content\":[{\"type\":\"text\",\"text\":\"defaultuser\\n\"}]}}}\n");
+}
+
 static QByteArray permissionRequestLine()
 {
     return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}},\"options\":[{\"optionId\":\"allow\",\"name\":\"Tillad\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
@@ -198,12 +235,13 @@ void TestVaerktoejskald::selvtest_verdict()
     probe.close();
     QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
     acp.uiToolCallsSeen(1);
-    acp.feedBytesForTest(permissionRequestLine() + toolCallLine() + endTurnLine());
+    acp.feedBytesForTest(permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("permission_requests=1")));
     QVERIFY(v.contains(QStringLiteral("probe_fil=OK")));
+    QVERIFY(v.contains(QStringLiteral("diffs=1")));
     QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
     QFile::remove(QStringLiteral("/tmp/skrynja-1-probe.txt"));
 }
@@ -338,6 +376,10 @@ int main(int argc, char *argv[])
     }
     {
         TestTilladelser t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    {
+        TestDiffUddata t;
         status |= QTest::qExec(&t, argc, argv);
     }
     return status;
