@@ -4,6 +4,7 @@
 #include <QQmlContext>
 #include <QFile>
 #include <QDateTime>
+#include <QTimer>
 #include "acpclient.h"
 
 static QFile g_logFile(QStringLiteral("/tmp/skrynja-1-app.log"));
@@ -43,6 +44,15 @@ int main(int argc, char *argv[])
     view->rootContext()->setContextProperty(QStringLiteral("acp"), &acp);
     view->setSource(SailfishApp::pathTo(QStringLiteral("qml/harbour-skrynja-1.qml")));
     view->show();
+
+    if (selvtest) {
+        QObject::connect(&acp, &AcpClient::promptDone, &acp, [view, &acp]() {
+            QTimer::singleShot(800, &acp, [view, &acp]() {
+                const QVariant ui = view->rootObject()->property("uiToolCalls");
+                acp.finishSelvtest(ui.isValid() ? ui.toInt() : -1);
+            });
+        });
+    }
 
     return app->exec();
 }

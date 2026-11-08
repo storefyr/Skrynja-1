@@ -4,6 +4,8 @@ import Sailfish.Silica 1.0
 Page {
     id: startSide
 
+    property int uiToolCalls: toolRepeater.count
+
     function sendPrompt() {
         if (promptField.text.length > 0 && acp.sessionId.length > 0) {
             acp.sendPrompt(promptField.text)
@@ -65,6 +67,7 @@ Page {
             }
 
             Repeater {
+                id: toolRepeater
                 model: acp.toolCalls
 
                 Label {

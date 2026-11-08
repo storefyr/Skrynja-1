@@ -122,7 +122,7 @@ målt_på_wire:
 
 åbne_punkter:
   ap_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
-  ap_02: skive_værktøjskald UI — klienten har toolCalls, men listen skal bekræftes visuelt i QML ved næste eksekver_test.sh; hvis tom, rettes bindingen
+  ap_02: skive_værktøjskald UI — selvtest-verdict tjekker nu ui_tool_calls automatisk (læses fra QML efter end_turn); PASS kræver både klient- og UI-træf
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -132,7 +132,7 @@ operationel_implementering:
 vejkort:
   skive_byg: accept — pr_byg.yml grønt i Actions (unit tests + aarch64 RPM); enhed røres ikke
   skive_rygrad: accept — på enheden måles prompt sendt, svar vist, exit-kode 0
-  skive_værktøjskald: accept — kald vist med ikon efter kind, titel og fuld sti
+  skive_værktøjskald: accept — kald vist i UI med kind, titel og detalje; selvtest-verdict kræver tool_calls>0 og ui_tool_calls>0 (ikon efter kind kommer senere)
   skive_tilladelser: accept — dialog viser kind og fuld kommando; Stop sender session/cancel før cancelled
   skive_diff: accept — filændring som diff; kommando viser uddata
   skive_konfiguration: accept — configOptions vises og kan ændres

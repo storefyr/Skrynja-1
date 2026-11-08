@@ -126,22 +126,23 @@ void AcpClient::dispatch(const QJsonObject &obj)
         if (m_selvtest)
             sendPrompt(QStringLiteral("kør id -un i terminalen"));
     }
-    if (m_selvtest && result.contains(QStringLiteral("stopReason"))) {
-        writeVerdict();
-        if (m_process.state() == QProcess::Running)
-            QCoreApplication::exit(m_toolCalls.isEmpty() ? 1 : 0);
-    }
+    if (m_selvtest && result.contains(QStringLiteral("stopReason")))
+        emit promptDone();
 }
 
-void AcpClient::writeVerdict()
+void AcpClient::finishSelvtest(int uiToolCalls)
 {
+    const bool pass = !m_toolCalls.isEmpty() && uiToolCalls > 0;
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
     if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         f.write("tool_calls=" + QByteArray::number(m_toolCalls.count()) + "\n");
+        f.write("ui_tool_calls=" + QByteArray::number(uiToolCalls) + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
-        f.write(m_toolCalls.isEmpty() ? "VERDICT=FAIL\n" : "VERDICT=PASS\n");
+        f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();
     }
+    if (m_process.state() == QProcess::Running)
+        QCoreApplication::exit(pass ? 0 : 1);
 }
 
 qint64 AcpClient::sendRequest(const QString &method, const QJsonObject &params)

@@ -32,6 +32,7 @@ public:
 
     void setSelvtest(bool on) { m_selvtest = on; }
     void feedBytesForTest(const QByteArray &d) { m_reader.feed(d); }
+    void finishSelvtest(int uiToolCalls);
 
 signals:
     void sessionIdChanged();
@@ -40,6 +41,7 @@ signals:
     void started();
     void finished(int exitCode);
     void frameWritten(const QByteArray &frame);
+    void promptDone();
 
 private slots:
     void onReadyRead();
@@ -51,7 +53,6 @@ private:
     qint64 sendRequest(const QString &method, const QJsonObject &params);
     void writeFrame(const QJsonObject &obj);
     void dispatch(const QJsonObject &obj);
-    void writeVerdict();
 
     AcpFrameReader m_reader;
     QProcess m_process;
