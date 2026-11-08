@@ -1,5 +1,7 @@
 #include "acpclient.h"
 
+#include <QCoreApplication>
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QDebug>
@@ -121,6 +123,24 @@ void AcpClient::dispatch(const QJsonObject &obj)
     } else if (method == QStringLiteral("session/new")) {
         m_sessionId = result.value(QStringLiteral("sessionId")).toString();
         emit sessionIdChanged();
+        if (m_selvtest)
+            sendPrompt(QStringLiteral("kør id -un i terminalen"));
+    }
+    if (m_selvtest && result.contains(QStringLiteral("stopReason"))) {
+        writeVerdict();
+        if (m_process.state() == QProcess::Running)
+            QCoreApplication::exit(m_toolCalls.isEmpty() ? 1 : 0);
+    }
+}
+
+void AcpClient::writeVerdict()
+{
+    QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        f.write("tool_calls=" + QByteArray::number(m_toolCalls.count()) + "\n");
+        f.write("last_text=" + m_lastText.toUtf8() + "\n");
+        f.write(m_toolCalls.isEmpty() ? "VERDICT=FAIL\n" : "VERDICT=PASS\n");
+        f.close();
     }
 }
 

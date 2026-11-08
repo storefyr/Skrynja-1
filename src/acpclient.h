@@ -30,6 +30,7 @@ public:
     QString lastText() const { return m_lastText; }
     QVariantList toolCalls() const { return m_toolCalls; }
 
+    void setSelvtest(bool on) { m_selvtest = on; }
     void feedBytesForTest(const QByteArray &d) { m_reader.feed(d); }
 
 signals:
@@ -50,12 +51,14 @@ private:
     qint64 sendRequest(const QString &method, const QJsonObject &params);
     void writeFrame(const QJsonObject &obj);
     void dispatch(const QJsonObject &obj);
+    void writeVerdict();
 
     AcpFrameReader m_reader;
     QProcess m_process;
     QString m_sessionId;
     QString m_lastText;
     QVariantList m_toolCalls;
+    bool m_selvtest = false;
     QString m_cwd;
     qint64 m_nextId = 1;
     QHash<qint64, QString> m_methods;

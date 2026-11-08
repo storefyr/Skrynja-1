@@ -30,7 +30,13 @@ int main(int argc, char *argv[])
     app->setOrganizationName(QStringLiteral("org.skrynja"));
     app->setApplicationName(QStringLiteral("Skrynja-1"));
 
+    bool selvtest = false;
+    for (int i = 1; i < argc; i++)
+        if (QLatin1String(argv[i]) == QLatin1String("--selvtest"))
+            selvtest = true;
+
     AcpClient acp;
+    acp.setSelvtest(selvtest);
     acp.start(AcpClient::defaultAgentPath(), QStringLiteral("/home/defaultuser"));
 
     QQuickView *view = SailfishApp::createView();

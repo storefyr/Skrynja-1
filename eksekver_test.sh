@@ -22,6 +22,22 @@ echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
 devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
 
+if [ "${1:-}" = "selvtest" ]; then
+    rm -f /tmp/skrynja-1-selvtest.txt
+    harbour-skrynja-1 --selvtest >/dev/null 2>&1 &
+    APP_PID=$!
+    i=0
+    while [ $i -lt 60 ]; do
+        [ -f /tmp/skrynja-1-selvtest.txt ] && break
+        sleep 2
+        i=$((i + 1))
+    done
+    kill $APP_PID 2>/dev/null || true
+    echo "--- selvtest-verdict ---"
+    cat /tmp/skrynja-1-selvtest.txt 2>/dev/null || echo "FEJL: intet verdict efter 120s — se fulde log"
+    exit 0
+fi
+
 LOG=/tmp/skrynja-1-app.log
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
