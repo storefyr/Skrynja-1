@@ -1,7 +1,6 @@
 #include <sailfishapp.h>
 #include <QGuiApplication>
 #include <QQuickView>
-#include <QQuickItem>
 #include <QQmlContext>
 #include <QFile>
 #include <QDateTime>
@@ -47,13 +46,8 @@ int main(int argc, char *argv[])
     view->show();
 
     if (selvtest) {
-        QObject::connect(&acp, &AcpClient::promptDone, &acp, [view, &acp]() {
-            QTimer::singleShot(800, &acp, [view, &acp]() {
-                QObject *root = view->rootObject();
-                const QVariant ui = root->property("uiToolCalls");
-                qDebug() << "[selvtest] root uiToolCalls=" << ui << " root=" << root;
-                acp.finishSelvtest(ui.isValid() ? ui.toInt() : -1);
-            });
+        QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() {
+            QTimer::singleShot(800, &acp, [&acp]() { acp.finishSelvtest(); });
         });
     }
 

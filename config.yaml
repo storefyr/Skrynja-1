@@ -126,7 +126,7 @@ målt_på_wire:
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
-  åbent_punkt_02: skive_værktøjskald UI — selvtest-verdict tjekker nu ui_tool_calls automatisk (læses fra QML efter end_turn); PASS kræver både klient- og UI-træf
+  åbent_punkt_02: skive_værktøjskald UI — selvtest måler ui_tool_calls via QML-callback (acp.uiToolCallsSeen sættes fra onToolCallsChanged); PASS kræver både klient- og UI-træf
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI

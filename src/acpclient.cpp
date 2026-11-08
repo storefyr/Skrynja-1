@@ -130,13 +130,14 @@ void AcpClient::dispatch(const QJsonObject &obj)
         emit promptDone();
 }
 
-void AcpClient::finishSelvtest(int uiToolCalls)
+void AcpClient::finishSelvtest()
 {
-    const bool pass = !m_toolCalls.isEmpty() && uiToolCalls > 0;
+    const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0;
+    qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls;
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
     if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         f.write("tool_calls=" + QByteArray::number(m_toolCalls.count()) + "\n");
-        f.write("ui_tool_calls=" + QByteArray::number(uiToolCalls) + "\n");
+        f.write("ui_tool_calls=" + QByteArray::number(m_uiToolCalls) + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();

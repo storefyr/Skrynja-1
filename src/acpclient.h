@@ -32,7 +32,8 @@ public:
 
     void setSelvtest(bool on) { m_selvtest = on; }
     void feedBytesForTest(const QByteArray &d) { m_reader.feed(d); }
-    void finishSelvtest(int uiToolCalls);
+    Q_INVOKABLE void uiToolCallsSeen(int n) { m_uiToolCalls = n; }
+    void finishSelvtest();
 
 signals:
     void sessionIdChanged();
@@ -59,6 +60,7 @@ private:
     QString m_sessionId;
     QString m_lastText;
     QVariantList m_toolCalls;
+    int m_uiToolCalls = 0;
     bool m_selvtest = false;
     QString m_cwd;
     qint64 m_nextId = 1;
