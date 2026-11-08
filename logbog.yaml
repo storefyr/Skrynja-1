@@ -1,4 +1,4 @@
-# Journal for Skrynja-1 — samtaler og kørsler logges her med id (kategori_navn).
+# Logbog for Skrynja-1 — samtaler og kørsler logges her med id (kategori_navn).
 # config.yaml bærer regler og aktuel tilstand, ikke voksende log.
 samtaler:
   samtale_skrynja1_2026-11-08:
