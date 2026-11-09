@@ -273,7 +273,7 @@ void TestTilladelser::tilladelse_tom_titel_faar_fallback()
 void TestTilladelser::tool_status_opdateres()
 {
     AcpClient acp;
-    acp.feedBytesForTest(toolCallLine());
+    acp.feedBytesForTest(diffToolCallLine());
     QCOMPARE(acp.toolCalls().first().toMap().value(QStringLiteral("status")).toString(), QStringLiteral("in_progress"));
     acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call_update\",\"toolCallId\":\"c1\",\"status\":\"failed\"}}}\n"));
     QCOMPARE(acp.toolCalls().first().toMap().value(QStringLiteral("status")).toString(), QStringLiteral("failed"));
