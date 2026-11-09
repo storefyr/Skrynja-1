@@ -1,6 +1,7 @@
 #!/bin/sh
 # Runs on the Jolla Phone 2026 itself (the only device).
-# Usage: sh eksekver_test.sh
+# Usage: sh eksekver_test.sh        (selvtest)
+#        sh eksekver_test.sh kør     (prøvetur — appen starter og bliver åben)
 # Downloads the newest test RPM (branch test-rpm, plain curl), unpacks it into
 # ~/skrynja-1-test-app (no root, no password), runs the app with --selvtest
 # and prints only the verdict.
@@ -52,6 +53,11 @@ BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
 if [ ! -x "$BIN" ]; then
     echo "FEJL: $BIN ikke fundet efter udpakning"
     exit 1
+fi
+
+if [ "${1:-}" = "kør" ]; then
+    echo "Starter Skrynja-1 — prøvetur (Ctrl+C lukker appen)"
+    exec "$BIN"
 fi
 
 echo "Kører selvtest (appen åbner kort) ..."
