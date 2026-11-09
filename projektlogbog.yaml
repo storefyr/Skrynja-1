@@ -6,7 +6,7 @@ samtaler:
     resume: Skrynja-1 grundlagt — formål, regler, vejkort, selvtest; fire skiver bestået (se config.yaml fremdrift); omdøbning af dialogen sker i klientens UI
   samtale_skrynja1_2026-11-09:
     besked_id: 1137f955-4a32-4663-bb90-5674f2d42bf2
-    resume: rate-limit skilt ad fra forbrug og fra GitHubs eget limit (målt — se selvtest.rate_limit); to selvtest-kørsler på revision 3147b8f, alle PASS-kriterier grønne; symboløkonomi-reglen tilføjet og igen fjernet samme samtale (sufflør uenig i den som fast regel)
+    resume: rate-limit skilt ad fra forbrug og fra GitHubs eget limit (målt — se selvtest.rate_limit); to selvtest-kørsler på revision 3147b8f, alle PASS-kriterier grønne; symboløkonomi-reglen tilføjet og igen fjernet samme samtale (sufflør uenig i den som fast regel); selvtest skiftet til frisk session pr. kørsel (session/new) — afventer enheds-kørsel
 
 kørsler:
   selvtest_760bc12:

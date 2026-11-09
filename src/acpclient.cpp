@@ -24,10 +24,14 @@ AcpClient::AcpClient(QObject *parent) : QObject(parent)
     connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyRead()));
     connect(&m_process, SIGNAL(finished(int)), this, SLOT(onProcessFinished(int)));
     connect(this, &AcpClient::sessionIdChanged, this, [this]() {
+        if (m_selvtest)
+            return;
         QSettings s2;
         s2.setValue(QStringLiteral("acp/sessionId"), m_sessionId);
     });
     connect(this, &AcpClient::lastTextChanged, this, [this]() {
+        if (m_selvtest)
+            return;
         QSettings s2;
         s2.setValue(QStringLiteral("acp/lastText"), m_lastText.right(20000));
     });
@@ -36,6 +40,8 @@ AcpClient::AcpClient(QObject *parent) : QObject(parent)
 void AcpClient::start(const QString &agentPath, const QString &cwd)
 {
     m_cwd = cwd;
+    if (m_selvtest)
+        m_lastText.clear();
     m_process.setProcessChannelMode(QProcess::SeparateChannels);
     m_process.start(agentPath, QStringList());
     if (!m_process.waitForStarted(5000)) {
@@ -245,7 +251,7 @@ void AcpClient::dispatch(const QJsonObject &obj)
         emit configOptionsChanged();
     }
     if (method == QStringLiteral("initialize")) {
-        if (!m_sessionId.isEmpty()) {
+        if (!m_selvtest && !m_sessionId.isEmpty()) {
             QJsonObject params;
             params.insert(QStringLiteral("sessionId"), m_sessionId);
             params.insert(QStringLiteral("cwd"), m_cwd);
@@ -399,7 +405,7 @@ void AcpClient::finishSelvtest()
         f.write("diffs=" + QByteArray::number(m_diffs.count()) + "\n");
         f.write("outputs=" + QByteArray::number(m_outputs.count()) + "\n");
         f.write("config_options=" + QByteArray::number(m_configOptions.count()) + "\n");
-        f.write("session_load=" + QByteArray(m_sessionLoaded ? "ok" : (m_hadRestored || !m_sessionId.isEmpty() ? "fallback" : "ingen")) + "\n");
+        f.write("session_load=" + QByteArray(m_selvtest ? "fravalgt" : (m_sessionLoaded ? "ok" : (m_hadRestored || !m_sessionId.isEmpty() ? "fallback" : "ingen"))) + "\n");
         f.write("genoptaget=" + QByteArray(m_hadRestored ? "ja" : "nej") + "\n");
         f.write("replayed_user=" + QByteArray::number(m_replayedUser) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
