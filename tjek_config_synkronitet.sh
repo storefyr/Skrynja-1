@@ -28,6 +28,14 @@ if [ "$#" -ge 1 ]; then
     fi
 fi
 
+# 3) All config.yaml keys must be Danish orthography (æøå allowed; apostrophe allowed for id'er)
+bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml | grep -vP "^[a-zæøå_0-9']+$" || true)
+if [ -n "$bad_keys" ]; then
+    echo "FAIL: nøgler ikke på dansk ortografi:"
+    printf '%s\n' "$bad_keys"
+    fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
