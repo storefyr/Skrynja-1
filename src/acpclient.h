@@ -28,8 +28,10 @@ public:
 
     static QString defaultAgentPath();
 
-    Q_INVOKABLE void start(const QString &agentPath, const QString &cwd);
+    Q_INVOKABLE void start(const QString &agentPath, const QString &cwd, const QString &savedSessionId = QString());
     Q_INVOKABLE qint64 sendPrompt(const QString &text);
+    qint64 sendRequestForTest(const QString &method, const QJsonObject &params) { return sendRequest(method, params); }
+    qint64 sendSessionNew(const QString &cwd);
 
     QString sessionId() const { return m_sessionId; }
     QString lastText() const { return m_lastText; }
@@ -83,6 +85,9 @@ private:
     AcpFrameReader m_reader;
     QProcess m_process;
     QString m_sessionId;
+    QString m_savedSessionId;
+    bool m_sessionLoaded = false;
+    int m_replayedUser = 0;
     QString m_lastText;
     QVariantList m_toolCalls;
     QVariantList m_diffs;

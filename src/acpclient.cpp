@@ -19,9 +19,10 @@ AcpClient::AcpClient(QObject *parent) : QObject(parent)
     connect(&m_process, SIGNAL(finished(int)), this, SLOT(onProcessFinished(int)));
 }
 
-void AcpClient::start(const QString &agentPath, const QString &cwd)
+void AcpClient::start(const QString &agentPath, const QString &cwd, const QString &savedSessionId)
 {
     m_cwd = cwd;
+    m_savedSessionId = savedSessionId;
     m_process.setProcessChannelMode(QProcess::SeparateChannels);
     m_process.start(agentPath, QStringList());
     if (!m_process.waitForStarted(5000)) {
@@ -37,6 +38,14 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
     params.insert(QStringLiteral("clientCapabilities"), QJsonObject());
     params.insert(QStringLiteral("clientInfo"), clientInfo);
     sendRequest(QStringLiteral("initialize"), params);
+}
+
+qint64 AcpClient::sendSessionNew(const QString &cwd)
+{
+    QJsonObject params;
+    params.insert(QStringLiteral("cwd"), cwd);
+    params.insert(QStringLiteral("mcpServers"), QJsonArray());
+    return sendRequest(QStringLiteral("session/new"), params);
 }
 
 qint64 AcpClient::sendPrompt(const QString &text)
@@ -89,12 +98,14 @@ void AcpClient::dispatch(const QJsonObject &obj)
             const QJsonObject upd = obj.value(QStringLiteral("params")).toObject()
                     .value(QStringLiteral("update")).toObject();
             const QString kind = upd.value(QStringLiteral("sessionUpdate")).toString();
-            if (kind == QStringLiteral("agent_message_chunk")) {
+            if (kind == QStringLiteral("agent_message_chunk") || kind == QStringLiteral("user_message_chunk")) {
                 const QString t = upd.value(QStringLiteral("content")).toObject()
                         .value(QStringLiteral("text")).toString();
                 if (!t.isEmpty()) {
                     m_lastText += t;
                     emit lastTextChanged();
+                    if (kind == QStringLiteral("user_message_chunk"))
+                        m_replayedUser++;
                 }
             } else if (kind == QStringLiteral("tool_call") || kind == QStringLiteral("tool_call_update")) {
                 const QString toolCallId = upd.value(QStringLiteral("toolCallId")).toString();
@@ -148,6 +159,8 @@ void AcpClient::dispatch(const QJsonObject &obj)
     const QString method = m_methods.take(id);
     if (obj.contains(QStringLiteral("error"))) {
         qWarning() << "[acp] fejl fra agent, id" << id << obj.value(QStringLiteral("error")).toObject();
+        if (method == QStringLiteral("session/load"))
+            sendSessionNew(m_cwd);
         return;
     }
     const QJsonObject result = obj.value(QStringLiteral("result")).toObject();
@@ -176,10 +189,21 @@ void AcpClient::dispatch(const QJsonObject &obj)
         emit configOptionsChanged();
     }
     if (method == QStringLiteral("initialize")) {
-        QJsonObject params;
-        params.insert(QStringLiteral("cwd"), m_cwd);
-        params.insert(QStringLiteral("mcpServers"), QJsonArray());
-        sendRequest(QStringLiteral("session/new"), params);
+        if (!m_savedSessionId.isEmpty()) {
+            QJsonObject params;
+            params.insert(QStringLiteral("sessionId"), m_savedSessionId);
+            params.insert(QStringLiteral("cwd"), m_cwd);
+            sendRequest(QStringLiteral("session/load"), params);
+        } else {
+            sendSessionNew(m_cwd);
+        }
+    } else if (method == QStringLiteral("session/load")) {
+        m_sessionLoaded = true;
+        const QString sid = result.value(QStringLiteral("sessionId")).toString();
+        if (!sid.isEmpty()) {
+            m_sessionId = sid;
+            emit sessionIdChanged();
+        }
     } else if (method == QStringLiteral("session/new")) {
         m_sessionId = result.value(QStringLiteral("sessionId")).toString();
         emit sessionIdChanged();
@@ -317,6 +341,8 @@ void AcpClient::finishSelvtest()
         f.write("diffs=" + QByteArray::number(m_diffs.count()) + "\n");
         f.write("outputs=" + QByteArray::number(m_outputs.count()) + "\n");
         f.write("config_options=" + QByteArray::number(m_configOptions.count()) + "\n");
+        f.write("session_load=" + QByteArray(m_sessionLoaded ? "ok" : (m_savedSessionId.isEmpty() ? "ingen" : "fallback")) + "\n");
+        f.write("replayed_user=" + QByteArray::number(m_replayedUser) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
