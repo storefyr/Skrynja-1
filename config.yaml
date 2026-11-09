@@ -149,6 +149,14 @@ anti_mønstre:
       metode: Qt foreach-makroen brugt i app-kode
       resultat: byg fejlede med lambda-expression in unevaluated context i Sailfish SDK (kørsel 42499995419)
       lektie: brug almindelig for-løkke over QJsonArray i app-koden på denne platform
+    - id: metodefejl_10
+      metode: test-hjælpere (frie funktioner) defineret efter testklasserne og brugt i inline-medlemsfunktioner
+      resultat: compile-fejl not declared in this scope to gange (kørsel 42500157658 og 42537105639)
+      lektie: fremad-deklarer frie hjælpere øverst i filen, før første klasse
+    - id: metodefejl_11
+      metode: git ls-files uden core.quotepath=false brugt til at generere YAML flow-lister
+      resultat: æøå-filnavne blev C-quotet med backslash-escape og gav ugyldig YAML (inventar-bygning denne session)
+      lektie: altid git -c core.quotepath=false ls-files når output skal ind i YAML eller shell
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
