@@ -212,4 +212,5 @@ fremdrift:
   skive_diff: bestået 2026-11-09 — selvtest PASS på enheden, revision 3bd9a6b (diffs=2, outputs=1 — både diff og uddata vist); CI 42537276959 grøn, 25/25 prøver
   skive_konfiguration: bestået 2026-11-09 — selvtest PASS på enheden, revision 3bd9a6b (config_options=3, mode=ask sat via set_config_option); UI indstillingsmenu; CI 42564758904 grøn, 29/29 prøver
   skive_genoptagelse: bestået 2026-11-09 — to selvtest-kørsler på revision b5192b8 — første session_load=ingen, anden session_load=fallback + genoptaget=ja (QSettings-historik vist igen), PASS begge gange
+  skive_oprydning: bestået 2026-11-09 — inventar og træ er identiske i begge retninger (målt lokalt), ingen utrackede filer; håndhæves fremadrettet af tjek_config i CI på hver push
 
