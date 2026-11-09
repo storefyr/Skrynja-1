@@ -71,7 +71,7 @@ qint64 AcpClient::sendSessionNew(const QString &cwd)
 
 qint64 AcpClient::sendPrompt(const QString &text)
 {
-    if (m_sessionId.isEmpty() || m_process.state() != QProcess::Running)
+    if (m_sessionId.isEmpty())
         return -1;
     QJsonObject content;
     content.insert(QStringLiteral("type"), QStringLiteral("text"));

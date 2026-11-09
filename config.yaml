@@ -180,7 +180,7 @@ målt_på_wire:
   prompt_svar: svar med result stopReason end_turn og usage
   request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
   set_config_option: målt i Skrynja-1 2026-11-08 (revision 2a9e328) — mode=ask sat via session/set_config_option virker; fil-skrivning i ask-mode udløste 1 request_permission; læsning (id -un) gjorde ikke (i accept-edits)
-  session_load: målt 2026-11-09 (revision b5192b8) — første forsøg fik -32602 fordi anmodningen manglede mcpServers (loc mcpServers, Field required); med mcpServers:[] medsendt er næste skridt at måle om load så svarer ok (agenten erklærer loadSession true i initialize); indtil da gemmer klienten selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) og viser historikken ved næste start (genoptaget=ja målt)
+  session_load: målt 2026-11-09 — uden mcpServers svarer agenten -32602 (missing field); med mcpServers:[] medsendt svarer load OK (session_load=ok målt på revision d7cb315/c77fa0e) — agenten erklærer loadSession true; klienten gemmer stadig selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) som fallback og første visning
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
@@ -188,7 +188,7 @@ målt_på_wire:
   åbent_punkt_03: løst 2026-11-08 — selvtest læser probe-filen og kræver probe_fil=OK; målt PASS på enheden, revision 760bc12 (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, mode=ask)
   åbent_punkt_04: beviser uden for repoet forældes (app-log og verdict i /tmp på enheden, Actions-logs udløber) — kun kørsels-id og revision i git består; accepteret begrænsning
   åbent_punkt_05: løst i koden 2026-11-09 — dialoger åbnes nu via pageStack.push i stedet for open() (var TypeErrors i app-log); bekræftes ved næste eksekver_test.sh (ingen PageStack-fejl når tilladelsesdialogen åbner i ask-mode)
-  åbent_punkt_06: selvtest kunne gå i stå i UI når dialog blev pushet under kørsel — fix 2026-11-09 — selvtest viser ikke dialog (C++ auto-svarer), permOpen-guard mod dobbelt-push, samtaletekst capped ved 4000 tegn i UI; bekræftes ved næste eksekver_test.sh
+  åbent_punkt_06: selvtest kunne gå i stå (manglende end_turn etter load; dialog-push under kørsel) — fix 2026-11-09 — selvtest kører nu også probe efter session/load-ok, viser ikke dialog under selvtest, permOpen-guard, tekst capped i UI, watchdog 150s; bekræftes ved næste eksekver_test.sh
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
