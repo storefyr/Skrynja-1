@@ -10,6 +10,7 @@ static QByteArray endTurnLine();
 static QByteArray permissionRequestLine();
 static QByteArray diffToolCallLine();
 static QByteArray outputUpdateLine();
+static QByteArray configResponseLine(const char *currentValue);
 static QString readVerdict();
 
 class Collector : public QObject
@@ -97,6 +98,35 @@ private slots:
     void diff_blokk_samles();
     void uddata_blokk_samles();
 };
+
+class TestKonfiguration : public QObject
+{
+    Q_OBJECT
+private slots:
+    void configoptions_samles();
+    void configoptions_opdateres_ved_svar();
+};
+
+void TestKonfiguration::configoptions_samles()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(configResponseLine("ask"));
+    QCOMPARE(acp.configOptions().count(), 1);
+    QVariantMap c = acp.configOptions().first().toMap();
+    QCOMPARE(c.value(QStringLiteral("id")).toString(), QStringLiteral("mode"));
+    QCOMPARE(c.value(QStringLiteral("currentValue")).toString(), QStringLiteral("ask"));
+    QCOMPARE(c.value(QStringLiteral("options")).toList().count(), 2);
+}
+
+void TestKonfiguration::configoptions_opdateres_ved_svar()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(configResponseLine("ask"));
+    acp.feedBytesForTest(configResponseLine("accept-edits"));
+    QCOMPARE(acp.configOptions().count(), 1);
+    QCOMPARE(acp.configOptions().first().toMap().value(QStringLiteral("currentValue")).toString(),
+             QStringLiteral("accept-edits"));
+}
 
 void TestDiffUddata::diff_blokk_samles()
 {
@@ -213,6 +243,13 @@ static QByteArray outputUpdateLine()
     return QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call_update\",\"toolCallId\":\"c9\",\"status\":\"completed\",\"content\":[{\"type\":\"text\",\"text\":\"defaultuser\\n\"}]}}}\n");
 }
 
+static QByteArray configResponseLine(const char *currentValue)
+{
+    QByteArray v = currentValue;
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":5,\"result\":{\"sessionId\":\"s1\",\"configOptions\":[{\"id\":\"mode\",\"name\":\"Mode\",\"type\":\"select\",\"currentValue\":\"") + v +
+        QByteArray("\",\"options\":[{\"value\":\"ask\",\"name\":\"Ask\"},{\"value\":\"accept-edits\",\"name\":\"Accept Edits\"}]}]}}\n");
+}
+
 static QByteArray permissionRequestLine()
 {
     return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":7,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"id -un\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"id -un\"}},\"options\":[{\"optionId\":\"allow\",\"name\":\"Tillad\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
@@ -237,13 +274,14 @@ void TestVaerktoejskald::selvtest_verdict()
     probe.close();
     QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
     acp.uiToolCallsSeen(1);
-    acp.feedBytesForTest(permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
+    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("permission_requests=1")));
     QVERIFY(v.contains(QStringLiteral("probe_fil=OK")));
     QVERIFY(v.contains(QStringLiteral("diffs=1")));
+    QVERIFY(v.contains(QStringLiteral("config_options=1")));
     QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
     QFile::remove(QStringLiteral("/tmp/skrynja-1-probe.txt"));
 }
@@ -382,6 +420,10 @@ int main(int argc, char *argv[])
     }
     {
         TestDiffUddata t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    {
+        TestKonfiguration t;
         status |= QTest::qExec(&t, argc, argv);
     }
     return status;
