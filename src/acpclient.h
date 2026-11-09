@@ -39,6 +39,7 @@ public:
     QVariantList toolCalls() const { return m_toolCalls; }
 
     void setSelvtest(bool on) { m_selvtest = on; }
+    void setQuitOnFinish(bool on) { m_quitOnFinish = on; }
     void feedBytesForTest(const QByteArray &d) { m_reader.feed(d); }
     Q_INVOKABLE void uiToolCallsSeen(int n) { m_uiToolCalls = n; }
     void finishSelvtest();
@@ -71,6 +72,7 @@ signals:
 
 private slots:
     void onReadyRead();
+    void selvtestTimeout();
     void onMessage(const QJsonObject &obj);
     void onDiscarded(const QString &reason);
     void onProcessFinished(int exitCode);
@@ -87,6 +89,7 @@ private:
     QProcess m_process;
     QString m_sessionId;
     bool m_hadRestored = false;
+    bool m_quitOnFinish = false;
     bool m_sessionLoaded = false;
     int m_replayedUser = 0;
     QString m_lastText;

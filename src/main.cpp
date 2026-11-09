@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 
     AcpClient acp;
     acp.setSelvtest(selvtest);
+    if (selvtest)
+        acp.setQuitOnFinish(true);
     acp.start(AcpClient::defaultAgentPath(), QStringLiteral("/home/defaultuser"));
 
     QQuickView *view = SailfishApp::createView();

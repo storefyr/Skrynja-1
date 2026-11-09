@@ -5,6 +5,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSettings>
+#include <QTimer>
 #include <QDebug>
 
 QString AcpClient::defaultAgentPath()
@@ -42,6 +43,8 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
         return;
     }
     emit started();
+    if (m_selvtest)
+        QTimer::singleShot(150000, this, SLOT(selvtestTimeout()));
     QJsonObject clientInfo;
     clientInfo.insert(QStringLiteral("name"), QStringLiteral("Skrynja-1"));
     clientInfo.insert(QStringLiteral("version"), QStringLiteral("0.1.0"));
@@ -87,6 +90,12 @@ void AcpClient::onMessage(const QJsonObject &obj)
 void AcpClient::onDiscarded(const QString &reason)
 {
     qWarning() << "[acp] linje kasseret:" << reason;
+}
+
+void AcpClient::selvtestTimeout()
+{
+    qWarning() << "[selvtest] watchdog udløst efter 150s — skriver verdict nu";
+    finishSelvtest();
 }
 
 void AcpClient::onProcessFinished(int exitCode)
@@ -362,7 +371,7 @@ void AcpClient::finishSelvtest()
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();
     }
-    if (m_process.state() == QProcess::Running)
+    if (m_quitOnFinish)
         QCoreApplication::exit(pass ? 0 : 1);
 }
 

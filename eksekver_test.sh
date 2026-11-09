@@ -67,6 +67,8 @@ while [ $i -lt 90 ]; do
     i=$((i + 1))
 done
 kill $APP_PID 2>/dev/null || true
+sleep 1
+kill -9 $APP_PID 2>/dev/null || true
 
 echo ""
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
