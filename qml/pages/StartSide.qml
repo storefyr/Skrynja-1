@@ -7,6 +7,7 @@ Page {
     Connections {
         target: acp
         onToolCallsChanged: acp.uiToolCallsSeen(acp.toolCalls.length)
+        onLastTextChanged: flick.scrollToBottom()
     }
 
     property string permTekst: {
@@ -30,6 +31,7 @@ Page {
     }
 
     SilicaFlickable {
+        id: flick
         anchors.fill: parent
         contentHeight: column.height
 
@@ -115,9 +117,7 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WordWrap
-                text: acp.lastText.length > 4000
-                      ? "…" + acp.lastText.substring(acp.lastText.length - 4000)
-                      : acp.lastText
+                text: acp.lastText
             }
 
             Label {

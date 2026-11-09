@@ -29,7 +29,7 @@ AcpClient::AcpClient(QObject *parent) : QObject(parent)
     });
     connect(this, &AcpClient::lastTextChanged, this, [this]() {
         QSettings s2;
-        s2.setValue(QStringLiteral("acp/lastText"), m_lastText);
+        s2.setValue(QStringLiteral("acp/lastText"), m_lastText.right(20000));
     });
 }
 
