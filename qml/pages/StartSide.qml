@@ -35,6 +35,15 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WordWrap
+                color: Theme.errorColor
+                visible: acp.lastError.length > 0
+                text: "Fejl: " + acp.lastError
+            }
+
+            Label {
+                x: Theme.horizontalPageMargin
+                width: parent.width - 2 * Theme.horizontalPageMargin
+                wrapMode: Text.WordWrap
                 color: Theme.secondaryColor
                 text: acp.sessionId.length > 0 ? "Session: " + acp.sessionId : "Starter agent…"
             }
@@ -83,7 +92,8 @@ Page {
                     wrapMode: Text.WordWrap
                     color: Theme.secondaryColor
                     text: modelData.kind + ": " + modelData.title +
-                          (modelData.detalje.length > 0 ? " — " + modelData.detalje : "")
+                          (modelData.detalje.length > 0 ? " — " + modelData.detalje : "") +
+                          " [" + (modelData.status || "") + "]"
                 }
             }
 
@@ -139,6 +149,19 @@ Page {
         onAccepted: startSide.permOpen = false
         onRejected: startSide.permOpen = false
 
+        property string visTekst: {
+            var k = acp.pendingPermission.kind || ""
+            var t = acp.pendingPermission.title || ""
+            var c = acp.pendingPermission.kommando || ""
+            var r = acp.pendingPermission.rå || ""
+            var s = (k ? k + ": " : "") + t
+            if (c)
+                s += " — " + c
+            if (!t && !c && r)
+                s = r
+            return s
+        }
+
         Column {
             width: parent.width
             spacing: Theme.paddingMedium
@@ -151,7 +174,7 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WordWrap
-                text: (acp.pendingPermission.kind || "") + ": " + (acp.pendingPermission.title || "")
+                text: permDialog.visTekst
             }
 
             Label {

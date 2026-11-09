@@ -61,6 +61,14 @@ void AcpClient::startSelvtestProbe()
     sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
 }
 
+void AcpClient::setLastError(const QString &e)
+{
+    if (m_lastError == e)
+        return;
+    m_lastError = e;
+    emit lastErrorChanged();
+}
+
 qint64 AcpClient::sendSessionNew(const QString &cwd)
 {
     QJsonObject params;
@@ -141,6 +149,7 @@ void AcpClient::dispatch(const QJsonObject &obj)
                     tc.insert(QStringLiteral("toolCallId"), toolCallId);
                     tc.insert(QStringLiteral("kind"), upd.value(QStringLiteral("kind")).toString());
                     tc.insert(QStringLiteral("title"), upd.value(QStringLiteral("title")).toString());
+                    tc.insert(QStringLiteral("status"), upd.value(QStringLiteral("status")).toString());
                     const QJsonObject raw = upd.value(QStringLiteral("rawInput")).toObject();
                     QString detalje = raw.value(QStringLiteral("command")).toString();
                     if (detalje.isEmpty())
@@ -153,6 +162,24 @@ void AcpClient::dispatch(const QJsonObject &obj)
                     tc.insert(QStringLiteral("detalje"), detalje);
                     m_toolCalls.append(tc);
                     emit toolCallsChanged();
+                } else {
+                    const QString status = upd.value(QStringLiteral("status")).toString();
+                    for (int j = 0; j < m_toolCalls.count(); j++) {
+                        QVariantMap tc = m_toolCalls.at(j).toMap();
+                        if (tc.value(QStringLiteral("toolCallId")).toString() == toolCallId) {
+                            tc.insert(QStringLiteral("status"), status);
+                            m_toolCalls[j] = tc;
+                            break;
+                        }
+                    }
+                    emit toolCallsChanged();
+                    if (status == QStringLiteral("failed")) {
+                        QString errText;
+                        const QJsonArray content0 = upd.value(QStringLiteral("content")).toArray();
+                        for (int k = 0; k < content0.size(); k++)
+                            errText += content0.at(k).toObject().value(QStringLiteral("content")).toObject().value(QStringLiteral("text")).toString();
+                        setLastError(errText.isEmpty() ? QStringLiteral("Værktøjskald fejlede") : errText);
+                    }
                 }
                 const QJsonArray content = upd.value(QStringLiteral("content")).toArray();
                 for (int i = 0; i < content.size(); i++) {
@@ -185,7 +212,9 @@ void AcpClient::dispatch(const QJsonObject &obj)
     const qint64 id = obj.value(QStringLiteral("id")).toVariant().toLongLong();
     const QString method = m_methods.take(id);
     if (obj.contains(QStringLiteral("error"))) {
-        qWarning() << "[acp] fejl fra agent, id" << id << obj.value(QStringLiteral("error")).toObject();
+        const QString msg = obj.value(QStringLiteral("error")).toObject().value(QStringLiteral("message")).toString();
+        qWarning() << "[acp] fejl fra agent, id" << id << msg;
+        setLastError(QStringLiteral("Agent-fejl (id ") + QString::number(id) + QStringLiteral("): ") + msg);
         if (method == QStringLiteral("session/load"))
             sendSessionNew(m_cwd);
         return;
@@ -266,6 +295,7 @@ void AcpClient::handlePermissionRequest(qint64 id, const QJsonObject &params)
     if (cmd.isEmpty())
         cmd = raw.value(QStringLiteral("path")).toString();
     p.insert(QStringLiteral("kommando"), cmd);
+    p.insert(QStringLiteral("rå"), QJsonDocument(raw.isEmpty() ? tc : raw).toJson(QJsonDocument::Compact));
     QVariantList opts;
     const QJsonArray arr = params.value(QStringLiteral("options")).toArray();
     for (int i = 0; i < arr.size(); i++) {

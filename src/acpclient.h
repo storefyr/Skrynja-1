@@ -23,6 +23,7 @@ class AcpClient : public QObject
     Q_PROPERTY(QVariantList diffs READ diffs NOTIFY diffsChanged)
     Q_PROPERTY(QVariantList outputs READ outputs NOTIFY outputsChanged)
     Q_PROPERTY(QVariantList configOptions READ configOptions NOTIFY configOptionsChanged)
+    Q_PROPERTY(QString lastError READ lastError NOTIFY lastErrorChanged)
 public:
     explicit AcpClient(QObject *parent = nullptr);
 
@@ -56,6 +57,8 @@ public:
     QVariantList diffs() const { return m_diffs; }
     QVariantList outputs() const { return m_outputs; }
     QVariantList configOptions() const { return m_configOptions; }
+    QString lastError() const { return m_lastError; }
+    void setLastError(const QString &e);
 
 signals:
     void sessionIdChanged();
@@ -69,6 +72,7 @@ signals:
     void diffsChanged();
     void outputsChanged();
     void configOptionsChanged();
+    void lastErrorChanged();
 
 private slots:
     void onReadyRead();
@@ -98,6 +102,7 @@ private:
     QVariantList m_diffs;
     QVariantList m_outputs;
     QVariantList m_configOptions;
+    QString m_lastError;
     QVariantMap m_pendingPermission;
     int m_uiToolCalls = 0;
     int m_permissionRequests = 0;
