@@ -91,7 +91,14 @@ private slots:
     void tilladelse_tillad_svar();
     void tilladelse_afvis_svar();
     void tilladelse_stop_raekkefoelge();
+    void tilladelse_tom_titel_faar_fallback();
+    void tool_status_opdateres();
 };
+
+static QByteArray permissionEmptyTitleLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":8,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"toolCallId\":\"c2\",\"kind\":\"execute\",\"rawInput\":{\"url\":\"https://github.com/storefyr/Skrynja-1\"}},\"options\":[{\"optionId\":\"allow_once\",\"name\":\"Allow Once\"},{\"optionId\":\"reject\",\"name\":\"Afvis\"}]}}\n");
+}
 
 class TestDiffUddata : public QObject
 {
@@ -252,6 +259,25 @@ void TestTilladelser::tilladelse_afvis_svar()
     acp.feedBytesForTest(permissionRequestLine());
     acp.dismissPermission();
     QVERIFY(fc.frames.last().contains(QStringLiteral("\"cancelled\"")));
+}
+
+void TestTilladelser::tilladelse_tom_titel_faar_fallback()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(permissionEmptyTitleLine());
+    QVariantMap p = acp.pendingPermission();
+    QVERIFY(p.value(QStringLiteral("title")).toString().isEmpty());
+    QVERIFY(p.value(QStringLiteral("rå")).toString().contains(QStringLiteral("github.com")));
+}
+
+void TestTilladelser::tool_status_opdateres()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(toolCallLine());
+    QCOMPARE(acp.toolCalls().first().toMap().value(QStringLiteral("status")).toString(), QStringLiteral("in_progress"));
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call_update\",\"toolCallId\":\"c1\",\"status\":\"failed\"}}}\n"));
+    QCOMPARE(acp.toolCalls().first().toMap().value(QStringLiteral("status")).toString(), QStringLiteral("failed"));
+    QVERIFY(!acp.lastError().isEmpty());
 }
 
 void TestTilladelser::tilladelse_stop_raekkefoelge()
