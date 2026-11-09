@@ -10,3 +10,7 @@ kørsler:
     dato: 2026-11-08
     revision: 760bc121a9c59857699a53e25af28c5230991dfa
     resultat: PASS (exit 0) — tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, mode=ask; CI 42518900853 grøn (21/21 prøver + config-synkronitet OK)
+  selvtest_4eea463:
+    dato: 2026-11-08
+    revision: 4eea463e2ce1f0b7bb495e2c17581bd27d87263c
+    resultat: PASS (exit 0) — tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, outputs=1, diffs=0, mode=ask; CI 42537276959 grøn (25/25 prøver)
