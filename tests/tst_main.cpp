@@ -2,6 +2,7 @@
 #include <QFile>
 #include <QJsonObject>
 #include <QVariantMap>
+#include <QSettings>
 #include "acpframereader.h"
 #include "acpclient.h"
 
@@ -115,6 +116,7 @@ private slots:
     void load_fallback_ved_fejl();
     void load_ok_saetter_session();
     void replay_vises_i_lasttext();
+    void klient_henter_gammel_tekst_ved_start();
 };
 
 static QByteArray userChunkLine(const char *text)
@@ -147,6 +149,18 @@ void TestGenoptagelse::replay_vises_i_lasttext()
     AcpClient acp;
     acp.feedBytesForTest(userChunkLine("gammel besked"));
     QVERIFY(acp.lastText().contains(QStringLiteral("gammel besked")));
+}
+
+void TestGenoptagelse::klient_henter_gammel_tekst_ved_start()
+{
+    QSettings s;
+    s.setValue(QStringLiteral("acp/lastText"), QStringLiteral("gammel samtale fra før"));
+    {
+        AcpClient acp;
+        QCOMPARE(acp.lastText(), QStringLiteral("gammel samtale fra før"));
+        QVERIFY(acp.hadRestoredHistory());
+    }
+    s.remove(QStringLiteral("acp/lastText"));
 }
 
 void TestKonfiguration::configoptions_samles()
@@ -447,6 +461,8 @@ void TestRygradParser::rygrad_cap()
 int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
+    app.setOrganizationName(QStringLiteral("org.skrynja"));
+    app.setApplicationName(QStringLiteral("Skrynja-1-test"));
     int status = 0;
     {
         TestRygradParser t;
