@@ -55,6 +55,11 @@ ApplicationWindow {
                     }
                 }
             }
+
+            Button {
+                text: "Luk"
+                onClicked: pageStack.pop()
+            }
         }
     }
 }

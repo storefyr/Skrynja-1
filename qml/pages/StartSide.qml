@@ -192,7 +192,8 @@ Page {
                     text: modelData.name
                     onClicked: {
                         acp.answerPermission(modelData.optionId)
-                        permDialog.reject()
+                        startSide.permOpen = false
+                        pageStack.pop()
                     }
                 }
             }
@@ -201,7 +202,8 @@ Page {
                 text: "Afvis"
                 onClicked: {
                     acp.dismissPermission()
-                    permDialog.reject()
+                    startSide.permOpen = false
+                    pageStack.pop()
                 }
             }
 
@@ -209,7 +211,8 @@ Page {
                 text: "Stop"
                 onClicked: {
                     acp.stopAgent()
-                    permDialog.reject()
+                    startSide.permOpen = false
+                    pageStack.pop()
                 }
             }
         }
