@@ -4,6 +4,8 @@ import Sailfish.Silica 1.0
 Page {
     id: startSide
 
+    property bool permOpen: false
+
     Connections {
         target: acp
         onToolCallsChanged: acp.uiToolCallsSeen(acp.toolCalls.length)
@@ -57,7 +59,9 @@ Page {
                 x: Theme.horizontalPageMargin
                 width: parent.width - 2 * Theme.horizontalPageMargin
                 wrapMode: Text.WordWrap
-                text: acp.lastText
+                text: acp.lastText.length > 4000
+                      ? "…" + acp.lastText.substring(acp.lastText.length - 4000)
+                      : acp.lastText
             }
 
             Label {
@@ -132,6 +136,8 @@ Page {
     Dialog {
         id: permDialog
         canAccept: false
+        onAccepted: startSide.permOpen = false
+        onRejected: startSide.permOpen = false
 
         Column {
             width: parent.width
@@ -189,8 +195,10 @@ Page {
     Connections {
         target: acp
         onPendingPermissionChanged: {
-            if (acp.hasPendingPermission)
+            if (acp.hasPendingPermission && !selvtest && !startSide.permOpen) {
+                startSide.permOpen = true
                 pageStack.push(permDialog)
+            }
         }
     }
 

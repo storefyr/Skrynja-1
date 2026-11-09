@@ -44,6 +44,7 @@ int main(int argc, char *argv[])
 
     QQuickView *view = SailfishApp::createView();
     view->rootContext()->setContextProperty(QStringLiteral("acp"), &acp);
+    view->rootContext()->setContextProperty(QStringLiteral("selvtest"), selvtest);
     view->setSource(SailfishApp::pathTo(QStringLiteral("qml/harbour-skrynja-1.qml")));
     view->show();
 
