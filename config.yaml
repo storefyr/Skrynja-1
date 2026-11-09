@@ -180,13 +180,14 @@ målt_på_wire:
   prompt_svar: svar med result stopReason end_turn og usage
   request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
   set_config_option: målt i Skrynja-1 2026-11-08 (revision 2a9e328) — mode=ask sat via session/set_config_option virker; fil-skrivning i ask-mode udløste 1 request_permission; læsning (id -un) gjorde ikke (i accept-edits)
-  session_load: målt igen 2026-11-09 (revision 171089d, session_load=fallback) — agenten svarer -32602 Invalid params på session/load ved genstart, så server-side replay findes ikke; klienten gemmer selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) og viser historikken ved næste start
+  session_load: målt 2026-11-09 (revision b5192b8) — første forsøg fik -32602 fordi anmodningen manglede mcpServers (loc mcpServers, Field required); med mcpServers:[] medsendt er næste skridt at måle om load så svarer ok (agenten erklærer loadSession true i initialize); indtil da gemmer klienten selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) og viser historikken ved næste start (genoptaget=ja målt)
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
   åbent_punkt_02: løst 2026-11-08 — selvtest PASS på revision 7a3f52e med tool_calls=1 og ui_tool_calls=1 (QML-callback uiToolCallsSeen målte, at UI-bindingen kørte)
   åbent_punkt_03: løst 2026-11-08 — selvtest læser probe-filen og kræver probe_fil=OK; målt PASS på enheden, revision 760bc12 (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, mode=ask)
   åbent_punkt_04: beviser uden for repoet forældes (app-log og verdict i /tmp på enheden, Actions-logs udløber) — kun kørsels-id og revision i git består; accepteret begrænsning
+  åbent_punkt_05: Silica Dialog åbnet via open() giver TypeErrors i loggen (PageStack nægter to samme sider efter hinanden) — fix er pageStack.push(dialog) i stedet; målt i app-log 2026-11-09
 
 operationel_implementering:
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
@@ -210,4 +211,5 @@ fremdrift:
   skive_tilladelser: bestået 2026-11-08 — selvtest PASS på enheden, revision 2a9e328 (mode=ask via set_config_option, permission_requests=1, tool_calls=1, ui_tool_calls=1, exit 0); stop-rækkefølge (session/cancel før cancelled) unit-testet; CI 42500337915 grøn, 21/21 prøver
   skive_diff: bestået 2026-11-09 — selvtest PASS på enheden, revision 3bd9a6b (diffs=2, outputs=1 — både diff og uddata vist); CI 42537276959 grøn, 25/25 prøver
   skive_konfiguration: bestået 2026-11-09 — selvtest PASS på enheden, revision 3bd9a6b (config_options=3, mode=ask sat via set_config_option); UI indstillingsmenu; CI 42564758904 grøn, 29/29 prøver
+  skive_genoptagelse: bestået 2026-11-09 — to selvtest-kørsler på revision b5192b8: første session_load=ingen, anden session_load=fallback + genoptaget=ja (QSettings-historik vist igen), PASS begge gange
 

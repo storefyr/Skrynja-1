@@ -205,6 +205,7 @@ void AcpClient::dispatch(const QJsonObject &obj)
             QJsonObject params;
             params.insert(QStringLiteral("sessionId"), m_sessionId);
             params.insert(QStringLiteral("cwd"), m_cwd);
+            params.insert(QStringLiteral("mcpServers"), QJsonArray());
             sendRequest(QStringLiteral("session/load"), params);
         } else {
             sendSessionNew(m_cwd);

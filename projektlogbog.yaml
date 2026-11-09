@@ -18,3 +18,7 @@ kørsler:
     dato: 2026-11-09
     revision: 3bd9a6b92461a832ac2796b7ebf6126c456a1de4
     resultat: PASS (exit 0) — tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, diffs=2, outputs=1, config_options=3, mode=ask; CI 42564758904 grøn (29/29 prøver + config-synkronitet)
+  selvtest_b5192b8_genoptag:
+    dato: 2026-11-09
+    revision: b5192b8cbc9c779dbac5d0113d178204971aa10a
+    resultat: to kørsler, begge PASS — 1. session_load=ingen, genoptaget=nej; 2. session_load=fallback (agent -32602 uden mcpServers), genoptaget=ja (QSettings-historik vist igen)
