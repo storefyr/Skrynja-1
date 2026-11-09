@@ -37,7 +37,6 @@ regler:
   kapabiliteter: Tom clientCapabilities indtil SailJail er målt
   sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første commit — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
   filer: Nye kildefiler registreres i .pro; nye QML-filer til install
-  symboløkonomi: Altid målsætning at brænde færrest mulige symboler (tokens) — samme Mistral-konto deles af Vibe-appen og vibe-acp på telefonen (målt 2026-11-09); praksis — korte stokastiker-svar, kun verdict-blokken pastes i dialogen (ikke hele app-loggen), eksekver_test.sh truncater udskrevne linjer, få gh-kald, højst ét push pr. arbejdsgang, ikke flere selvtest-kørsler i træk på samme genoptagne session; forbrug målt 39/255EUR 2026-11-09, rate-limit er pr. vindue ikke forbrug — om vinduet tæller forespørgsler eller symboler er ikke målt
 
 
 inventar:
