@@ -6,7 +6,7 @@ samtaler:
     resume: Skrynja-1 grundlagt — formål, regler, vejkort, selvtest; fire skiver bestået (se config.yaml fremdrift); omdøbning af dialogen sker i klientens UI
   samtale_skrynja1_2026-11-09:
     besked_id: 1137f955-4a32-4663-bb90-5674f2d42bf2
-    resume: rate-limit skilt ad fra forbrug og fra GitHubs eget limit (målt — se selvtest.rate_limit); to selvtest-kørsler på revision 3147b8f, alle PASS-kriterier grønne; symboløkonomi-reglen tilføjet og igen fjernet samme samtale (sufflør uenig i den som fast regel); selvtest skiftet til frisk session pr. kørsel (session/new) — afventer enheds-kørsel
+    resume: rate-limit skilt ad fra forbrug og fra GitHubs eget limit (målt — se selvtest.rate_limit); to selvtest-kørsler på revision 3147b8f, alle PASS-kriterier grønne; symboløkonomi-reglen tilføjet og igen fjernet samme samtale (sufflør uenig i den som fast regel); selvtest skiftet til frisk session pr. kørsel (session/new) — målt på enheden: session_load=fravalgt, replayed_user=1, PASS på 18de24d
 
 kørsler:
   selvtest_760bc12:
@@ -37,3 +37,7 @@ kørsler:
     dato: 2026-11-09
     revision: 3147b8fe30b88b6e2d8576bb9c7ad8346d176693
     resultat: to kørsler samme session (11:02 og 11:27); 11:27-verdict — alle PASS-kriterier grønne: tool_calls=34, ui_tool_calls=34, permission_requests=1, probe_fil=OK, diffs=6, outputs=36, config_options=3, session_load=ok, genoptaget=ja, replayed_user=10, mode=ask (VERDICT-linjen ikke med i sufflørs udklip); indre agent ramte effect_recovery_failed på edit/bash — dens værktøjsfejl, ikke klientens
+  selvtest_18de24d:
+    dato: 2026-11-09
+    revision: 18de24d12c41e3751a8ba405df570f4411635ffb
+    resultat: PASS (exit 0) — tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, outputs=1, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask; frisk session pr. selvtest målt — ingen historik sendt igen (replayed_user 10→1), last_text kun probe+svar
