@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QSettings>
 #include <QDebug>
 
 QString AcpClient::defaultAgentPath()
@@ -13,16 +14,27 @@ QString AcpClient::defaultAgentPath()
 
 AcpClient::AcpClient(QObject *parent) : QObject(parent)
 {
+    QSettings s;
+    m_sessionId = s.value(QStringLiteral("acp/sessionId")).toString();
+    m_lastText = s.value(QStringLiteral("acp/lastText")).toString();
+    m_hadRestored = !m_lastText.isEmpty();
     connect(&m_reader, SIGNAL(messageReady(QJsonObject)), this, SLOT(onMessage(QJsonObject)));
     connect(&m_reader, SIGNAL(lineDiscarded(QString)), this, SLOT(onDiscarded(QString)));
     connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyRead()));
     connect(&m_process, SIGNAL(finished(int)), this, SLOT(onProcessFinished(int)));
+    connect(this, &AcpClient::sessionIdChanged, this, [this]() {
+        QSettings s2;
+        s2.setValue(QStringLiteral("acp/sessionId"), m_sessionId);
+    });
+    connect(this, &AcpClient::lastTextChanged, this, [this]() {
+        QSettings s2;
+        s2.setValue(QStringLiteral("acp/lastText"), m_lastText);
+    });
 }
 
-void AcpClient::start(const QString &agentPath, const QString &cwd, const QString &savedSessionId)
+void AcpClient::start(const QString &agentPath, const QString &cwd)
 {
     m_cwd = cwd;
-    m_savedSessionId = savedSessionId;
     m_process.setProcessChannelMode(QProcess::SeparateChannels);
     m_process.start(agentPath, QStringList());
     if (!m_process.waitForStarted(5000)) {
@@ -189,9 +201,9 @@ void AcpClient::dispatch(const QJsonObject &obj)
         emit configOptionsChanged();
     }
     if (method == QStringLiteral("initialize")) {
-        if (!m_savedSessionId.isEmpty()) {
+        if (!m_sessionId.isEmpty()) {
             QJsonObject params;
-            params.insert(QStringLiteral("sessionId"), m_savedSessionId);
+            params.insert(QStringLiteral("sessionId"), m_sessionId);
             params.insert(QStringLiteral("cwd"), m_cwd);
             sendRequest(QStringLiteral("session/load"), params);
         } else {
@@ -341,7 +353,8 @@ void AcpClient::finishSelvtest()
         f.write("diffs=" + QByteArray::number(m_diffs.count()) + "\n");
         f.write("outputs=" + QByteArray::number(m_outputs.count()) + "\n");
         f.write("config_options=" + QByteArray::number(m_configOptions.count()) + "\n");
-        f.write("session_load=" + QByteArray(m_sessionLoaded ? "ok" : (m_savedSessionId.isEmpty() ? "ingen" : "fallback")) + "\n");
+        f.write("session_load=" + QByteArray(m_sessionLoaded ? "ok" : (m_hadRestored || !m_sessionId.isEmpty() ? "fallback" : "ingen")) + "\n");
+        f.write("genoptaget=" + QByteArray(m_hadRestored ? "ja" : "nej") + "\n");
         f.write("replayed_user=" + QByteArray::number(m_replayedUser) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");

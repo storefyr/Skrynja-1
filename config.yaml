@@ -91,7 +91,7 @@ selvtest:
   verdict_fil: /tmp/skrynja-1-selvtest.txt med tool_calls, ui_tool_calls, last_text, VERDICT og exit-kode
   pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen), permission_requests større end 0 (selvtest sætter mode ask først), probe_fil=OK (probe-filen /tmp/skrynja-1-probe.txt skal indeholde OK) og diffs eller outputs større end 0 (skive_diff) og config_options større end 0 (skive_konfiguration)
   kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
-  genoptagelse: to selvtest-kørsler — første kører session/new (session_load=ingen), anden kører session/load (session_load=ok) og viser replay i verdict (replayed_user større end 0); sessionId gemmes i QSettings under acp/sessionId
+  genoptagelse: to selvtest-kørsler — første giver session_load=ingen, anden giver session_load=fallback (agent svarer -32602) og genoptaget=ja (klient viser gemt samtale fra QSettings); sessionId og samtaletekst gemmes under acp/sessionId og acp/lastText
 
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
@@ -172,6 +172,7 @@ målt_på_wire:
   prompt_svar: svar med result stopReason end_turn og usage
   request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
   set_config_option: målt i Skrynja-1 2026-11-08 (revision 2a9e328) — mode=ask sat via session/set_config_option virker; fil-skrivning i ask-mode udløste 1 request_permission; læsning (id -un) gjorde ikke (i accept-edits)
+  session_load: målt igen 2026-11-09 (revision 171089d, session_load=fallback) — agenten svarer -32602 Invalid params på session/load ved genstart, så server-side replay findes ikke; klienten gemmer selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) og viser historikken ved næste start
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
@@ -191,7 +192,7 @@ vejkort:
   skive_tilladelser: accept — dialog viser kind og fuld kommando; Stop sender session/cancel før cancelled
   skive_diff: accept — filændring som diff; kommando viser uddata
   skive_konfiguration: accept — configOptions vises og kan ændres
-  skive_genoptagelse: accept — samtale vises korrekt efter genstart
+  skive_genoptagelse: accept — gammel samtale vises efter genstart (klient-side historik i QSettings; session/load svarer -32602, så fallback til session/new er forventet — se målt_på_wire.session_load)
   skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar)
 
 fremdrift:
