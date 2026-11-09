@@ -151,6 +151,30 @@ void AcpClient::dispatch(const QJsonObject &obj)
         return;
     }
     const QJsonObject result = obj.value(QStringLiteral("result")).toObject();
+    if (result.contains(QStringLiteral("configOptions"))) {
+        QVariantList list;
+        const QJsonArray arr = result.value(QStringLiteral("configOptions")).toArray();
+        for (int i = 0; i < arr.size(); i++) {
+            const QJsonObject o = arr.at(i).toObject();
+            QVariantMap m;
+            m.insert(QStringLiteral("id"), o.value(QStringLiteral("id")).toString());
+            m.insert(QStringLiteral("name"), o.value(QStringLiteral("name")).toString());
+            m.insert(QStringLiteral("type"), o.value(QStringLiteral("type")).toString());
+            m.insert(QStringLiteral("currentValue"), o.value(QStringLiteral("currentValue")).toVariant());
+            QVariantList opts;
+            const QJsonArray oa = o.value(QStringLiteral("options")).toArray();
+            for (int j = 0; j < oa.size(); j++) {
+                QVariantMap oo;
+                oo.insert(QStringLiteral("value"), oa.at(j).toObject().value(QStringLiteral("value")).toVariant());
+                oo.insert(QStringLiteral("name"), oa.at(j).toObject().value(QStringLiteral("name")).toString());
+                opts.append(oo);
+            }
+            m.insert(QStringLiteral("options"), opts);
+            list.append(m);
+        }
+        m_configOptions = list;
+        emit configOptionsChanged();
+    }
     if (method == QStringLiteral("initialize")) {
         QJsonObject params;
         params.insert(QStringLiteral("cwd"), m_cwd);
@@ -281,7 +305,7 @@ void AcpClient::finishSelvtest()
         probe = QString::fromUtf8(pf.readAll());
     const bool probeOk = probe.contains(QStringLiteral("OK"));
     const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0 && m_permissionRequests > 0 && probeOk
-                      && (!m_diffs.isEmpty() || !m_outputs.isEmpty());
+                      && (!m_diffs.isEmpty() || !m_outputs.isEmpty()) && !m_configOptions.isEmpty();
     qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls
              << " permission_requests=" << m_permissionRequests << " probe_fil=" << (probeOk ? "OK" : "mangler");
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
@@ -292,6 +316,7 @@ void AcpClient::finishSelvtest()
         f.write("probe_fil=" + QByteArray(probeOk ? "OK" : "mangler") + "\n");
         f.write("diffs=" + QByteArray::number(m_diffs.count()) + "\n");
         f.write("outputs=" + QByteArray::number(m_outputs.count()) + "\n");
+        f.write("config_options=" + QByteArray::number(m_configOptions.count()) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
