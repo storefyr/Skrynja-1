@@ -190,14 +190,14 @@ Page {
         target: acp
         onPendingPermissionChanged: {
             if (acp.hasPendingPermission)
-                permDialog.open()
+                pageStack.push(permDialog)
         }
     }
 
     PullDownMenu {
         MenuItem {
             text: "Indstillinger"
-            onClicked: configDialog.open()
+            onClicked: pageStack.push(configDialog)
         }
     }
 
