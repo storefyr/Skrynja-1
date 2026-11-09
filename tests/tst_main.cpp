@@ -11,6 +11,7 @@ static QByteArray permissionRequestLine();
 static QByteArray diffToolCallLine();
 static QByteArray outputUpdateLine();
 static QByteArray configResponseLine(const char *currentValue);
+static QByteArray userChunkLine(const char *text);
 static QString readVerdict();
 
 class Collector : public QObject
@@ -106,6 +107,47 @@ private slots:
     void configoptions_samles();
     void configoptions_opdateres_ved_svar();
 };
+
+class TestGenoptagelse : public QObject
+{
+    Q_OBJECT
+private slots:
+    void load_fallback_ved_fejl();
+    void load_ok_saetter_session();
+    void replay_vises_i_lasttext();
+};
+
+static QByteArray userChunkLine(const char *text)
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"user_message_chunk\",\"content\":{\"type\":\"text\",\"text\":\"") + text + QByteArray("\"}}}}\n");
+}
+
+void TestGenoptagelse::load_fallback_ved_fejl()
+{
+    AcpClient acp;
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    const qint64 id = acp.sendRequestForTest(QStringLiteral("session/load"), QJsonObject());
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id) +
+                        QByteArray(",\"error\":{\"code\":-32602,\"message\":\"Invalid params\"}}\n"));
+    QVERIFY(fc.frames.join(QStringLiteral("\n")).contains(QStringLiteral("session/new")));
+}
+
+void TestGenoptagelse::load_ok_saetter_session()
+{
+    AcpClient acp;
+    const qint64 id = acp.sendRequestForTest(QStringLiteral("session/load"), QJsonObject());
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id) +
+                        QByteArray(",\"result\":{\"sessionId\":\"ny-session-123\"}}\n"));
+    QCOMPARE(acp.sessionId(), QStringLiteral("ny-session-123"));
+}
+
+void TestGenoptagelse::replay_vises_i_lasttext()
+{
+    AcpClient acp;
+    acp.feedBytesForTest(userChunkLine("gammel besked"));
+    QVERIFY(acp.lastText().contains(QStringLiteral("gammel besked")));
+}
 
 void TestKonfiguration::configoptions_samles()
 {
@@ -424,6 +466,10 @@ int main(int argc, char *argv[])
     }
     {
         TestKonfiguration t;
+        status |= QTest::qExec(&t, argc, argv);
+    }
+    {
+        TestGenoptagelse t;
         status |= QTest::qExec(&t, argc, argv);
     }
     return status;
