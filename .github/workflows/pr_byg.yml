@@ -60,20 +60,25 @@ jobs:
         with:
           name: rpm-aarch64
           path: RPMS/*.rpm
-      - name: Publicer RPM på test-rpm-grenen
+      - name: Publicer RPM og udpakket payload på test-rpm-grenen
         run: |
           set -e
+          sudo apt-get update && sudo apt-get install -y rpm2cpio cpio
           RPM_FILE=$(ls RPMS/harbour-skrynja-1-*.rpm | head -1)
+          RPM_ABS="$(cd "$(dirname "$RPM_FILE")" && pwd)/$(basename "$RPM_FILE")"
+          PAY=/tmp/skrynja-1-payload
+          rm -rf "$PAY" && mkdir -p "$PAY"
+          (cd "$PAY" && rpm2cpio "$RPM_ABS" | cpio -idm)
+          tar -czf skrynja-1-test.tar.gz -C "$PAY" usr
           git config user.email "ci@skrynja-1.local"
           git config user.name "pr_byg CI"
           git checkout -B test-rpm
           cp "$RPM_FILE" skrynja-1-test.aarch64.rpm
           echo "${{ github.sha }}" > revision.txt
-          git add skrynja-1-test.aarch64.rpm revision.txt
+          git add skrynja-1-test.aarch64.rpm skrynja-1-test.tar.gz revision.txt
           git commit -m "testkørsel ${{ github.sha }}"
           git push --force origin test-rpm
-          echo "Publiceret revision ${{ github.sha }} på test-rpm"
-          echo "Publiceret: raw.githubusercontent.com/storefyr/Skrynja-1/test-rpm/skrynja-1-test.aarch64.rpm"
+          echo "Publiceret revision ${{ github.sha }} på test-rpm (RPM + tar.gz)"
 
   tjek_config:
     name: Tjek config-synkronitet

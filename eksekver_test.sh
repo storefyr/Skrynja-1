@@ -33,15 +33,19 @@ if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
 fi
 echo "Testet revision: ${REV:-ukendt}"
 
-echo "Pakker RPM ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
+echo "Pakker ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR"
-if command -v bsdtar >/dev/null 2>&1; then
+TAR_URL="https://raw.githubusercontent.com/${REPO}/test-rpm/skrynja-1-test.tar.gz"
+if command -v tar >/dev/null 2>&1 \
+   && curl -sSL --connect-timeout 10 -m 60 -o "$TMP/app.tar.gz" "$TAR_URL"; then
+    tar -xzf "$TMP/app.tar.gz" -C "$APP_DIR"
+elif command -v bsdtar >/dev/null 2>&1; then
     bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
 elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
     (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
 else
-    echo "FEJL: hverken bsdtar eller rpm2cpio+cpio findes på enheden" >&2
+    echo "FEJL: hverken tar.gz-payload, bsdtar eller rpm2cpio+cpio kunne bruges" >&2
     exit 1
 fi
 BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
