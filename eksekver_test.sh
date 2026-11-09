@@ -65,7 +65,7 @@ rm -f "$VERDICT"
 nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
 i=0
-while [ $i -lt 50 ]; do
+while [ $i -lt 20 ]; do
     if [ -f "$VERDICT" ]; then
         break
     fi
@@ -81,7 +81,7 @@ kill $APP_PID 2>/dev/null || true
 sleep 1
 kill -9 $APP_PID 2>/dev/null || true
 if [ ! -f "$VERDICT" ]; then
-    echo "FEJL: intet verdict efter 100s — seneste app-log:"
+    echo "FEJL: intet verdict efter 40s — seneste app-log:"
     tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
     exit 1
 fi
@@ -89,7 +89,7 @@ fi
 echo ""
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
-    grep -E 'tool_call|[Ee]rror|[Ff]ejl' "$LOG" | tail -30 || true
+    grep -v '/Silica/' "$LOG" | grep -E 'tool_call|[Ee]rror|[Ff]ejl' | tail -30 || true
     echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer) ---"
 else
     echo "(ingen log endnu)"
