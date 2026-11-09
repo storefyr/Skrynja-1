@@ -31,6 +31,10 @@ if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
 fi
 echo "Testet revision: ${REV:-ukendt}"
 
+if [ ! -t 1 ]; then
+    echo "FEJL: kør uden omdirigering (sh eksekver_test.sh) — devel-su spørger efter kodeord, og prompten forsvinder hvis output omdirigeres" >&2
+    exit 1
+fi
 echo "Næste linje spørger devel-su efter kodeordet til Developer Mode — skriv det og tryk Enter (det vises IKKE mens du skriver, så det kan ligne et hang)"
 devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
 
