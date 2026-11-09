@@ -55,6 +55,12 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
     sendRequest(QStringLiteral("initialize"), params);
 }
 
+void AcpClient::startSelvtestProbe()
+{
+    sendSetConfigOption(QStringLiteral("mode"), QStringLiteral("ask"));
+    sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
+}
+
 qint64 AcpClient::sendSessionNew(const QString &cwd)
 {
     QJsonObject params;
@@ -226,15 +232,15 @@ void AcpClient::dispatch(const QJsonObject &obj)
             m_sessionId = sid;
             emit sessionIdChanged();
         }
+        if (m_selvtest)
+            startSelvtestProbe();
     } else if (method == QStringLiteral("session/new")) {
         m_sessionId = result.value(QStringLiteral("sessionId")).toString();
         emit sessionIdChanged();
         m_mode = result.value(QStringLiteral("modes")).toObject()
                     .value(QStringLiteral("currentModeId")).toString();
-        if (m_selvtest) {
-            sendSetConfigOption(QStringLiteral("mode"), QStringLiteral("ask"));
-            sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
-        }
+        if (m_selvtest)
+            startSelvtestProbe();
     } else if (method == QStringLiteral("session/set_config_option")) {
         const QJsonArray opts = result.value(QStringLiteral("configOptions")).toArray();
         for (int i = 0; i < opts.size(); i++) {

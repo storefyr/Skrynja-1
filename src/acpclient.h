@@ -82,6 +82,7 @@ private:
     void writeFrame(const QJsonObject &obj);
     void dispatch(const QJsonObject &obj);
     void handlePermissionRequest(qint64 id, const QJsonObject &params);
+    void startSelvtestProbe();
     void sendResult(qint64 id, const QJsonObject &result);
     void sendNotification(const QString &method, const QJsonObject &params);
 
