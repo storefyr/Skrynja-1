@@ -62,6 +62,7 @@ fi
 
 echo "Kører selvtest (appen åbner kort) ..."
 rm -f "$VERDICT"
+: > "$LOG" 2>/dev/null || true   # truncér log, så rapporten kun viser denne kørsel
 nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
 i=0
