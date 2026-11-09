@@ -31,6 +31,7 @@ if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
 fi
 echo "Testet revision: ${REV:-ukendt}"
 
+echo "Skriv kodeordet til Developer Mode, når du bliver spurgt (prompten kommer i terminalen)"
 devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
 
 echo "Kører selvtest (appen åbner kort) ..."
