@@ -163,6 +163,10 @@ anti_mønstre:
       metode: eksekver_test.sh kørt med omdirigeret output mens devel-su spørger efter kodeord
       resultat: kodeordsprompten forsvinder og det ligner et hang (to hændelser 2026-11-09)
       lektie: kør altid uden omdirigering; scriptet nægter nu selv ved ikke-tty (exit 1 med besked)
+    - id: metodefejl_13
+      metode: script hentet fra raw.githubusercontent.com uden sha256-tjek
+      resultat: forældet cachet udgave blev kørt (2026-11-09, så devel-su-prompt kom tilbage efter fix)
+      lektie: hent med cache-buster og verificer sha256sum mod main før kørsel
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
