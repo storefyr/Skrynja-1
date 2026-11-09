@@ -9,7 +9,7 @@ dokumentations_standard:
     model: Case-Hybrid
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
-    id'er: kategori_navn (snake_case), også filnavne og egne nøgler; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser — undtaget produktnavne og veletablerede tekniske begreber (Qt, QML, Sailfish, GitHub, OS, SDK) samt eksisterende fil- og mappenavne (src, qml, rpm, .pro); entydige inden for kategorien — samme navn to steder er en fejl
+    id'er: kategori_navn (snake_case), også filnavne og egne nøgler; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser — undtaget produktnavne og veletablerede tekniske begreber (Qt, QML, Sailfish, GitHub, OS, SDK) samt eksisterende fil- og mappenavne (src, qml, rpm, .pro); entydige inden for kategorien — samme navn to steder er en fejl; ascii-udvanding (ae/oe/aa) tæller som fejl — skriv æøå (før, ikke foer)
     sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth)
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
