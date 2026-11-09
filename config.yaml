@@ -98,7 +98,7 @@ lokal_opsaetning:
   klient_lige_nu: Mistral Vibe Android-app på Jolla Phone 2026 (kun indtil Skrynja-1 er materialiseret); samtaler og deres navne håndteres i den app — uden for dette repos kontrol (sufflør 2026-11-08)
   klient_fremtid: Når Skrynja-1 overtager som klient, logges hver session automatisk i projektlogbogen ved session/new (sessionId + navn) — koblingen bliver stærk og automatisk, ikke manuel
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
-  testkørsel: eksekver_test.sh kører på telefonen selv — henter og installerer seneste RPM fra test-rpm (anonym curl, fast URL) sammen med revision.txt (hvilken commit der blev testet), kører derefter automatisk appen med --selvtest (probe-prompt, verdict i /tmp/skrynja-1-selvtest.txt) og viser filtrerede loglinjer fra /tmp; ingen manuel start eller prompt nødvendig
+  testkørsel: eksekver_test.sh kører på telefonen selv — henter seneste RPM fra test-rpm (anonym curl, fast URL) sammen med revision.txt (testet commit), pakker den ud i ~/skrynja-1-test-app (bsdtar eller rpm2cpio+cpio; ingen root, ingen kodeord — devel-su-prompt viser kodeord i klartekst i nogle terminaler) og kører appen med --selvtest; verdict i /tmp/skrynja-1-selvtest.txt; filtrerede loglinjer fra /tmp vises også; ingen manuel start eller prompt nødvendig
   ordbog_opslag: sh opslag.sh [ord] — henter config.yaml fra main og slår op i projekt_ordbogen (uden ord skrives hele ordbogen ud)
   forbudt: ingen fjern-pipes
 

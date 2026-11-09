@@ -1,14 +1,16 @@
 #!/bin/sh
 # Runs on the Jolla Phone 2026 itself (the only device).
 # Usage: sh eksekver_test.sh
-# Downloads the newest test RPM (branch test-rpm, plain curl), installs it,
-# then runs the app in --selvtest mode and prints only the verdict.
-# Requires: curl, devel-su (preinstalled on Sailfish OS)
+# Downloads the newest test RPM (branch test-rpm, plain curl), unpacks it into
+# ~/skrynja-1-test-app (no root, no password), runs the app with --selvtest
+# and prints only the verdict.
+# Requires: curl (preinstalled), bsdtar or rpm2cpio+cpio.
 set -e
 
 REPO="storefyr/Skrynja-1"
 URL="https://raw.githubusercontent.com/${REPO}/test-rpm/skrynja-1-test.aarch64.rpm"
 TMP="/tmp/skrynja-1-test"
+APP_DIR="$HOME/skrynja-1-test-app"
 LOG="/tmp/skrynja-1-app.log"
 VERDICT="/tmp/skrynja-1-selvtest.txt"
 
@@ -31,16 +33,26 @@ if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
 fi
 echo "Testet revision: ${REV:-ukendt}"
 
-if [ ! -t 1 ]; then
-    echo "FEJL: kør uden omdirigering (sh eksekver_test.sh) — devel-su spørger efter kodeord, og prompten forsvinder hvis output omdirigeres" >&2
+echo "Pakker RPM ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
+rm -rf "$APP_DIR"
+mkdir -p "$APP_DIR"
+if command -v bsdtar >/dev/null 2>&1; then
+    bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
+elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
+    (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
+else
+    echo "FEJL: hverken bsdtar eller rpm2cpio+cpio findes på enheden" >&2
     exit 1
 fi
-echo "Næste linje spørger devel-su efter kodeordet til Developer Mode — skriv det og tryk Enter (det vises IKKE mens du skriver, så det kan ligne et hang)"
-devel-su pkcon install-local --allow-reinstall "$TMP/skrynja-1-test.aarch64.rpm"
+BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
+if [ ! -x "$BIN" ]; then
+    echo "FEJL: $BIN ikke fundet efter udpakning"
+    exit 1
+fi
 
 echo "Kører selvtest (appen åbner kort) ..."
 rm -f "$VERDICT"
-nohup /usr/bin/harbour-skrynja-1 --selvtest >/dev/null 2>&1 &
+nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
 i=0
 while [ $i -lt 90 ]; do
