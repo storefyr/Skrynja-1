@@ -115,6 +115,7 @@ class TestGenoptagelse : public QObject
 private slots:
     void load_fallback_ved_fejl();
     void load_ok_saetter_session();
+    void load_ok_starter_selvtest_probe();
     void replay_vises_i_lasttext();
     void klient_henter_gammel_tekst_ved_start();
 };
@@ -142,6 +143,20 @@ void TestGenoptagelse::load_ok_saetter_session()
     acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id) +
                         QByteArray(",\"result\":{\"sessionId\":\"ny-session-123\"}}\n"));
     QCOMPARE(acp.sessionId(), QStringLiteral("ny-session-123"));
+}
+
+void TestGenoptagelse::load_ok_starter_selvtest_probe()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    const qint64 id = acp.sendRequestForTest(QStringLiteral("session/load"), QJsonObject());
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id) +
+                        QByteArray(",\"result\":{\"sessionId\":\"ny-session-123\"}}\n"));
+    const QString all = fc.frames.join(QStringLiteral("\n"));
+    QVERIFY(all.contains(QStringLiteral("session/set_config_option")));
+    QVERIFY(all.contains(QStringLiteral("session/prompt")));
 }
 
 void TestGenoptagelse::replay_vises_i_lasttext()
