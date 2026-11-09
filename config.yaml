@@ -24,6 +24,7 @@ videnshåndtering:
   config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
+  foer_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse
   aldrig_i_repoet: Samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
   github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
 
