@@ -72,7 +72,7 @@ while [ $i -lt 20 ]; do
     fi
     if ! kill -0 $APP_PID 2>/dev/null; then
         echo "App-processen døde før verdict — seneste app-log:"
-        tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
+        tail -30 "$LOG" 2>/dev/null | cut -c1-400 || echo "(ingen log)"
         exit 1
     fi
     sleep 2
@@ -90,8 +90,8 @@ fi
 echo ""
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
-    grep -v '/Silica/' "$LOG" | grep -E 'tool_call|[Ee]rror|[Ff]ejl' | tail -30 || true
-    echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer) ---"
+    grep -v '/Silica/' "$LOG" | grep -E 'tool_call|[Ee]rror|[Ff]ejl' | tail -15 | cut -c1-400 || true
+    echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer; udskrevne linjer trunkeret til 400 tegn) ---"
 else
     echo "(ingen log endnu)"
 fi
@@ -100,7 +100,7 @@ echo ""
 echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
-    cat "$VERDICT"
+    awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
     if grep -q 'VERDICT=PASS' "$VERDICT"; then
         exit 0
     fi
