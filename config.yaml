@@ -92,7 +92,7 @@ selvtest:
   pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen), permission_requests større end 0 (selvtest sætter mode ask først), probe_fil=OK (probe-filen /tmp/skrynja-1-probe.txt skal indeholde OK) og diffs eller outputs større end 0 (skive_diff) og config_options større end 0 (skive_konfiguration)
   kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
   genoptagelse: to selvtest-kørsler — første giver session_load=ingen, anden giver session_load=fallback (agent svarer -32602) og genoptaget=ja (klient viser gemt samtale fra QSettings); sessionId og samtaletekst gemmes under acp/sessionId og acp/lastText
-  rate_limit: målt 2026-11-09 — rate-limits (3 gange) kommer af konto-kvoten, IKKE netværk eller VPN (tredje limit kom med VPN slået fra); samme Mistral-konto bruges af Vibe Android-appen og vibe-acp på telefonen, så de rammer Skrynja-1 også (selvtest fejler med tomme felter når agenten ikke svarer); watchdog 30s skriver altid verdict, så testen hænger aldrig; vent på kvote og kør igen
+  rate_limit: målt 2026-11-09 — tre rate-limits, alle med VPN aktiv (VPN blev først slået fra efter tredje); årsagen er server-side konto-kvote (VPN ændrer IP-sti, ikke kvote); samme Mistral-konto bruges af Vibe Android-appen og vibe-acp på telefonen, så de rammer Skrynja-1 også; watchdog 30s skriver altid verdict; vent på kvote og kør igen
 
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
