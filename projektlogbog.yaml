@@ -22,6 +22,10 @@ kørsler:
     dato: 2026-11-09
     revision: b5192b8cbc9c779dbac5d0113d178204971aa10a
     resultat: to kørsler, begge PASS — 1. session_load=ingen, genoptaget=nej; 2. session_load=fallback (agent -32602 uden mcpServers), genoptaget=ja (QSettings-historik vist igen)
+  selvtest_fd4cd46_fejl:
+    dato: 2026-11-09
+    revision: fd4cd4616ecf44c51884972d9affe6d8c9db0329
+    resultat: FAIL — tool_calls=0, permission_requests=0, probe_fil=mangler, config_options=0 (agenten svarede ikke; konto-kvote — samme Mistral-konto som Android-appen); watchdog skrev verdict efter 90s, intet hæng
   selvtest_90b9c45:
     dato: 2026-11-09
     revision: 90b9c4562ae6dccb37e0574ac6e7f3e4e0f5bc2d
