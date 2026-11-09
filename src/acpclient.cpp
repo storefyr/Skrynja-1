@@ -44,7 +44,7 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
     }
     emit started();
     if (m_selvtest)
-        QTimer::singleShot(150000, this, SLOT(selvtestTimeout()));
+        QTimer::singleShot(90000, this, SLOT(selvtestTimeout()));
     QJsonObject clientInfo;
     clientInfo.insert(QStringLiteral("name"), QStringLiteral("Skrynja-1"));
     clientInfo.insert(QStringLiteral("version"), QStringLiteral("0.1.0"));
@@ -108,7 +108,7 @@ void AcpClient::onDiscarded(const QString &reason)
 
 void AcpClient::selvtestTimeout()
 {
-    qWarning() << "[selvtest] watchdog udløst efter 150s — skriver verdict nu";
+    qWarning() << "[selvtest] watchdog udløst efter 90s — skriver verdict nu";
     finishSelvtest();
 }
 

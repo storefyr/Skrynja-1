@@ -65,9 +65,14 @@ rm -f "$VERDICT"
 nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
 i=0
-while [ $i -lt 90 ]; do
+while [ $i -lt 50 ]; do
     if [ -f "$VERDICT" ]; then
         break
+    fi
+    if ! kill -0 $APP_PID 2>/dev/null; then
+        echo "App-processen døde før verdict — seneste app-log:"
+        tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
+        exit 1
     fi
     sleep 2
     i=$((i + 1))
@@ -75,6 +80,11 @@ done
 kill $APP_PID 2>/dev/null || true
 sleep 1
 kill -9 $APP_PID 2>/dev/null || true
+if [ ! -f "$VERDICT" ]; then
+    echo "FEJL: intet verdict efter 100s — seneste app-log:"
+    tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
+    exit 1
+fi
 
 echo ""
 echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
@@ -95,6 +105,6 @@ if [ -f "$VERDICT" ]; then
     fi
     exit 1
 else
-    echo "FEJL: intet verdict efter 180s"
+    echo "FEJL: intet verdict (u nået)"
     exit 1
 fi
