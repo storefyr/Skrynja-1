@@ -9,38 +9,63 @@
 set -e
 
 REPO="storefyr/Skrynja-1"
-URL="https://raw.githubusercontent.com/${REPO}/test-rpm/skrynja-1-test.aarch64.rpm"
+BASE="https://raw.githubusercontent.com/${REPO}/test-rpm"
+REV_URL="${BASE}/revision.txt"
+RPM_URL="${BASE}/skrynja-1-test.aarch64.rpm"
+TAR_URL="${BASE}/skrynja-1-test.tar.gz"
 TMP="/tmp/skrynja-1-test"
 APP_DIR="$HOME/skrynja-1-test-app"
 LOG="/tmp/skrynja-1-app.log"
 VERDICT="/tmp/skrynja-1-selvtest.txt"
 
-echo "Henter ${URL} ..."
+if [ ! -t 1 ]; then
+    echo "FEJL: kør uden omdirigering — ellers kan kodeord vises i klartekst (metodefejl_12)" >&2
+    exit 1
+fi
+
 rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
 
-if ! curl -sSL --connect-timeout 10 -m 120 -o skrynja-1-test.aarch64.rpm "$URL"; then
-    echo "ERROR: download failed: $URL" >&2
+echo "Henter revision først, så artefakter og revision kan sammenlignes bagefter ..."
+if ! curl -sfSL --connect-timeout 10 -m 30 -o revision.txt "$REV_URL"; then
+    echo "FEJL: kunne ikke hente revision.txt fra test-rpm" >&2
     exit 1
+fi
+REV=$(cat revision.txt)
+echo "Testet revision: $REV"
+
+echo "Henter ${RPM_URL} ..."
+if ! curl -sfSL --connect-timeout 10 -m 120 -o skrynja-1-test.aarch64.rpm "$RPM_URL"; then
+    echo "FEJL: kunne ikke hente RPM ($RPM_URL)" >&2
+    exit 1
+fi
+if command -v sha256sum >/dev/null 2>&1 \
+   && curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.aarch64.rpm.sha256 "${RPM_URL}.sha256"; then
+    sha256sum -c skrynja-1-test.aarch64.rpm.sha256 || { echo "FEJL: sha256 passer ikke for RPM (revision $REV)" >&2; exit 1; }
 fi
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
-REV=""
-if curl -sSL --connect-timeout 10 -m 30 -o "$TMP/revision.txt" \
-        "https://raw.githubusercontent.com/${REPO}/test-rpm/revision.txt" \
-        && [ -s "$TMP/revision.txt" ]; then
-    REV=$(cat "$TMP/revision.txt")
+echo "Henter revision igen — tjekker at test-rpm ikke blev push'et undervejs ..."
+if ! curl -sfSL --connect-timeout 10 -m 30 -o revision2.txt "$REV_URL"; then
+    echo "FEJL: kunne ikke hente revision.txt igen" >&2
+    exit 1
 fi
-echo "Testet revision: ${REV:-ukendt}"
+if [ "$(cat revision2.txt)" != "$REV" ]; then
+    echo "FEJL: revision.txt ændrede sig under hentning ($REV -> $(cat revision2.txt)) — kør igen" >&2
+    exit 1
+fi
 
 echo "Pakker ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR"
-TAR_URL="https://raw.githubusercontent.com/${REPO}/test-rpm/skrynja-1-test.tar.gz"
 if command -v tar >/dev/null 2>&1 \
-   && curl -sSL --connect-timeout 10 -m 60 -o "$TMP/app.tar.gz" "$TAR_URL"; then
-    tar -xzf "$TMP/app.tar.gz" -C "$APP_DIR"
+   && curl -sfSL --connect-timeout 10 -m 60 -o skrynja-1-test.tar.gz "$TAR_URL"; then
+    if command -v sha256sum >/dev/null 2>&1 \
+       && curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.tar.gz.sha256 "${TAR_URL}.sha256"; then
+        sha256sum -c skrynja-1-test.tar.gz.sha256 || { echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2; exit 1; }
+    fi
+    tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"
 elif command -v bsdtar >/dev/null 2>&1; then
     bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
 elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then

@@ -50,6 +50,8 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
     m_process.start(agentPath, QStringList());
     if (!m_process.waitForStarted(5000)) {
         qWarning() << "[acp] agent start fejlede:" << agentPath;
+        if (m_selvtest)
+            finishSelvtest();
         return;
     }
     emit started();
@@ -131,6 +133,8 @@ void AcpClient::onProcessFinished(int exitCode)
     m_reader.feedEof();
     qDebug() << "[acp] agent afsluttet, exit-kode" << exitCode;
     emit finished(exitCode);
+    if (m_selvtest)
+        finishSelvtest();
 }
 
 void AcpClient::dispatch(const QJsonObject &obj)

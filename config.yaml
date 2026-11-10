@@ -10,7 +10,7 @@ dokumentations_standard:
     nøgler: snake_case (Bonded_Tokens)
     værdier: Naturligt sprog (Ortografisk korrekt)
     id'er: kategori_navn (snake_case), også filnavne og egne nøgler; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser — undtaget produktnavne og veletablerede tekniske begreber (Qt, QML, Sailfish, GitHub, OS, SDK) samt eksisterende fil- og mappenavne (src, qml, rpm, .pro); entydige inden for kategorien — samme navn to steder er en fejl; ascii-udvanding (ae/oe/aa) tæller som fejl — skriv æøå (før, ikke foer)
-    sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth)
+    sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth); veletablerede tekniske begreber må bruges i nøgler og tekster — ud over (Qt, QML, Sailfish, GitHub, OS, SDK) også watchdog, fallback, chunk, wire, verdict, debounce, flash, log, payload
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
     støjreduktion: Maksimal
@@ -26,8 +26,8 @@ videnshåndtering:
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
   før_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse
   aldrig_i_repoet: Samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
-  github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
-  ved_genoptagelse: ved hver samtales første besked måler stokastikeren sekunder siden seneste commit (git log -1 --format=%ct mod date +%s) og om origin ligger foran local (git ls-remote origin main mod git rev-parse main); er forskellen over 3600 sekunder eller origin foran, køres git pull --ff-only og config.yaml + projektlogbog.yaml læses før første svar — git ls-remote/fetch/push går over git-protokollen og tæller ikke i GitHubs REST-limit (60 req/time uden token, se lokal_opsaetning.github_api)
+  github_about: Afledt visningskopi af initialiserings_streng (som vises på GitHub-siden) — ikke normativ; opdateres når nøglen ændres
+  ved_genoptagelse: ved hver samtales første besked måler stokastikeren sekunder siden seneste commit (git log -1 --format=%ct mod date +%s) og om origin ligger foran local (git ls-remote origin main mod git rev-parse main); er forskellen over 3600 sekunder eller origin foran, køres git pull --ff-only og config.yaml + projektlogbog.yaml læses før første svar — og første svar angiver hvilken revision der blev læst (git rev-parse HEAD efter pull), så en læser kan skelne frisk fra forældet — git ls-remote/fetch/push går over git-protokollen og tæller ikke i GitHubs REST-limit (60 req/time uden token, se lokal_opsaetning.github_api)
 
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
@@ -62,7 +62,7 @@ projekt_ordbog:
 
 arkitektonisk_logik:
   struktur: RekursivOrkestrering (afledt visning — projekt_ordbog.rekursiv_orkestrering er normativ)
-  flow: Sufflør → Stokastiker[n] → Output
+  flow: Sufflør → Stokastiker[n] → Output (afledt visning — projekt_ordbog er normativ)
   særlige_instrukser:
     rekursion: Stokastiker[n] kan sufflere Stokastiker[n+1]
     mål: Distribution af kognitiv belastning via lagdeling for at undgå systemiske hårdknuder
@@ -99,7 +99,7 @@ selvtest:
     forbrug: "39 af 255 euro brugt samme dag på admin.mistral.ai (enhed: euro; sufflør 2026-11-09)"
     vpn: "aktiv ved de første tre limits, fra ved den fjerde — uden betydning, ikke årsag"
     delt_konto: "samme Mistral-konto deles af Vibe Android-app og vibe-acp på telefonen, så Skrynja-1 rammes også"
-    ved_limit: "hele svaret falder bort — intet delvist svar (målt af sufflør 2026-11-09); watchdog 30s skriver altid verdict; vent til vinduet er nulstillet og kør igen"
+    ved_limit: "hele svaret falder bort — intet delvist svar (målt af sufflør 2026-11-09); watchdog 30s skriver altid verdict mens appen kører, og dør agent-processen eller starter den ikke, skriver finishSelvtest også verdict; vent til vinduet er nulstillet og kør igen"
     gh_korrelation: "observeret 2026-11-09, årsag ikke bevist, modbevist to gange (NU! uden gh-kald; push 949d3ef uden limit) — ligner periodiske kvote-vinduer; som forsigtighed (ikke målt årsag): hold lavt med GitHub-kald og push højst én gang pr. arbejdsgang"
     github_note: "NB — dette er Mistrals limit; GitHub har sit eget (60 req/time uden token, se lokal_opsaetning.github_api)"
 
@@ -109,8 +109,8 @@ lokal_opsaetning:
   klient_fremtid: Når Skrynja-1 overtager som klient, logges hver session automatisk i projektlogbogen ved session/new (sessionId + navn) — koblingen bliver stærk og automatisk, ikke manuel
   github_api: GitHub API uden token giver 60 req/time pr. IP (delt ved VPN) — ved API-brug fra telefonen brug read-only token i Sailfish.Secrets (SecretStorage, org.nemomobile.secrets), aldrig i repoet (målt via Sko-a 2026-11-09); GitHubs rate limit er noget andet end Mistrals — de hænger ikke sammen
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
-  testkørsel: eksekver_test.sh kører på telefonen selv — henter seneste RPM fra test-rpm (anonym curl, fast URL) sammen med revision.txt (testet commit), pakker den ud i ~/skrynja-1-test-app (tar.gz-payload fra test-rpm først, ellers RPM via bsdtar/rpm2cpio; ingen root, ingen kodeord — devel-su-prompt viser kodeord i klartekst i nogle terminaler) og kører appen med --selvtest (eller kør prøvetur med argumentet kør — appen starter og bliver åben); verdict i /tmp/skrynja-1-selvtest.txt; filtrerede loglinjer fra /tmp vises også; ingen manuel start eller prompt nødvendig; RPM-hentningen fra fast URL er bundet via revision.txt (commit-sha fra samme gren, udskrevet ved hver kørsel) — samme binding som metodefejl_13 kræver; sha256 af selve RPM'et ikke målt nødvendig, da CI bygger fra samme sha
-  ordbog_opslag: sh opslag.sh [ord] — henter config.yaml fra main og slår op i projekt_ordbogen (uden ord skrives hele ordbogen ud)
+  testkørsel: eksekver_test.sh kører på telefonen selv — nægter ved ikke-tty (metodefejl_12), henter revision.txt først, så RPM + tar.gz med curl -f og sha256-verifikation når CI har publiceret .sha256-filer, og revision.txt igen bagefter for at tjekke at test-rpm ikke ændrede sig undervejs (metodefejl_13: ingen fast-URL uden binding); pakker ud i ~/skrynja-1-test-app (tar.gz først, ellers RPM via bsdtar/rpm2cpio; ingen root, ingen kodeord — devel-su-prompt viser kodeord i klartekst i nogle terminaler) og kører appen med --selvtest (eller kør prøvetur med argumentet kør); verdict i /tmp/skrynja-1-selvtest.txt; filtrerede loglinjer fra /tmp vises også; ingen manuel start eller prompt nødvendig
+  ordbog_opslag: sh opslag.sh [ord] — henter først sha på main via ét API-kald (commits-enden) og henter så config.yaml med fuldt commit-sha i stien (metodefejl_13), skriver hvilken revision der blev læst; slår op i projekt_ordbogen (uden ord skrives hele ordbogen ud)
   forbudt: ingen fjern-pipes
 
 sufflør_protokol:
@@ -192,11 +192,11 @@ målt_på_wire:
   kilde: app-log /tmp/skrynja-1-app.log på Jolla Phone 2026, 2026-11-08T15:25-15:26
   initialize_svar: protocolVersion 1, agentInfo @mistralai/mistral-vibe 3.0.2, authMethods inkl. browser-auth
   session_new_svar: sessionId som UUID, currentModeId accept-edits, configOptions med mode/model/thinking, modes ask/accept-edits/smart-approve/auto-approve
-  update_typer: session/update med agent_message_chunk, agent_thought_chunk, user_message_chunk, usage_update, available_commands_update, tool_call — klienten viser pt. kun agent_message_chunk og tool_call
+  update_typer: session/update med agent_message_chunk, agent_thought_chunk, user_message_chunk, usage_update, available_commands_update, tool_call — klienten viser agent_message_chunk og tool_call og håndterer også tool_call_update (status-opdatering; failed sætter lastError)
   prompt_svar: svar med result stopReason end_turn og usage
   request_permission: målt i forgængeren (runde 11/12) — anmodninger med id 0/1 og options (optionId og name), tom titel kan forekomme; cancelled uden session/cancel stoppede ikke agenten (hårdknude_01)
   set_config_option: målt i Skrynja-1 2026-11-08 (revision 2a9e328) — mode=ask sat via session/set_config_option virker; fil-skrivning i ask-mode udløste 1 request_permission; læsning (id -un) gjorde ikke (i accept-edits)
-  session_load: målt 2026-11-09 — uden mcpServers svarer agenten -32602 (missing field); med mcpServers:[] medsendt svarer load OK (session_load=ok målt på revision d7cb315/c77fa0e) — agenten erklærer loadSession true; klienten gemmer stadig selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) som fallback og første visning
+  session_load: målt 2026-11-09 — revision d7cb315 uden mcpServers: agenten svarer -32602 (missing field); revision c77fa0e med mcpServers:[] medsendt: load OK (session_load=ok) — agenten erklærer loadSession true; klienten gemmer stadig selv sessionId og samtaletekst i QSettings (acp/sessionId, acp/lastText) som fallback og første visning
 
 åbne_punkter:
   åbent_punkt_01: løst 2026-11-08 — selvtest på enheden gav tool_calls=1 og VERDICT=PASS (agenten sender tool_call, klienten fanger det)
@@ -211,9 +211,9 @@ målt_på_wire:
   åbent_punkt_10: hver lastText-chunk skriver 20000 tegn til QSettings (flash-skrivning pr. chunk) og m_lastText vokser ubegrænset i hukommelsen (kodelæsning review 2026-11-09) — forslag: debounce QSettings-skrivningen og sæt loft i hukommelsen; ikke målt på enhed
   åbent_punkt_11: JSON-RPC-id læses som tal (toLongLong) — streng-id'er ville blive læst som 0; agenten har kun vist numeriske id'er på wire (målt), så risikoen er lav (kodelæsning review 2026-11-09)
   åbent_punkt_12: app-log i /tmp kan indeholde samtaletekst i klartekst — lokal fil på enheden, truncateres pr. kørsel af eksekver_test.sh, kommer aldrig i repoet (accepteret; kodelæsning review 2026-11-09)
-  tilstand_bestået_med_åbent_punkt: accepteret — en skive kan være bestået mens et åbent punkt står, hvis punktet kun begrænser manuel efterprøvning og ikke selvtest (review 2026-11-10)
 
 operationel_implementering:
+  tilstand_bestået_med_åbent_punkt: accepteret — en skive kan være bestået mens et åbent punkt står, hvis punktet kun begrænser manuel efterprøvning og ikke selvtest (review 2026-11-10)
   workflow: Ingen fjern-pipes; agent lokalt via uv (~/.local/bin/vibe-acp); RPM bygges i CI
   verifikation: Unit tests og aarch64 RPM-byg i GitHub Actions; testkørsler på enheden selv via eksekver_test.sh (test-rpm-gren, anonym curl, log fra /tmp)
   succes_kriterium: CI grønt og prompt-tur målt på enheden — svar vist, app afslutter med exit-kode 0
@@ -225,7 +225,7 @@ vejkort:
   skive_tilladelser: accept — dialog viser kind og fuld kommando; Stop sender session/cancel før cancelled
   skive_diff: accept — filændring som diff; kommando viser uddata
   skive_konfiguration: accept — configOptions vises og kan ændres
-  skive_genoptagelse: accept — gammel samtale vises efter genstart (klient-side historik i QSettings); session/load svarer ok når mcpServers:[] medsendes (målt 2026-11-09); uden mcpServers svarer agenten -32602 — se målt_på_wire.session_load; beviset for genoptagelse (session_load=fallback + genoptaget=ja) er målt på revision b5192b8 før selvtest blev frisk-session (18de24d) — efter 18de24d kan genoptagelse kun efterprøves ved manuel prøvetur (åbent_punkt_09)
+  skive_genoptagelse: accept — gammel samtale vises efter genstart (klient-side historik i QSettings); session/load svarer ok når mcpServers:[] medsendes (målt 2026-11-09); uden mcpServers svarer agenten -32602 — se målt_på_wire.session_load; beviset for genoptagelse (session_load=fallback + genoptaget=ja) er målt på revision b5192b8 før selvtest blev frisk-session (18de24d); session/load-grenen dækkes af unit-prøver (load_ok_saetter_session, load_fallback_ved_fejl, load_ok_starter_selvtest_probe), på enheden kun ved manuel prøvetur (åbent_punkt_09)
   skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar)
 
 fremdrift:
