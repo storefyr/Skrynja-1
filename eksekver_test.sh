@@ -20,10 +20,19 @@ else
 fi
 
 REPO="storefyr/Skrynja-1"
-BASE="https://raw.githubusercontent.com/${REPO}/test-rpm"
+# Artefakter hentes via test-rpm's eget commit-sha, ikke gren-navnet — raw cacher pr. sti,
+# så to filer fra samme force-push ellers kan komme fra hver sit commit (metodefejl_13/17)
+TR_SHA=$(curl -sfSL --connect-timeout 10 -m 30 "https://api.github.com/repos/${REPO}/commits/test-rpm" \
+         | sed -n 's/.*"sha"[ ]*:[ ]*"\([0-9a-f]\{40\}\)".*/\1/p' | head -n 1)
+if [ -z "$TR_SHA" ]; then
+    echo "FEJL: kunne ikke få fuldt sha på test-rpm via API — nægter at hente uden sha i stien" >&2
+    exit 1
+fi
+BASE="https://raw.githubusercontent.com/${REPO}/${TR_SHA}"
 REV_URL="${BASE}/revision.txt"
 RPM_URL="${BASE}/skrynja-1-test.aarch64.rpm"
 TAR_URL="${BASE}/skrynja-1-test.tar.gz"
+echo "Artefakter fra test-rpm commit ${TR_SHA}"
 TMP="/tmp/skrynja-1-test"
 APP_DIR="$HOME/skrynja-1-test-app"
 LOG="/tmp/skrynja-1-app.log"
@@ -60,12 +69,6 @@ hent skrynja-1-test.aarch64.rpm "$RPM_URL" 120
 hent skrynja-1-test.aarch64.rpm.sha256 "${RPM_URL}.sha256" 30
 sha256sum -c skrynja-1-test.aarch64.rpm.sha256 || { echo "FEJL: sha256 passer ikke for RPM (revision $REV)" >&2; exit 1; }
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
-
-echo "Henter revision igen — kun advarsel hvis test-rpm ændrede sig undervejs (artefaktens identitet ligger i sha256) ..."
-hent revision2.txt "$REV_URL" 30
-if [ "$(cat revision2.txt)" != "$REV" ]; then
-    echo "ADVARSEL: revision.txt ændrede sig under hentning ($REV -> $(cat revision2.txt)) — kør igen hvis du vil være sikker" >&2
-fi
 
 echo "Pakker ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
 rm -rf "$APP_DIR"
@@ -156,6 +159,7 @@ if [ -f "$VERDICT" ]; then
         echo "FEJL: kunne ikke beregne sha256 af $ARTEFAKT" >&2
         exit 1
     fi
+    echo "artefakt_commit=$TR_SHA" >> "$VERDICT"
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"
     awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
