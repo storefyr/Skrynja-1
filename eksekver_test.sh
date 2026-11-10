@@ -61,18 +61,33 @@ rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR"
 ARTEFAKT="skrynja-1-test.aarch64.rpm"
 if command -v tar >/dev/null 2>&1; then
-    hent skrynja-1-test.tar.gz "$TAR_URL" 60
-    hent skrynja-1-test.tar.gz.sha256 "${TAR_URL}.sha256" 30
-    sha256sum -c skrynja-1-test.tar.gz.sha256 || { echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2; exit 1; }
-    tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"
-    ARTEFAKT="skrynja-1-test.tar.gz"
-elif command -v bsdtar >/dev/null 2>&1; then
-    bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
-elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
-    (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
-else
-    echo "FEJL: hverken tar.gz-payload, bsdtar eller rpm2cpio+cpio kunne bruges" >&2
-    exit 1
+    rc=0
+    curl -sfSL --connect-timeout 10 -m 60 -o skrynja-1-test.tar.gz "$TAR_URL" || rc=$?
+    if [ "$rc" -ne 0 ]; then
+        echo "ADVARSEL: kunne ikke hente tar.gz (curl exit $rc) — falder tilbage til verificeret RPM" >&2
+    else
+        rc=0
+        curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.tar.gz.sha256 "${TAR_URL}.sha256" || rc=$?
+        if [ "$rc" -ne 0 ]; then
+            echo "ADVARSEL: kunne ikke hente tar.gz.sha256 (curl exit $rc) — falder tilbage til verificeret RPM" >&2
+        elif sha256sum -c skrynja-1-test.tar.gz.sha256; then
+            tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"
+            ARTEFAKT="skrynja-1-test.tar.gz"
+        else
+            echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2
+            exit 1
+        fi
+    fi
+fi
+if [ ! -d "$APP_DIR/usr" ]; then
+    if [ "$ARTEFAKT" != "skrynja-1-test.tar.gz" ] && command -v bsdtar >/dev/null 2>&1; then
+        bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
+    elif [ "$ARTEFAKT" != "skrynja-1-test.tar.gz" ] && command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
+        (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
+    else
+        echo "FEJL: hverken tar.gz-payload, bsdtar eller rpm2cpio+cpio kunne bruges" >&2
+        exit 1
+    fi
 fi
 BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
 if [ ! -x "$BIN" ]; then
@@ -138,6 +153,6 @@ if [ -f "$VERDICT" ]; then
     fi
     exit 1
 else
-    echo "FEJL: intet verdict (u nået)"
+    echo "FEJL: intet verdict (uafsluttet)"
     exit 1
 fi

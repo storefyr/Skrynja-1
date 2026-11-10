@@ -201,7 +201,7 @@ void AcpClient::dispatch(const QJsonObject &obj)
                         QString errText;
                         const QJsonArray content0 = upd.value(QStringLiteral("content")).toArray();
                         for (int k = 0; k < content0.size(); k++)
-                            errText += content0.at(k).toObject().value(QStringLiteral("content")).toObject().value(QStringLiteral("text")).toString();
+                            errText += content0.at(k).toObject().value(QStringLiteral("text")).toString();
                         setLastError(errText.isEmpty() ? QStringLiteral("Værktøjskald fejlede") : errText);
                     }
                 }
