@@ -53,3 +53,7 @@ kørsler:
     dato: 2026-11-10
     revision: 23f0b3451fdcab5529566f70fbfb21cbbb53d96b
     resultat: PASS (exit 0) — diffs=2, outputs=1 denne gang (tredje kørsel på samme revision: diffs/outputs har været 0/0, 0/1, 2/1 — agent-variance bekræftet, klienten fanger hvad der sendes); stadig gammel revision fordi CI for 2511810 endnu ikke har publiceret på test-rpm; telefonens script stadig uden auto-pull indtil første manuelle git pull i ~/Skrynja-1 (bootstrap)
+  selvtest_23f0b34_fjerde:
+    dato: 2026-11-10
+    revision: 23f0b3451fdcab5529566f70fbfb21cbbb53d96b
+    resultat: PASS (exit 0) — diffs=0, outputs=1; fjerde kørsel på samme revision (stadig gammel — CI for 2511810 ikke færdig på test-rpm endnu)
