@@ -27,6 +27,7 @@ videnshåndtering:
   før_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse
   aldrig_i_repoet: Samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
   github_about: Afledt visningskopi af initialiserings_streng — ikke normativ; opdateres når nøglen ændres
+  ved_genoptagelse: ved hver samtales første besked måler stokastikeren sekunder siden seneste commit (git log -1 --format=%ct mod date +%s) og om origin ligger foran local (git ls-remote origin main mod git rev-parse main); er forskellen over 3600 sekunder eller origin foran, køres git pull --ff-only og config.yaml + projektlogbog.yaml læses før første svar — git ls-remote/fetch/push går over git-protokollen og tæller ikke i GitHubs REST-limit (60 req/time uden token, se lokal_opsaetning.github_api)
 
 regler:
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
