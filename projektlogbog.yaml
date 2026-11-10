@@ -45,3 +45,7 @@ kørsler:
     dato: 2026-11-10
     revision: 23f0b3451fdcab5529566f70fbfb21cbbb53d96b
     resultat: FAIL — tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom (normal end_turn), men diffs=0 og outputs=0, og PASS kræver diffs||outputs>0; bemærk også at telefonens script var forældet (overskrift stadig «sidste linje», ingen artefakt_fil/artefakt_sha256 i kendelsen) — scriptet kører fra telefonens lokale clone ~/Skrynja-1, som ikke var pull'et; app-bygningen var ny (revision 23f0b34); årsagen til diffs=outputs=0 afventer app-log (agentens værktøjsvalg)
+  selvtest_23f0b34_igen:
+    dato: 2026-11-10
+    revision: 23f0b3451fdcab5529566f70fbfb21cbbb53d96b
+    resultat: PASS (exit 0) — samme revision som FAIL-kørslen, eneste forskel outputs 0→1 (diffs=0 begge gange); alle andre felter identiske — det afgør åbent_punkt_13: klienten fanger uddata når agenten sender dem (outputs=1 beviser capture-stien), FAIL skyldtes agentens værktøjsvalg uden content-blokke
