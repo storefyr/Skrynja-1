@@ -115,7 +115,7 @@ sufflør_protokol:
     filter: Ingen høflighedsfraser
     prioritet: Operationel løsning > Teoretisk perfektion
     kommandoer: Blanke linjer før hver kommando-blok i svaret, så de er nemme at kopiere (sufflør 2026-11-08)
-    tal_i_svar: Ingen rå tal i svar til sufflør — sig hvad der skete i almindeligt dansk; rå tal (sekunder, sha'er, byte, linjetal) må bruges når sufflør siger at svaret suffleres videre til en anden stokastiker (sufflør 2026-11-10)
+    tal_i_svar: Svar i almindeligt dansk uden udmålinger der ikke blev bedt om; rå tal (sekunder, sha'er, byte, verdict-felter, kørsels-id'er, fejltekster) bruges når de er svaret på spørgsmålet (målinger, verdict, sporbarhed) eller når sufflør siger at svaret suffleres videre til en anden stokastiker (sufflør 2026-11-10)
 
 anti_mønstre:
   metodiske_fejl:
