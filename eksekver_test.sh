@@ -8,6 +8,17 @@
 # Requires: curl (preinstalled), bsdtar or rpm2cpio+cpio.
 set -e
 
+# Opdater scriptets eget clone først, så vi ikke kører et forældet script mod et nyt byg
+if command -v git >/dev/null 2>&1 && [ -d "$HOME/Skrynja-1/.git" ]; then
+    if git -C "$HOME/Skrynja-1" pull --ff-only >/dev/null 2>&1; then
+        echo "Script fra lokal clone ved $(git -C "$HOME/Skrynja-1" rev-parse --short HEAD)"
+    else
+        echo "ADVARSEL: git pull i ~/Skrynja-1 fejlede — kører muligvis forældet script" >&2
+    fi
+else
+    echo "ADVARSEL: ~/Skrynja-1 er ikke et git-clone (eller git mangler) — kører scriptet som det ligger" >&2
+fi
+
 REPO="storefyr/Skrynja-1"
 BASE="https://raw.githubusercontent.com/${REPO}/test-rpm"
 REV_URL="${BASE}/revision.txt"
