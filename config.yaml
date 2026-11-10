@@ -90,7 +90,7 @@ teknisk_stack:
 
 selvtest:
   tilstand: appen kører med --selvtest, sætter mode ask via session/set_config_option og sender først probe-prompten (opret filen /tmp/skrynja-1-probe.txt med teksten OK) når set_config_option-svaret er kommet, venter på end_turn
-  verdict_fil: /tmp/skrynja-1-selvtest.txt med felterne tool_calls, ui_tool_calls, permission_requests, probe_fil, diffs, outputs, config_options, session_load, genoptaget, replayed_user, mode, last_text, slut_aarsag (agent_afsluttet/agent_start_fejlede ved tidlig død; tom ved normal afslutning), VERDICT — exit-koden følger PASS/FAIL; eksekver_test.sh tilføjer desuden artefakt_sha256 (sha256 af den testede RPM) efter appens linjer
+  verdict_fil: /tmp/skrynja-1-selvtest.txt med felterne tool_calls, ui_tool_calls, permission_requests, probe_fil, diffs, outputs, config_options, session_load, genoptaget, replayed_user, mode, last_text, slut_aarsag (agent_afsluttet/agent_start_fejlede ved tidlig død; tom ved normal afslutning), VERDICT — exit-koden følger PASS/FAIL; eksekver_test.sh tilføjer desuden artefakt_fil og artefakt_sha256 (sha256 af den artefakt der faktisk blev pakket ud — tar.gz hvis den vej bruges, ellers RPM) efter appens linjer
   pass_kriterier: tool_calls større end 0, ui_tool_calls større end 0 (sættes af QML via acp.uiToolCallsSeen), permission_requests større end 0 (selvtest sætter mode ask først), probe_fil=OK (probe-filen /tmp/skrynja-1-probe.txt skal indeholde OK) og diffs eller outputs større end 0 (skive_diff) og config_options større end 0 (skive_konfiguration)
   kørsel: eksekver_test.sh på telefonen viser også testet revision fra revision.txt på test-rpm
   genoptagelse: almindelig kørsel genoptager gemt session via session/load; sessionId og samtaletekst gemmes under acp/sessionId og acp/lastText; under --selvtest ignoreres den gemte session og QSettings overskrives ikke — selvtest kører altid session/new (frisk session pr. kørsel, besluttet 2026-11-09, så historien ikke sendes frem og tilbage hver kørsel); verdict skriver session_load=fravalgt under selvtest; målt på enheden revision 18de24d — session_load=fravalgt (klienten sendte session/new, ikke load — ses også som fravær af session/load i wire-log [acp][out]), VERDICT=PASS, last_text kun probe+svar; NB replayed_user tæller også agentens ekko af den aktuelle prompt, så replayed_user=1 betyder kun proben — det er session_load=fravalgt plus fraværet af load på wire, der beviser at ingen historik blev sendt (før fix var replayed_user=10 på genoptagne sessioner); session/load tidligere målt ok med mcpServers:[] (se målt_på_wire.session_load)
@@ -109,7 +109,7 @@ lokal_opsaetning:
   klient_fremtid: Når Skrynja-1 overtager som klient, logges hver session automatisk i projektlogbogen ved session/new (sessionId + navn) — koblingen bliver stærk og automatisk, ikke manuel
   github_api: GitHub API uden token giver 60 req/time pr. IP (delt ved VPN) — ved API-brug fra telefonen brug read-only token i Sailfish.Secrets (SecretStorage, org.nemomobile.secrets), aldrig i repoet (målt via Sko-a 2026-11-09); GitHubs rate limit er noget andet end Mistrals — de hænger ikke sammen
   sufflør_viden: Så godt som ingen viden om GitHub, gh og git (sufflør 2026-11-07) — maskinsiden udfører alle git/gh-operationer; instruktioner til sufflør må ikke forudsætte git-kendskab
-  testkørsel: eksekver_test.sh kører på telefonen selv — henter revision.txt først, så RPM + tar.gz med curl -f (HTTP-fejl skelnes fra netværksfejl) og sha256-verifikation når CI publicerer .sha256-filer, henter revision.txt igen bagefter kun som advarsel ved ændring (artefaktens identitet ligger i sha256), og skriver artefakt_sha256 ind i kendelsesfilen (metodefejl_13: ingen fast-URL uden binding); pakker ud i ~/skrynja-1-test-app (tar.gz først, ellers RPM via bsdtar/rpm2cpio; ingen root, ingen kodeord — devel-su-prompt viser kodeord i klartekst i nogle terminaler) og kører appen med --selvtest (eller kør prøvetur med argumentet kør); verdict i /tmp/skrynja-1-selvtest.txt; filtrerede loglinjer fra /tmp vises også; ingen manuel start eller prompt nødvendig
+  testkørsel: eksekver_test.sh kører på telefonen selv — henter revision.txt først, så RPM + tar.gz med curl -f (HTTP-fejl skelnes fra netværksfejl via rc uden negation, metodefejl_15) og obligatorisk sha256-verifikation (CI publicerer .sha256 i samme commit på test-rpm; manglende sha256sum eller .sha256-fil giver exit 1), henter revision.txt igen bagefter kun som advarsel ved ændring, og skriver artefakt_fil + artefakt_sha256 (af den udpakkede artefakt) ind i kendelsesfilen (metodefejl_13: ingen fast-URL uden binding); pakker ud i ~/skrynja-1-test-app (tar.gz først, ellers RPM via bsdtar/rpm2cpio; ingen root, ingen kodeord — devel-su-prompt viser kodeord i klartekst i nogle terminaler) og kører appen med --selvtest (eller kør prøvetur med argumentet kør); verdict i /tmp/skrynja-1-selvtest.txt; filtrerede loglinjer fra /tmp vises også; ingen manuel start eller prompt nødvendig
   ordbog_opslag: sh opslag.sh [ord] — henter først sha på main via ét API-kald (commits-enden) og henter så config.yaml med fuldt commit-sha i stien (metodefejl_13), skriver hvilken revision der blev læst; slår op i projekt_ordbogen (uden ord skrives hele ordbogen ud)
   forbudt: ingen fjern-pipes
 
@@ -174,7 +174,7 @@ anti_mønstre:
     - id: metodefejl_12
       metode: eksekver_test.sh kørt med omdirigeret output mens devel-su spørger efter kodeord
       resultat: kodeordsprompten forsvinder og det ligner et hang (to hændelser 2026-11-09)
-      lektie: kør altid uden omdirigering; scriptet nægter nu selv ved ikke-tty (exit 1 med besked)
+      lektie: historisk — hændelsen involverede devel-su; scriptet kører i dag uden root og med app-uddata til /dev/null, så omdirigeringslektionen gælder ikke længere og der er ingen tty-vagt (review ki_quick 2026-11-10)
     - id: metodefejl_13
       metode: script hentet fra raw.githubusercontent.com uden sha256-tjek
       resultat: forældet cachet udgave blev kørt to gange 2026-11-09 — også med ?v= cache-buster i query (raw cacher på stien alene)
@@ -183,6 +183,10 @@ anti_mønstre:
       metode: over-loftslinje afsluttet med \n ryddede ikke m_buffer i AcpFrameReader::feed
       resultat: præfiks fra tidligere feed()-kald klæbte sig på næste gyldige linje, som blev kasseret — tavs datatab (kodelæsning review 2026-11-09; prøven rygrad_cap_rydder_praefiks tilføjet før fix, CI kører den)
       lektie: over-loftsgrenen skal også nulstille bufferen ved linjeskift — samme fejlklasse som metodefejl_02
+    - id: metodefejl_15
+      metode: rc=$? læst inde i then-grenen efter "if ! curl ..." — efter negation er $? altid 0, så HTTP-fejl kunne ikke skelnes fra netværksfejl
+      resultat: diagnosen var død kode — altid "netværk/time-out (curl exit 0)" (kodelæsning review ki_quick 2026-11-10)
+      lektie: opsaml exit-koden uden negation — rc=0; cmd || rc=$? — samme fejlklasse som metodefejl_03 (konstruktion der aldrig kan antage den ene gren)
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds

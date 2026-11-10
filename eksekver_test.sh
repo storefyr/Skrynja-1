@@ -19,9 +19,11 @@ LOG="/tmp/skrynja-1-app.log"
 VERDICT="/tmp/skrynja-1-selvtest.txt"
 
 # hent <fil> <url> <max-sek> — fejler hårdt og skelner HTTP-fejl (curl exit 22) fra netværksfejl
+# NB: rc opsamles uden negation — efter "if ! cmd" er $? altid 0 (metodefejl_15)
 hent() {
-    if ! curl -sfSL --connect-timeout 10 -m "${3:-30}" -o "$1" "$2"; then
-        rc=$?
+    rc=0
+    curl -sfSL --connect-timeout 10 -m "${3:-30}" -o "$1" "$2" || rc=$?
+    if [ "$rc" -ne 0 ]; then
         if [ "$rc" -eq 22 ]; then
             echo "FEJL: HTTP-fejl (f.eks. 404) fra $2" >&2
         else
@@ -40,12 +42,12 @@ hent revision.txt "$REV_URL" 30
 REV=$(cat revision.txt)
 echo "Testet revision: $REV"
 
+command -v sha256sum >/dev/null 2>&1 || { echo "FEJL: sha256sum mangler — nægter at køre uverificeret artefakt (metodefejl_13)" >&2; exit 1; }
+
 echo "Henter ${RPM_URL} ..."
 hent skrynja-1-test.aarch64.rpm "$RPM_URL" 120
-if command -v sha256sum >/dev/null 2>&1 \
-   && curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.aarch64.rpm.sha256 "${RPM_URL}.sha256"; then
-    sha256sum -c skrynja-1-test.aarch64.rpm.sha256 || { echo "FEJL: sha256 passer ikke for RPM (revision $REV)" >&2; exit 1; }
-fi
+hent skrynja-1-test.aarch64.rpm.sha256 "${RPM_URL}.sha256" 30
+sha256sum -c skrynja-1-test.aarch64.rpm.sha256 || { echo "FEJL: sha256 passer ikke for RPM (revision $REV)" >&2; exit 1; }
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
 echo "Henter revision igen — kun advarsel hvis test-rpm ændrede sig undervejs (artefaktens identitet ligger i sha256) ..."
@@ -57,13 +59,13 @@ fi
 echo "Pakker ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
 rm -rf "$APP_DIR"
 mkdir -p "$APP_DIR"
-if command -v tar >/dev/null 2>&1 \
-   && curl -sfSL --connect-timeout 10 -m 60 -o skrynja-1-test.tar.gz "$TAR_URL"; then
-    if command -v sha256sum >/dev/null 2>&1 \
-       && curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.tar.gz.sha256 "${TAR_URL}.sha256"; then
-        sha256sum -c skrynja-1-test.tar.gz.sha256 || { echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2; exit 1; }
-    fi
+ARTEFAKT="skrynja-1-test.aarch64.rpm"
+if command -v tar >/dev/null 2>&1; then
+    hent skrynja-1-test.tar.gz "$TAR_URL" 60
+    hent skrynja-1-test.tar.gz.sha256 "${TAR_URL}.sha256" 30
+    sha256sum -c skrynja-1-test.tar.gz.sha256 || { echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2; exit 1; }
     tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"
+    ARTEFAKT="skrynja-1-test.tar.gz"
 elif command -v bsdtar >/dev/null 2>&1; then
     bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
 elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
@@ -123,9 +125,8 @@ echo ""
 echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
-    if command -v sha256sum >/dev/null 2>&1; then
-        echo "artefakt_sha256=$(sha256sum skrynja-1-test.aarch64.rpm | cut -d' ' -f1)" >> "$VERDICT"
-    fi
+    echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
+    echo "artefakt_sha256=$(sha256sum "$ARTEFAKT" | cut -d' ' -f1)" >> "$VERDICT"
     awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
     if grep -q 'VERDICT=PASS' "$VERDICT"; then
         exit 0
