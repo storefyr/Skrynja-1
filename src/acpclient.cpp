@@ -302,7 +302,7 @@ void AcpClient::dispatch(const QJsonObject &obj)
                 m_mode = o.value(QStringLiteral("currentValue")).toString();
         }
         if (m_selvtest)
-            sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
+            sendPrompt(QStringLiteral("kør shell-kommandoen \"echo OK > /tmp/skrynja-1-probe.txt && cat /tmp/skrynja-1-probe.txt\" og inkluder uddata i svaret"));
     }
     if (m_selvtest && result.contains(QStringLiteral("stopReason")))
         emit promptDone();
