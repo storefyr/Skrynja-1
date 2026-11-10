@@ -75,6 +75,7 @@ private slots:
     void selvtest_fail_uden_toolcall();
     void selvtest_ingen_dobbelt_verdict();
     void selvtest_verdict_ved_agentdød();
+    void selvtest_verdict_ved_startfejl();
 };
 
 class FrameCollector : public QObject
@@ -463,6 +464,17 @@ void TestVaerktoejskald::selvtest_verdict_ved_agentdød()
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
     QVERIFY(v.contains(QStringLiteral("slut_aarsag=agent_afsluttet")));
+}
+
+void TestVaerktoejskald::selvtest_verdict_ved_startfejl()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    acp.start(QStringLiteral("/nonexistent/agent"), QStringLiteral("/tmp"));
+    const QString v = readVerdict();
+    QVERIFY(v.contains(QStringLiteral("slut_aarsag=agent_start_fejlede")));
+    QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
 }
 
 void TestRygradParser::rygrad_fixture_hoved()
