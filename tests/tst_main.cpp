@@ -62,6 +62,7 @@ private slots:
     void rygrad_crlf();
     void rygrad_split();
     void rygrad_cap();
+    void rygrad_cap_rydder_praefiks();
 };
 
 class TestVaerktoejskald : public QObject
@@ -72,6 +73,7 @@ private slots:
     void vaerktoejskald_tekstchunk();
     void selvtest_verdict();
     void selvtest_fail_uden_toolcall();
+    void selvtest_ingen_dobbelt_verdict();
 };
 
 class FrameCollector : public QObject
@@ -93,6 +95,8 @@ private slots:
     void tilladelse_stop_raekkefoelge();
     void tilladelse_tom_titel_faar_fallback();
     void tool_status_opdateres();
+    void anmodning_ukendt_metode_faar_fejl();
+    void selvtest_vaelger_tillad_ved_navn();
 };
 
 static QByteArray permissionEmptyTitleLine()
@@ -161,8 +165,12 @@ void TestGenoptagelse::load_ok_starter_selvtest_probe()
     const qint64 id = acp.sendRequestForTest(QStringLiteral("session/load"), QJsonObject());
     acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id) +
                         QByteArray(",\"result\":{\"sessionId\":\"ny-session-123\"}}\n"));
-    const QString all = fc.frames.join(QStringLiteral("\n"));
+    QString all = fc.frames.join(QStringLiteral("\n"));
     QVERIFY(all.contains(QStringLiteral("session/set_config_option")));
+    QVERIFY(!all.contains(QStringLiteral("session/prompt")));
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":") + QByteArray::number(id + 1) +
+                        QByteArray(",\"result\":{\"configOptions\":[{\"id\":\"mode\",\"name\":\"Mode\",\"type\":\"select\",\"currentValue\":\"ask\",\"options\":[{\"value\":\"ask\",\"name\":\"Ask\"}]}]}}\n"));
+    all = fc.frames.join(QStringLiteral("\n"));
     QVERIFY(all.contains(QStringLiteral("session/prompt")));
 }
 
@@ -278,6 +286,34 @@ void TestTilladelser::tool_status_opdateres()
     acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"method\":\"session/update\",\"params\":{\"sessionId\":\"s\",\"update\":{\"sessionUpdate\":\"tool_call_update\",\"toolCallId\":\"c1\",\"status\":\"failed\"}}}\n"));
     QCOMPARE(acp.toolCalls().first().toMap().value(QStringLiteral("status")).toString(), QStringLiteral("failed"));
     QVERIFY(!acp.lastError().isEmpty());
+}
+
+static QByteArray permissionRejectFirstLine()
+{
+    return QByteArray("{\"jsonrpc\":\"2.0\",\"id\":8,\"method\":\"session/request_permission\",\"params\":{\"toolCall\":{\"title\":\"t\",\"kind\":\"shell\",\"rawInput\":{\"command\":\"x\"}},\"options\":[{\"optionId\":\"reject\",\"name\":\"Afvis\"},{\"optionId\":\"allow_once\",\"name\":\"Allow Once\"}]}}\n");
+}
+
+void TestTilladelser::anmodning_ukendt_metode_faar_fejl()
+{
+    AcpClient acp;
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    acp.feedBytesForTest(QByteArray("{\"jsonrpc\":\"2.0\",\"id\":55,\"method\":\"fs/read_text_file\",\"params\":{}}\n"));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"error\"")));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("-32601")));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"id\":55")));
+}
+
+void TestTilladelser::selvtest_vaelger_tillad_ved_navn()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    FrameCollector fc;
+    QObject::connect(&acp, SIGNAL(frameWritten(QByteArray)), &fc, SLOT(onFrame(QByteArray)));
+    acp.feedBytesForTest(permissionRejectFirstLine());
+    QVERIFY(fc.frames.last().contains(QStringLiteral("\"selected\"")));
+    QVERIFY(fc.frames.last().contains(QStringLiteral("allow_once")));
+    QVERIFY(!fc.frames.last().contains(QStringLiteral("\"reject\"")));
 }
 
 void TestTilladelser::tilladelse_stop_raekkefoelge()
@@ -397,6 +433,26 @@ void TestVaerktoejskald::selvtest_fail_uden_toolcall()
     QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
 }
 
+void TestVaerktoejskald::selvtest_ingen_dobbelt_verdict()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    QFile probe(QStringLiteral("/tmp/skrynja-1-probe.txt"));
+    QVERIFY(probe.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text));
+    probe.write("OK");
+    probe.close();
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
+    acp.uiToolCallsSeen(1);
+    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
+    acp.uiToolCallsSeen(0);
+    acp.finishSelvtest();
+    const QString v = readVerdict();
+    QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
+    QVERIFY(v.contains(QStringLiteral("VERDICT=PASS")));
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-probe.txt"));
+}
+
 void TestRygradParser::rygrad_fixture_hoved()
 {
     AcpFrameReader r;
@@ -494,6 +550,22 @@ void TestRygradParser::rygrad_cap()
     QByteArray big = QByteArray("{\"jsonrpc\":\"2.0\",\"id\":40,\"result\":{\"pad\":\"") + QByteArray(200, 'x') + QByteArray("\"}}\n");
     QByteArray small = QByteArray("{\"jsonrpc\":\"2.0\",\"id\":41,\"result\":{}}\n");
     r.feed(big + small);
+    QCOMPARE(c.overCap, 1);
+    QCOMPARE(c.messages.count(), 1);
+    QCOMPARE(msgId(c.messages.first()), 41LL);
+}
+
+void TestRygradParser::rygrad_cap_rydder_praefiks()
+{
+    AcpFrameReader r;
+    Collector c;
+    connectAll(r, c);
+    r.setLineCap(32);
+    QByteArray big = QByteArray("{\"id\":40,\"pad\":\"") + QByteArray(100, 'x') + QByteArray("\"}\n");
+    QByteArray small = QByteArray("{\"id\":41}\n");
+    r.feed(big.left(20));
+    QCOMPARE(c.messages.count(), 0);
+    r.feed(big.mid(20) + small);
     QCOMPARE(c.overCap, 1);
     QCOMPARE(c.messages.count(), 1);
     QCOMPARE(msgId(c.messages.first()), 41LL);
