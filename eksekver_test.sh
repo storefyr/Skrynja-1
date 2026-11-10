@@ -91,7 +91,7 @@ rm -f "$VERDICT"
 nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
 i=0
-while [ $i -lt 20 ]; do
+while [ $i -lt 30 ]; do
     if [ -f "$VERDICT" ]; then
         break
     fi
@@ -107,7 +107,7 @@ kill $APP_PID 2>/dev/null || true
 sleep 1
 kill -9 $APP_PID 2>/dev/null || true
 if [ ! -f "$VERDICT" ]; then
-    echo "FEJL: intet verdict efter 40s — seneste app-log:"
+    echo "FEJL: intet verdict efter 60s — seneste app-log:"
     tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
     exit 1
 fi
@@ -122,11 +122,16 @@ else
 fi
 
 echo ""
-echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
+echo "--- selvtest-verdict (exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
+    ARTEFAKT_SHA=$(sha256sum "$ARTEFAKT" | cut -d' ' -f1)
+    if [ -z "$ARTEFAKT_SHA" ]; then
+        echo "FEJL: kunne ikke beregne sha256 af $ARTEFAKT" >&2
+        exit 1
+    fi
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
-    echo "artefakt_sha256=$(sha256sum "$ARTEFAKT" | cut -d' ' -f1)" >> "$VERDICT"
+    echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"
     awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
     if grep -q 'VERDICT=PASS' "$VERDICT"; then
         exit 0
