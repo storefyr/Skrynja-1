@@ -114,6 +114,7 @@ private:
     qint64 m_nextId = 1;
     QHash<qint64, QString> m_methods;
     bool m_selvtestDone = false;
+    QString m_selvtestAarsag;
 };
 
 #endif // ACPCLIENT_H

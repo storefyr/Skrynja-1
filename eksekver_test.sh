@@ -18,42 +18,40 @@ APP_DIR="$HOME/skrynja-1-test-app"
 LOG="/tmp/skrynja-1-app.log"
 VERDICT="/tmp/skrynja-1-selvtest.txt"
 
-if [ ! -t 1 ]; then
-    echo "FEJL: kør uden omdirigering — ellers kan kodeord vises i klartekst (metodefejl_12)" >&2
-    exit 1
-fi
+# hent <fil> <url> <max-sek> — fejler hårdt og skelner HTTP-fejl (curl exit 22) fra netværksfejl
+hent() {
+    if ! curl -sfSL --connect-timeout 10 -m "${3:-30}" -o "$1" "$2"; then
+        rc=$?
+        if [ "$rc" -eq 22 ]; then
+            echo "FEJL: HTTP-fejl (f.eks. 404) fra $2" >&2
+        else
+            echo "FEJL: netværk/time-out ved hentning af $2 (curl exit $rc)" >&2
+        fi
+        exit 1
+    fi
+}
 
 rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
 
-echo "Henter revision først, så artefakter og revision kan sammenlignes bagefter ..."
-if ! curl -sfSL --connect-timeout 10 -m 30 -o revision.txt "$REV_URL"; then
-    echo "FEJL: kunne ikke hente revision.txt fra test-rpm" >&2
-    exit 1
-fi
+echo "Henter revision først, så artefakter knyttes til den ..."
+hent revision.txt "$REV_URL" 30
 REV=$(cat revision.txt)
 echo "Testet revision: $REV"
 
 echo "Henter ${RPM_URL} ..."
-if ! curl -sfSL --connect-timeout 10 -m 120 -o skrynja-1-test.aarch64.rpm "$RPM_URL"; then
-    echo "FEJL: kunne ikke hente RPM ($RPM_URL)" >&2
-    exit 1
-fi
+hent skrynja-1-test.aarch64.rpm "$RPM_URL" 120
 if command -v sha256sum >/dev/null 2>&1 \
    && curl -sfSL --connect-timeout 10 -m 30 -o skrynja-1-test.aarch64.rpm.sha256 "${RPM_URL}.sha256"; then
     sha256sum -c skrynja-1-test.aarch64.rpm.sha256 || { echo "FEJL: sha256 passer ikke for RPM (revision $REV)" >&2; exit 1; }
 fi
 echo "Downloaded: $(du -h skrynja-1-test.aarch64.rpm | cut -f1)"
 
-echo "Henter revision igen — tjekker at test-rpm ikke blev push'et undervejs ..."
-if ! curl -sfSL --connect-timeout 10 -m 30 -o revision2.txt "$REV_URL"; then
-    echo "FEJL: kunne ikke hente revision.txt igen" >&2
-    exit 1
-fi
+echo "Henter revision igen — kun advarsel hvis test-rpm ændrede sig undervejs (artefaktens identitet ligger i sha256) ..."
+hent revision2.txt "$REV_URL" 30
 if [ "$(cat revision2.txt)" != "$REV" ]; then
-    echo "FEJL: revision.txt ændrede sig under hentning ($REV -> $(cat revision2.txt)) — kør igen" >&2
-    exit 1
+    echo "ADVARSEL: revision.txt ændrede sig under hentning ($REV -> $(cat revision2.txt)) — kør igen hvis du vil være sikker" >&2
 fi
 
 echo "Pakker ud i ${APP_DIR} (ingen root, ingen kodeord) ..."
@@ -125,6 +123,9 @@ echo ""
 echo "--- selvtest-verdict (sidste linje; exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
+    if command -v sha256sum >/dev/null 2>&1; then
+        echo "artefakt_sha256=$(sha256sum skrynja-1-test.aarch64.rpm | cut -d' ' -f1)" >> "$VERDICT"
+    fi
     awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
     if grep -q 'VERDICT=PASS' "$VERDICT"; then
         exit 0

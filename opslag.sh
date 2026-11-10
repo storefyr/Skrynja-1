@@ -9,8 +9,8 @@ set -e
 SHA=$(curl -sfSL --connect-timeout 10 -m 30 "https://api.github.com/repos/storefyr/Skrynja-1/commits/main" \
       | sed -n 's/.*"sha"[ ]*:[ ]*"\([0-9a-f]\{40\}\)".*/\1/p' | head -n 1)
 if [ -z "$SHA" ]; then
-    echo "ADVARSEL: kunne ikke få sha på main — falder tilbage til main uden sha" >&2
-    SHA="main"
+    echo "FEJL: kunne ikke få fuldt sha på main via API — nægter at hente uden sha i stien (metodefejl_13)" >&2
+    exit 1
 fi
 URL="https://raw.githubusercontent.com/storefyr/Skrynja-1/${SHA}/config.yaml"
 CFG=$(curl -sfSL --connect-timeout 10 -m 30 "$URL")

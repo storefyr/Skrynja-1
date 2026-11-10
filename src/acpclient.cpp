@@ -50,8 +50,10 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
     m_process.start(agentPath, QStringList());
     if (!m_process.waitForStarted(5000)) {
         qWarning() << "[acp] agent start fejlede:" << agentPath;
-        if (m_selvtest)
+        if (m_selvtest) {
+            m_selvtestAarsag = QStringLiteral("agent_start_fejlede");
             finishSelvtest();
+        }
         return;
     }
     emit started();
@@ -133,8 +135,10 @@ void AcpClient::onProcessFinished(int exitCode)
     m_reader.feedEof();
     qDebug() << "[acp] agent afsluttet, exit-kode" << exitCode;
     emit finished(exitCode);
-    if (m_selvtest)
+    if (m_selvtest) {
+        m_selvtestAarsag = QStringLiteral("agent_afsluttet");
         finishSelvtest();
+    }
 }
 
 void AcpClient::dispatch(const QJsonObject &obj)
@@ -452,6 +456,7 @@ void AcpClient::finishSelvtest()
         f.write("replayed_user=" + QByteArray::number(m_replayedUser) + "\n");
         f.write("mode=" + m_mode.toUtf8() + "\n");
         f.write("last_text=" + m_lastText.toUtf8() + "\n");
+        f.write("slut_aarsag=" + m_selvtestAarsag.toUtf8() + "\n");
         f.write(pass ? "VERDICT=PASS\n" : "VERDICT=FAIL\n");
         f.close();
     }
