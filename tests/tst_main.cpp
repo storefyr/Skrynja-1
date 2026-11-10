@@ -174,6 +174,7 @@ void TestGenoptagelse::load_ok_starter_selvtest_probe()
                         QByteArray(",\"result\":{\"configOptions\":[{\"id\":\"mode\",\"name\":\"Mode\",\"type\":\"select\",\"currentValue\":\"ask\",\"options\":[{\"value\":\"ask\",\"name\":\"Ask\"}]}]}}\n"));
     all = fc.frames.join(QStringLiteral("\n"));
     QVERIFY(all.contains(QStringLiteral("session/prompt")));
+    QVERIFY(all.contains(QStringLiteral("cat /tmp/skrynja-1-probe.txt")));
 }
 
 void TestGenoptagelse::replay_vises_i_lasttext()
