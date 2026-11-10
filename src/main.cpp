@@ -40,13 +40,13 @@ int main(int argc, char *argv[])
     acp.setSelvtest(selvtest);
     if (selvtest)
         acp.setQuitOnFinish(true);
-    acp.start(AcpClient::defaultAgentPath(), QStringLiteral("/home/defaultuser"));
 
     QQuickView *view = SailfishApp::createView();
     view->rootContext()->setContextProperty(QStringLiteral("acp"), &acp);
     view->rootContext()->setContextProperty(QStringLiteral("selvtest"), selvtest);
     view->setSource(SailfishApp::pathTo(QStringLiteral("qml/harbour-skrynja-1.qml")));
     view->show();
+    acp.start(AcpClient::defaultAgentPath(), QStringLiteral("/home/defaultuser"));
 
     if (selvtest) {
         QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() {

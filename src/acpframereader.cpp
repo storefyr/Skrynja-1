@@ -53,6 +53,7 @@ void AcpFrameReader::feed(const QByteArray &data)
                 emit lineOverCap(m_counter, m_cap);
                 m_capNotified = true;
             }
+            m_buffer.clear();
         } else {
             m_buffer.append(data.constData() + pos, nl - pos);
             parseAndDeliver(m_buffer, false);

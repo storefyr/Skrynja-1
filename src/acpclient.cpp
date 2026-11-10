@@ -22,6 +22,10 @@ AcpClient::AcpClient(QObject *parent) : QObject(parent)
     connect(&m_reader, SIGNAL(messageReady(QJsonObject)), this, SLOT(onMessage(QJsonObject)));
     connect(&m_reader, SIGNAL(lineDiscarded(QString)), this, SLOT(onDiscarded(QString)));
     connect(&m_process, SIGNAL(readyReadStandardOutput()), this, SLOT(onReadyRead()));
+    connect(&m_process, SIGNAL(readyReadStandardError()), this, SLOT(onReadyReadError()));
+    connect(&m_process, &QProcess::errorOccurred, this, [this](QProcess::ProcessError) {
+        setLastError(QStringLiteral("Agent-processen kunne ikke startes"));
+    });
     connect(&m_process, SIGNAL(finished(int)), this, SLOT(onProcessFinished(int)));
     connect(this, &AcpClient::sessionIdChanged, this, [this]() {
         if (m_selvtest)
@@ -64,7 +68,6 @@ void AcpClient::start(const QString &agentPath, const QString &cwd)
 void AcpClient::startSelvtestProbe()
 {
     sendSetConfigOption(QStringLiteral("mode"), QStringLiteral("ask"));
-    sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
 }
 
 void AcpClient::setLastError(const QString &e)
@@ -101,6 +104,11 @@ void AcpClient::onReadyRead()
     m_reader.feed(m_process.readAllStandardOutput());
 }
 
+void AcpClient::onReadyReadError()
+{
+    qWarning() << "[acp][err]" << QString::fromUtf8(m_process.readAllStandardError());
+}
+
 void AcpClient::onMessage(const QJsonObject &obj)
 {
     qDebug() << "[acp][in]" << QJsonDocument(obj).toJson(QJsonDocument::Compact);
@@ -133,6 +141,8 @@ void AcpClient::dispatch(const QJsonObject &obj)
             const QString method = obj.value(QStringLiteral("method")).toString();
             if (method == QStringLiteral("session/request_permission"))
                 handlePermissionRequest(id, obj.value(QStringLiteral("params")).toObject());
+            else
+                sendError(id, -32601, QStringLiteral("metode ikke understøttet: ") + method);
             return;
         }
         if (obj.value(QStringLiteral("method")).toString() == QStringLiteral("session/update")) {
@@ -283,6 +293,8 @@ void AcpClient::dispatch(const QJsonObject &obj)
             if (o.value(QStringLiteral("id")).toString() == QStringLiteral("mode"))
                 m_mode = o.value(QStringLiteral("currentValue")).toString();
         }
+        if (m_selvtest)
+            sendPrompt(QStringLiteral("opret filen /tmp/skrynja-1-probe.txt med teksten OK"));
     }
     if (m_selvtest && result.contains(QStringLiteral("stopReason")))
         emit promptDone();
@@ -314,9 +326,20 @@ void AcpClient::handlePermissionRequest(qint64 id, const QJsonObject &params)
     p.insert(QStringLiteral("options"), opts);
     m_pendingPermission = p;
     emit pendingPermissionChanged();
-    if (m_selvtest)
-        answerPermission(opts.isEmpty() ? QStringLiteral("allow")
-                                       : opts.first().toMap().value(QStringLiteral("optionId")).toString());
+    if (m_selvtest) {
+        QString valgt = opts.isEmpty() ? QStringLiteral("allow")
+                                       : opts.first().toMap().value(QStringLiteral("optionId")).toString();
+        for (int i = 0; i < opts.size(); i++) {
+            const QVariantMap o = opts.at(i).toMap();
+            const QString samlet = (o.value(QStringLiteral("optionId")).toString() + " " +
+                                    o.value(QStringLiteral("name")).toString()).toLower();
+            if (samlet.contains(QStringLiteral("allow"))) {
+                valgt = o.value(QStringLiteral("optionId")).toString();
+                break;
+            }
+        }
+        answerPermission(valgt);
+    }
 }
 
 void AcpClient::answerPermission(const QString &optionId)
@@ -375,6 +398,18 @@ void AcpClient::sendResult(qint64 id, const QJsonObject &result)
     writeFrame(resp);
 }
 
+void AcpClient::sendError(qint64 id, int code, const QString &message)
+{
+    QJsonObject err;
+    err.insert(QStringLiteral("code"), code);
+    err.insert(QStringLiteral("message"), message);
+    QJsonObject resp;
+    resp.insert(QStringLiteral("jsonrpc"), QStringLiteral("2.0"));
+    resp.insert(QStringLiteral("id"), id);
+    resp.insert(QStringLiteral("error"), err);
+    writeFrame(resp);
+}
+
 void AcpClient::sendNotification(const QString &method, const QJsonObject &params)
 {
     QJsonObject note;
@@ -387,6 +422,9 @@ void AcpClient::sendNotification(const QString &method, const QJsonObject &param
 
 void AcpClient::finishSelvtest()
 {
+    if (m_selvtestDone)
+        return;
+    m_selvtestDone = true;
     QString probe;
     QFile pf(QStringLiteral("/tmp/skrynja-1-probe.txt"));
     if (pf.open(QIODevice::ReadOnly | QIODevice::Text))

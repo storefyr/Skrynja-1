@@ -76,6 +76,7 @@ signals:
 
 private slots:
     void onReadyRead();
+    void onReadyReadError();
     void selvtestTimeout();
     void onMessage(const QJsonObject &obj);
     void onDiscarded(const QString &reason);
@@ -88,6 +89,7 @@ private:
     void handlePermissionRequest(qint64 id, const QJsonObject &params);
     void startSelvtestProbe();
     void sendResult(qint64 id, const QJsonObject &result);
+    void sendError(qint64 id, int code, const QString &message);
     void sendNotification(const QString &method, const QJsonObject &params);
 
     AcpFrameReader m_reader;
@@ -111,6 +113,7 @@ private:
     QString m_cwd;
     qint64 m_nextId = 1;
     QHash<qint64, QString> m_methods;
+    bool m_selvtestDone = false;
 };
 
 #endif // ACPCLIENT_H
