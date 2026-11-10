@@ -21,7 +21,7 @@ dokumentations_standard:
     se_ogsaa: videnshåndtering (sektionen længere nede)
 
 videnshåndtering:
-  config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver
+  config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver; fungerer som stokastikeres persistente hukommelse på tværs af samtaler og instanser — forudsat at hver instans læser den først (se ved_genoptagelse) (sufflør 2026-11-10)
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
   før_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse
