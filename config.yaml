@@ -115,6 +115,7 @@ sufflør_protokol:
     filter: Ingen høflighedsfraser
     prioritet: Operationel løsning > Teoretisk perfektion
     kommandoer: Blanke linjer før hver kommando-blok i svaret, så de er nemme at kopiere (sufflør 2026-11-08)
+    tal_i_svar: Ingen rå tal (sekunder, sha'er, byte, linjetal) i svar — sig hvad der skete i almindeligt dansk (sufflør 2026-11-10)
 
 anti_mønstre:
   metodiske_fejl:
