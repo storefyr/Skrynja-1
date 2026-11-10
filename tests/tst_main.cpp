@@ -462,6 +462,7 @@ void TestVaerktoejskald::selvtest_verdict_ved_agentdød()
     QVERIFY(QMetaObject::invokeMethod(&acp, "onProcessFinished", Qt::DirectConnection, Q_ARG(int, 0)));
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
+    QVERIFY(v.contains(QStringLiteral("slut_aarsag=agent_afsluttet")));
 }
 
 void TestRygradParser::rygrad_fixture_hoved()
