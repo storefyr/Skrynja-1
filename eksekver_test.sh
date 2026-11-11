@@ -133,7 +133,11 @@ while [ $i -lt 30 ]; do
     i=$((i + 1))
 done
 kill $APP_PID 2>/dev/null || true
-sleep 1
+i=0
+while kill -0 $APP_PID 2>/dev/null && [ $i -lt 5 ]; do
+    sleep 1
+    i=$((i + 1))
+done
 kill -9 $APP_PID 2>/dev/null || true
 if [ ! -f "$VERDICT" ]; then
     echo "FEJL: intet verdict efter 60s — seneste app-log:"
