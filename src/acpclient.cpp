@@ -439,7 +439,7 @@ void AcpClient::finishSelvtest()
         probe = QString::fromUtf8(pf.readAll());
     const bool probeOk = probe.contains(QStringLiteral("OK"));
     const bool pass = !m_toolCalls.isEmpty() && m_uiToolCalls > 0 && m_permissionRequests > 0 && probeOk
-                      && (!m_diffs.isEmpty() || !m_outputs.isEmpty()) && !m_configOptions.isEmpty();
+                      && !m_outputs.isEmpty() && !m_configOptions.isEmpty();
     qDebug() << "[selvtest] tool_calls=" << m_toolCalls.count() << " ui_tool_calls=" << m_uiToolCalls
              << " permission_requests=" << m_permissionRequests << " probe_fil=" << (probeOk ? "OK" : "mangler");
     QFile f(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
