@@ -64,7 +64,7 @@ jobs:
   publicer_test_rpm:
     name: Publicer på test-rpm (kun når enhedstests og byg er grønne)
     if: github.event_name == 'push'
-    needs: [enhedstests, byg]
+    needs: [enhedstests, byg, tjek_config]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
