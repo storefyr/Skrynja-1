@@ -72,3 +72,7 @@ kørsler:
     dato: 2026-11-11
     revision: 57d7ce30a4bf15419dfd4bff6b5491c91d304ce2
     resultat: PASS (exit 0) — første kørsel med nyt pass-kriterium (outputs>0 kun): outputs=1 kommer af den deterministiske probes eget cat; kendelsen bærer artefakt_commit (test-rpm commit) + artefakt_fil=skrynja-1-test.tar.gz + artefakt_sha256; øvrige felter grønne (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom)
+  selvtest_701f73a:
+    dato: 2026-11-11
+    revision: 701f73a67db30b179ccbbd01ee1938b96125f6d1
+    resultat: PASS (exit 0) — samme grønne profil som 57d7ce3 (outputs=1 fra probens cat, artefakt_commit/fil/sha256 i kendelse); docs-only siden sidst, samme app-kode, nyt artefakt-commit fordi CI publicerede igen
