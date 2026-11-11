@@ -74,7 +74,7 @@ private slots:
     void selvtest_verdict();
     void selvtest_fail_uden_toolcall();
     void selvtest_ingen_dobbelt_verdict();
-    void selvtest_verdict_ved_agentdød();
+    void selvtest_verdict_ved_agentdoed();
     void selvtest_verdict_ved_startfejl();
     void selvtest_diff_alene_giver_ikke_pass();
 };
@@ -457,7 +457,7 @@ void TestVaerktoejskald::selvtest_ingen_dobbelt_verdict()
     QFile::remove(QStringLiteral("/tmp/skrynja-1-probe.txt"));
 }
 
-void TestVaerktoejskald::selvtest_verdict_ved_agentdød()
+void TestVaerktoejskald::selvtest_verdict_ved_agentdoed()
 {
     AcpClient acp;
     acp.setSelvtest(true);

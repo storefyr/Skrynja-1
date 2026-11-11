@@ -196,6 +196,10 @@ anti_mønstre:
       metode: artefakter (RPM + .sha256) hentet via gren-navnet test-rpm efter force-push — raw cacher pr. sti, så de to filer kunne komme fra hver sit commit
       resultat: sha256-mismatch fanget af det obligatoriske tjek på enheden (kørsel selvtest_44043f3_sha_mismatch, 2026-11-10) — rettelsen fangede metodefejl_13-skew i praksis
       lektie: hent altid via commit-sha i stien, også når CI lægger artefakter på en gren — gren-navne er mutable, commits er ikke
+    - id: metodefejl_18
+      metode: test-slot-navn med ø (selvtest_verdict_ved_agentdød) — moc kan ikke generere metacall for ikke-ascii navne
+      resultat: Enhedstests-byg fejlede i CI (kørsel 42852165999, error: selvtest_verdict_ved_agentd not declared); app-bygget fejlede ikke fordi moc kun kører på tests
+      lektie: C++-identifikatorer (også test-slot-navne) i ascii — som eksisterende prøvenavne (raekkefoelge); æøå kun i config-nøgler og filnavne, aldrig gennem moc
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
