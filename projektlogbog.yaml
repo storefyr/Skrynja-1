@@ -68,3 +68,7 @@ kørsler:
   ci_42852165999:
     dato: 2026-11-10
     resultat: FAIL i job Enhedstests (Byg tests) — moc kan ikke håndtere ø i slot-navn; Byg RPM og tjek_config var grønne (derfor fik enheden bygget alligevel); fix: slot-navn i ascii (metodefejl_18)
+  selvtest_57d7ce3:
+    dato: 2026-11-11
+    revision: 57d7ce30a4bf15419dfd4bff6b5491c91d304ce2
+    resultat: PASS (exit 0) — første kørsel med nyt pass-kriterium (outputs>0 kun): outputs=1 kommer af den deterministiske probes eget cat; kendelsen bærer artefakt_commit (test-rpm commit) + artefakt_fil=skrynja-1-test.tar.gz + artefakt_sha256; øvrige felter grønne (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom)
