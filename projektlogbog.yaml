@@ -76,3 +76,7 @@ kørsler:
     dato: 2026-11-11
     revision: 701f73a67db30b179ccbbd01ee1938b96125f6d1
     resultat: PASS (exit 0) — samme grønne profil som 57d7ce3 (outputs=1 fra probens cat, artefakt_commit/fil/sha256 i kendelse); docs-only siden sidst, samme app-kode, nyt artefakt-commit fordi CI publicerede igen
+  selvtest_9843a6c:
+    dato: 2026-11-11
+    revision: 9843a6c317969c6c5ca65904067fd35e5fd83b4e
+    resultat: PASS (exit 0) — tool_calls=2, outputs=2 denne gang (agenten lavede to kald), ellers samme profil; artefakt_commit/fil/sha256 i kendelse; bemærk: telefonens script var ved 9843a6c, så endnu uden revision=-feltet (ligger i 81fcc4e, ikke push'et endnu)
