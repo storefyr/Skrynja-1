@@ -76,6 +76,7 @@ private slots:
     void selvtest_ingen_dobbelt_verdict();
     void selvtest_verdict_ved_agentdød();
     void selvtest_verdict_ved_startfejl();
+    void selvtest_diff_alene_giver_ikke_pass();
 };
 
 class FrameCollector : public QObject
@@ -410,7 +411,7 @@ void TestVaerktoejskald::selvtest_verdict()
     probe.close();
     QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
     acp.uiToolCallsSeen(1);
-    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
+    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + outputUpdateLine() + endTurnLine());
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("tool_calls=1")));
     QVERIFY(v.contains(QStringLiteral("ui_tool_calls=1")));
@@ -447,7 +448,7 @@ void TestVaerktoejskald::selvtest_ingen_dobbelt_verdict()
     probe.close();
     QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
     acp.uiToolCallsSeen(1);
-    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
+    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + outputUpdateLine() + endTurnLine());
     acp.uiToolCallsSeen(0);
     acp.finishSelvtest();
     const QString v = readVerdict();
@@ -476,6 +477,25 @@ void TestVaerktoejskald::selvtest_verdict_ved_startfejl()
     const QString v = readVerdict();
     QVERIFY(v.contains(QStringLiteral("slut_aarsag=agent_start_fejlede")));
     QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
+}
+
+void TestVaerktoejskald::selvtest_diff_alene_giver_ikke_pass()
+{
+    AcpClient acp;
+    acp.setSelvtest(true);
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-selvtest.txt"));
+    QFile probe(QStringLiteral("/tmp/skrynja-1-probe.txt"));
+    QVERIFY(probe.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text));
+    probe.write("OK");
+    probe.close();
+    QObject::connect(&acp, &AcpClient::promptDone, &acp, [&acp]() { acp.finishSelvtest(); });
+    acp.uiToolCallsSeen(1);
+    acp.feedBytesForTest(configResponseLine("ask") + permissionRequestLine() + diffToolCallLine() + toolCallLine() + endTurnLine());
+    const QString v = readVerdict();
+    QVERIFY(v.contains(QStringLiteral("diffs=1")));
+    QVERIFY(v.contains(QStringLiteral("outputs=0")));
+    QVERIFY(v.contains(QStringLiteral("VERDICT=FAIL")));
+    QFile::remove(QStringLiteral("/tmp/skrynja-1-probe.txt"));
 }
 
 void TestRygradParser::rygrad_fixture_hoved()
