@@ -60,6 +60,7 @@ projekt_ordbog:
   ortografisk_krav: Krav om streng overholdelse af danske stave- og skrive-regler.
   kildekodelager: Det centrale depot for projektets kildekode, hvor versionsstyring og historik administreres.
   sko_a: Separat repo storefyr/Sko-a (GitHub-notifikations-app) — brugt 2026-11-09 til at måle GitHub API uden token (60 req/time pr. IP, se lokal_opsaetning.github_api); ligger uden for dette projekts inventar
+  vibe_ukendt_standardvalg: Midlertidigt navn for den aktuelle stokastiker i denne samtale — model kunne ikke identificeres hverken i app eller admin (sufflør 2026-11-11); omdøbes når modellen kendes
 
 arkitektonisk_logik:
   struktur: RekursivOrkestrering (afledt visning — projekt_ordbog.rekursiv_orkestrering er normativ)
@@ -125,6 +126,7 @@ sufflør_protokol:
     prioritet: Operationel løsning > Teoretisk perfektion
     kommandoer: Blanke linjer før hver kommando-blok i svaret, så de er nemme at kopiere (sufflør 2026-11-08)
     tal_i_svar: Svar i almindeligt dansk uden udmålinger der ikke blev bedt om; rå tal (sekunder, sha'er, byte, verdict-felter, kørsels-id'er, fejltekster) bruges når de er svaret på spørgsmålet (målinger, verdict, sporbarhed) eller når sufflør siger at svaret suffleres videre til en anden stokastiker (sufflør 2026-11-10)
+  ki_quick_kanal: konferering med ki_quick om commits — stokastikeren skriver en afgrænset besked mellem markørerne --- til ki_quick --- og --- /til ki_quick --- i dialogen; sufflør kopierer teksten manuelt over til ki_quick; der findes ingen direkte kanal (sufflør 2026-11-11)
 
 anti_mønstre:
   metodiske_fejl:
