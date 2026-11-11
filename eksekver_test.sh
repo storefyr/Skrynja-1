@@ -159,6 +159,7 @@ if [ -f "$VERDICT" ]; then
         echo "FEJL: kunne ikke beregne sha256 af $ARTEFAKT" >&2
         exit 1
     fi
+    echo "revision=$REV" >> "$VERDICT"
     echo "artefakt_commit=$TR_SHA" >> "$VERDICT"
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"

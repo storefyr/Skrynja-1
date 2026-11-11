@@ -62,7 +62,7 @@ jobs:
           path: RPMS/*.rpm
 
   publicer_test_rpm:
-    name: Publicer på test-rpm (kun når enhedstests og byg er grønne)
+    name: Publicer på test-rpm (kun når alle foregående jobs er grønne)
     if: github.event_name == 'push'
     needs: [enhedstests, byg, tjek_config]
     runs-on: ubuntu-latest
