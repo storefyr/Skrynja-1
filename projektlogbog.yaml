@@ -61,3 +61,7 @@ kørsler:
     dato: 2026-11-10
     revision: 44043f3945bda41db3108e929d072515de3c3030
     resultat: script fejlede KORREKT på sha256-mismatch for RPM — artefakter hentet via gren-navnet test-rpm efter force-push, og raw cacher pr. sti, så RPM og .sha256 kom fra hver deres commit (metodefejl_13 i praksis); målt på enheden; fix — hent via test-rpm's eget commit-sha i stien
+  selvtest_1184c07:
+    dato: 2026-11-10
+    revision: 1184c078dd93ed5d695c88c4dfc5dd8719a0a06a
+    resultat: PASS (exit 0) — første kørsel med sha-pinnede artefakter: sha256-verifikation bestod (ingen mismatch), artefakt_fil=skrynja-1-test.tar.gz med artefakt_sha256 i kendelsen; deterministisk probe målt første gang — last_text viser den nye shell-probe med cat, outputs=1 kommer af kommandoens egen uddata; alle øvrige felter som før (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom)
