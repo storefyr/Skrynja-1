@@ -177,7 +177,7 @@ fi
 
 echo ""
 echo "--- selvtest-verdict (exit-kode følger PASS/FAIL) ---"
-echo "revision: ${REV:-ukendt}"
+echo "byg_revision: $REV"
 if [ -f "$VERDICT" ]; then
     ARTEFAKT_SHA=$(sha256sum "$ARTEFAKT" 2>/dev/null | cut -d' ' -f1) || true
     if [ -z "$ARTEFAKT_SHA" ]; then
