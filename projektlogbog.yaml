@@ -107,6 +107,10 @@ kørsler:
     dato: 2026-11-12
     revision: e39416409e1b3aaedb232a386bc0026f5804ec22
     resultat: PASS (exit 0) — R23; kendelsen adskilte igen fire felter: script_revision_ved_start=68c2b42…, script_revision=byg_revision=e394164…, artefakt_commit=547cf5c… (test-rpm-spids); artefakt_sha256=aba1cea3… målt mod depotets .sha256 på 547cf5c (samme streng) — kæden kendelse→artefakt lukket; slut_aarsag tom; bemærk: last_text indeholder probe og agentsvar sammenklistret uden mellemrum (åbent_punkt_19); genoptaget=ja + session_load=fravalgt nu målt i to kørsler (R13, R23 — åbent_punkt_18 reproducerbart)
+  selvtest_a5ded0d:
+    dato: 2026-11-12
+    revision: a5ded0d6cbf2e8d686ce36de1d5320eff0e93e37
+    resultat: PASS (exit 0) — R31; første kendelse hvor script_revision ≠ byg_revision (a5ded0d vs e394164 — dokumentationscommit gav intet nyt byg, kendelsen viser det selv); script_revision_ved_start=e394164; artefakt_commit=547cf5c (test-rpm uændret siden R23), artefakt_sha256=aba1cea3… samme som R23; slut_aarsag tom; genoptaget=ja + session_load=fravalgt tredje kørsel (åbent_punkt_18); last_text sammenklistret tredje kørsel (åbent_punkt_19)
   telefon_klon_r5_r6:
     dato: 2026-11-12
     resultat: R5 på telefonen — efter push af b45759d: HEAD=2dbb3b6, origin/main=b45759d, status --porcelain tom (intet ugemt arbejde); R6 efter næste push — klon fulgte med via scriptets eget pull ved selvtest-kørslen (selvtest_68c2b42 viser ved_start=5b84f69 → script_revision=68c2b42)
