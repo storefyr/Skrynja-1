@@ -16,8 +16,12 @@ if command -v git >/dev/null 2>&1 && [ -d "$HOME/Skrynja-1/.git" ]; then
     if git -C "$HOME/Skrynja-1" pull --ff-only >/dev/null 2>&1; then
         S1=$(git -C "$HOME/Skrynja-1" rev-parse HEAD 2>/dev/null || echo "")
         if [ -n "$S1" ] && [ "$S0" != "$S1" ]; then
-            echo "Pull ændrede klonen — genstarter scriptet, så kørslen måler den nye udgave"
-            exec env SKRYNJA1_START_REV="${SKRYNJA1_START_REV:-$S0}" sh "$0" "$@"
+            if [ -z "$S0" ]; then
+                echo "Klonen kunne ikke måles før pull — genstarter for at køre en kendt udgave"
+            else
+                echo "Pull ændrede klonen — genstarter scriptet, så kørslen måler den nye udgave"
+            fi
+            exec env SKRYNJA1_START_REV="${SKRYNJA1_START_REV-${S0:-ukendt}}" sh "$0" "$@"
         fi
     else
         echo "ADVARSEL: git pull i ~/Skrynja-1 fejlede — kører muligvis forældet script" >&2
@@ -190,7 +194,7 @@ if [ -f "$VERDICT" ]; then
     fi
     echo "byg_revision=$REV" >> "$VERDICT"
     echo "script_revision=${S1:-ukendt}" >> "$VERDICT"
-    echo "script_revision_ved_start=${SKRYNJA1_START_REV:-ukendt}" >> "$VERDICT"
+    echo "script_revision_ved_start=${SKRYNJA1_START_REV-${S0:-ukendt}}" >> "$VERDICT"
     echo "artefakt_commit=$TR_SHA" >> "$VERDICT"
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"
