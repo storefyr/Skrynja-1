@@ -105,6 +105,7 @@ selvtest:
     gh_korrelation: "observeret 2026-11-09, årsag ikke bevist, modbevist to gange (NU! uden gh-kald; push 949d3ef uden limit) — ligner periodiske kvote-vinduer; ingen handlingsregel følger heraf i denne fil — praksis om lavt GitHub-forbrug aftales i dialogen (review ki_quick 2026-11-10)"
     github_note: "NB — dette er Mistrals limit; GitHub har sit eget (60 req/time uden token, se lokal_opsaetning.github_api)"
 
+arbejdsområde: denne stokastikers (vibe_ukendt_standardvalg) arbejdsområde er ikke persistent — nulstilling til origin/main kan ske uden varsel mellem to beskeder (målt 2026-11-11: lokal commit 27496ad forsvandt før push; kun push'et data overlever); gælder ikke nødvendigvis andre stokastikeres områder (ikke målt); risikoen ligger i ventetiden mellem commit og sufflørs push-signal, så færdige enheder bør ikke vente længe på signal
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
   klient_lige_nu: Mistral Vibe Android-app på Jolla Phone 2026 (kun indtil Skrynja-1 er materialiseret); samtaler og deres navne håndteres i den app — uden for dette repos kontrol (sufflør 2026-11-08)
