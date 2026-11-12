@@ -27,7 +27,7 @@ dokumentations_standard:
 videnshåndtering:
   config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver; fungerer som stokastikeres persistente hukommelse på tværs af samtaler og instanser — forudsat at hver instans læser den først (se ved_genoptagelse) (sufflør 2026-11-10)
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
-  rundemærker: R5/R6 = telefonens klon-tilstande (projektlogbog telefon_klon_r5_r6); R13/R23/R31 = selvtest-kørsler; R44-R53 = guard-fejlen på enheden (here-streng, busybox, fire runder med exit 2); R54/R62 = commit og guard målt på frisk worktree; R67-R69 = tekstændring, FF-kontrol, push til main (5647a96) og lokal oprydning — alle målt på telefonenee — mærker bruges kun i dialogen, derfor står målingerne også i logbogen (sufflør 2026-11-12)
+  rundemærker: R5/R6 = telefonens klon-tilstande (projektlogbog telefon_klon_r5_r6); R13/R23/R31 = selvtest-kørsler; R44-R53 = guard-fejlen på enheden (here-streng, busybox, fire runder med exit 2); R54/R62 = commit og guard målt på frisk worktree; R67-R69 = tekstændring, FF-kontrol, push til main (5647a96) og lokal oprydning — alle målt på telefonens — mærker bruges kun i dialogen, derfor står målingerne også i logbogen (sufflør 2026-11-12)
   hentelag: en påstand om et filindhold er ikke belagt, før den er målt med git i den kanal, hvor rettelsen skal foretages — konsistente svar gennem samme hentelag måler lageret, ikke kilden (bekræftet R37 og R40, review ki_quick 2026-11-12); derfor: læs altid med fuldt sha i stien, og mål tvivlsomme svar igen ad en ny sti (cache-bryder eller git-protokollen) før de bruges
   rapportering: en påstand om repoets tilstand skal bære rundemærke og kanal; et grønt signal kræver et målt udfald i modtagerens kanal — konsistente svar gennem samme lag måler lageret, ikke kilden (målt R44-R62)
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
@@ -66,6 +66,7 @@ projekt_ordbog:
   hårdknude: Udviklingsmæssig blindgyde eller systemisk fejl, hvor tilgangen fører til uoverstigelige problemer.
   ortografisk_krav: Krav om streng overholdelse af danske stave- og skrive-regler.
   kildekodelager: Det centrale depot for projektets kildekode, hvor versionsstyring og historik administreres.
+  acp_session: ACP-session (sessionId, session/new, session/load) — ikke stokastikerens samtale-session; de to betydninger må ikke forveksles i samme tekst
   sko_a: Separat repo storefyr/Sko-a (GitHub-notifikations-app) — brugt 2026-11-09 til at måle GitHub API uden token (60 req/time pr. IP, se lokal_opsætning.github_api); ligger uden for dette projekts inventar
   vibe_ukendt_standardvalg: Midlertidigt navn for den aktuelle stokastiker i denne samtale — model kunne ikke identificeres hverken i app eller admin (sufflør 2026-11-11); omdøbes når modellen kendes
 
@@ -218,7 +219,7 @@ anti_mønstre:
     - id: metodefejl_20
       metode: en hentning, der giver ordret samme svar i flere runder, blev brugt som bekræftelse af hvad main/gren pegede på (review ki_quick 2026-11-12 — senere målt som cache-artefakt: samme data ad ny sti gav spidsen)
       resultat: "uafgjort" og "endepunktet fejler" blev hævdet på grundlag af en frossen kopi; fejlen lå i hentelaget, ikke i kilden
-      lektie: samme svar flere runder på samme sti måler lageret, ikke kilden — mål altid igen ad en ny sti (cache-bryder eller andet endepunkt), før svaret tæller som bekræftelse; gælder også opslag.sh og eksekver_test.sh's API-kald
+      lektie: samme svar flere runder på samme sti måler lageret, ikke kilden — mål altid igen ad en ny sti (cache-bryder eller andet endepunkt), før svaret tæller som bekræftelse; gælder hvert enkelt API-kald — også opslag.sh og eksekver_test.sh (ét uautentificeret kald pr. kørsel)
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
@@ -253,8 +254,8 @@ målt_på_wire:
   åbent_punkt_16: scriptets kill rammer kun GUI-processen — vibe-acp er dens QProcess-barn og får intet signal; en dræbt app kan efterlade en kørende agent, som viser sig som uforklarligt forbrug, ikke som fejl (kodelæsning review ki_quick 2026-11-12; fix kunne være at dræbe procesgruppen (kræver setsid ved start — nohup … & giver ikke egen gruppe, så kill -TERM -$APP_PID virker ikke som naivt antaget) eller at appen sender session/cancel før nedlukning (den gør det ved stop, men ikke når scriptet dræber den)
   åbent_punkt_17: ordbogsbaseret stavning af nøgler (hunspell-da) afventet — først måles dækningen (R9: flagrer den foer/naar/aar, er ordbogsvejen udelukket); hvidlisten udvanding_tilladt er den operative kontrol indtil da (review ki_quick 2026-11-12)
   åbent_punkt_18: kendelsen bar genoptaget=ja samtidig med session_load=fravalgt under selvtest — nu målt i tre kørsler (R13/selvtest_68c2b42, R23/selvtest_e394164, R31/selvtest_a5ded0d), altså reproducerbart; filen definerer ikke hvad genoptaget måler når selvtest altid kører session/new (replayed_user=1 er kun probens ekko) — undersøg src/acpclient.cpp før nogen forklaring; ikke gættet (review ki_quick 2026-11-12)
-  åbent_punkt_20: guard-tjek 2 (src/qml mod config) kører kun med base-argument, og CI giver base kun ved pull_request — en ændring i src/ alene kan nå main uden den kontrol (review ki_quick 2026-11-12)
   åbent_punkt_19: last_text indeholder probe og helt agentsvar sammenklistret uden mellemrum — nu målt i tre kørsler (R13, R23, R31); selvtest.genoptagelse påstår «last_text kun probe+svar» (målt på 18de24d) — uafgjort om sammenklistringen sker i app eller agent, ikke konkluderet (review ki_quick 2026-11-12)
+  åbent_punkt_20: guard-tjek 2 (src/qml mod config) kører kun med base-argument, og CI giver base kun ved pull_request — en ændring i src/ alene kan nå main uden den kontrol (review ki_quick 2026-11-12)
 
 operationel_implementering:
   tilstand_bestået_med_åbent_punkt: accepteret — en skive kan være bestået mens et åbent punkt står, hvis punktet kun begrænser manuel efterprøvning og ikke selvtest (review 2026-11-10)

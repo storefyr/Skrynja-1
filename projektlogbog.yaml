@@ -113,6 +113,7 @@ kørsler:
     resultat: PASS (exit 0) — R31; første kendelse hvor script_revision ≠ byg_revision (a5ded0d vs e394164 — dokumentationscommit havde på det tidspunkt intet nyt byg (test-rpm nåede først a5ded0d i revision.txt senere), kendelsen viser det selv); script_revision_ved_start=e394164; artefakt_commit=547cf5c (test-rpm uændret siden R23), artefakt_sha256=aba1cea3… samme som R23; slut_aarsag tom; genoptaget=ja + session_load=fravalgt tredje kørsel (åbent_punkt_18); last_text sammenklistret tredje kørsel (åbent_punkt_19)
   guard_paa_enheden_r44_r69:
     dato: 2026-11-12
+    revision: d60501acd2b4deb172795c4a3c850825add81c0e
     resultat: målt på telefonen (busybox ash, ingen GNU grep) — R50-R54: here-streng <<< gav syntaksfejl/exit 2 fire runder; rettet til here-dokument, guard=0 (R53), commit 35b3e19 (R54); R62: worktree 1a7d650 bash -n=0, guard=0, kontrol A (stort bogstav i nøgle) exit 1, kontrol B (æøå i nøgle) exit 0; R67: tekstændringer (rapportering-nøgle, rundemærker), guard=0, commit 5647a96; R68: FF-kontrol OK, push main OK, ls-remote main=5647a96, review-gren slettet; R69: lokal main opdateret a5ded0d→5647a96, rent træ — kilde: ki_quick via sufflør, målt i ki_quicks kanal (ikke denne sandkasse)
   telefon_klon_r5_r6:
     dato: 2026-11-12
