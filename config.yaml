@@ -73,6 +73,59 @@ projekt_ordbog:
 arkitektonisk_logik:
   struktur: RekursivOrkestrering (afledt visning — projekt_ordbog.rekursiv_orkestrering er normativ)
   flow: Sufflør → Stokastiker[n] → Output (afledt visning — projekt_ordbog er normativ)
+  # verdensbillede — sufflørens beslutning 2026-11-12, ikke måling
+  # lager = hvor tilstanden ligger
+  # myndighed = hvem der må ændre den
+  # varighed = gælder samtalens afslutning / telefonens nulstilling; ansvar står ikke her — den der skriver en påstand uden måling bærer den
+  verdensbillede:
+    - navn: menneskelig sufflør
+      lager: uden for systemet
+      myndighed: suffløren
+      varighed: uden for systemet
+    - navn: kontoen
+      lager: hos udbyderen
+      myndighed: udbyderen
+      varighed: varig ved telefon-nulstilling
+    - navn: systemsufflien
+      lager: serverside hos udbyderen
+      myndighed: suffløren som indhold og udbyderen som lager
+      varighed: varig ved telefon-nulstilling
+    - navn: samtalehistorikken
+      lager: serverside hos udbyderen
+      myndighed: som systemsufflien
+      varighed: ukendt — betinget af opbevaringsindstilling
+    - navn: modellen
+      lager: hos udbyderen
+      myndighed: udbyderen
+      varighed: varig — ikke vælgbar i Vibe-appen
+    - navn: acp-sessionen
+      lager: dannes ved session/new
+      myndighed: agent-processen
+      varighed: dør med agenten
+    - navn: vibe-acp
+      lager: telefonen som barneproces
+      myndighed: processen
+      varighed: kan overleve appen — se åbent_punkt_16
+    - navn: klienten
+      lager: telefonen eller webben
+      myndighed: suffløren via kontoen
+      varighed: kan skiftes uden tab
+    - navn: telefonens klon
+      lager: hjemmemappen
+      myndighed: git
+      varighed: varig men kan være forældet
+    - navn: fjernlageret
+      lager: GitHub
+      myndighed: suffløren via kontoen og CI
+      varighed: varigt og autoritativt
+    - navn: CI og test-rpm
+      lager: GitHub Actions
+      myndighed: Actions
+      varighed: artefakter som omskrives ved force-push
+    - navn: ki_quicks område
+      lager: sandkassen
+      myndighed: udbyderen
+      varighed: ikke varig
   særlige_instrukser:
     rekursion: Stokastiker[n] kan sufflere Stokastiker[n+1]
     mål: Distribution af kognitiv belastning via lagdeling for at undgå systemiske hårdknuder
