@@ -7,7 +7,6 @@ set -u
 cd "$(git rev-parse --show-toplevel)"
 
 fail=0
-partial=0
 
 # 1) Every tracked file must be mentioned in config.yaml (full path or basename).
 while IFS= read -r f; do
@@ -31,16 +30,18 @@ fi
 
 # 3) Keys may only contain Danish letters, digits, underscore, apostrophe — spelling is NOT checked
 #    (æøå vs ae/oe/aa cannot be distinguished by a character class; see metodefejl_19)
-if echo x | grep -qP 'x' 2>/dev/null; then
-    bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml | grep -vP "^[a-zæøå_0-9']+$" || true)
-    if [ -n "$bad_keys" ]; then
-        echo "FAIL: nøgler ikke på dansk ortografi:"
-        printf '%s\n' "$bad_keys"
-        fail=1
-    fi
-else
-    echo "ADVARSEL: denne grep understøtter ikke -P — tjek 3 (nøgle-tegnesæt) springes over her; kør med GNU grep/bash (CI gør)"
-    partial=1
+#    Kun bash case-mønstre — ingen grep -P/-E nødvendig, så tjekket også kører på telefonen
+bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml)
+re="^[a-zæøå_0-9_']+$"
+bad=""
+while IFS= read -r key; do
+    [ -z "$key" ] && continue
+    [[ "$key" =~ $re ]] || bad="$bad$key\n"
+done <<< "$bad_keys"
+if [ -n "$bad" ]; then
+    echo "FAIL: nøgler ikke på dansk ortografi:"
+    printf '%b' "$bad"
+    fail=1
 fi
 
 # 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i dokumentations_standard.navngivnings_konvention.udvanding_tilladt (ægte ord) — ellers er det ascii-udvanding (metodefejl_19)
@@ -63,19 +64,21 @@ for peg in $(grep -o 'se projektlogbog [a-zæøå_0-9]*' config.yaml | awk '{pri
         continue
     fi
     linje=$(grep "se projektlogbog ${peg}" config.yaml | head -1)
-    sha=$(printf '%s' "$linje" | grep -o 'PASS på [0-9a-f]\{7,\}' | head -1 | grep -o '[0-9a-f]\{7,\}')
-    if [ -n "$sha" ] && ! grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}"; then
-        echo "FAIL: pegepind '$peg' har anden revision i logbogen end 'PASS på $sha' i samme sætning"
-        fail=1
+    if printf '%s' "$linje" | grep -q 'PASS på'; then
+        sha=$(printf '%s' "$linje" | grep -o 'PASS på [0-9a-f]\{40\}' | head -1 | grep -o '[0-9a-f]\{40\}')
+        if [ -z "$sha" ]; then sha=$(printf '%s' "$linje" | grep -o 'PASS på [0-9a-f]\{7,\}' | head -1 | grep -o '[0-9a-f]\{7,\}'); fi
+        if [ -z "$sha" ]; then
+            echo "FAIL: pegepind '$peg' står i en PASS-sætning uden sha — kan ikke kontrolleres"
+            fail=1
+        elif ! grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}[0-9a-f]\{33\}"; then
+            echo "FAIL: pegepind '$peg' har anden revision i logbogen end præfikset '$sha' i samme sætning"
+            fail=1
+        fi
     fi
 done
 
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
-fi
-if [ "$partial" -ne 0 ]; then
-    echo "config sync check: PARTIAL (advarsel — ikke alle kontroller kunne køre)"
-    exit 2
 fi
 echo "config sync check: OK"
