@@ -22,17 +22,7 @@ fi
 REPO="storefyr/Skrynja-1"
 # Artefakter hentes via test-rpm's eget commit-sha, ikke gren-navnet — raw cacher pr. sti,
 # så to filer fra samme force-push ellers kan komme fra hver sit commit (metodefejl_13/17)
-TR_SHA=$(curl -sfSL --connect-timeout 10 -m 30 "https://api.github.com/repos/${REPO}/commits/test-rpm" \
-         | sed -n 's/.*"sha"[ ]*:[ ]*"\([0-9a-f]\{40\}\)".*/\1/p' | head -n 1)
-if [ -z "$TR_SHA" ]; then
-    echo "FEJL: kunne ikke få fuldt sha på test-rpm via API — nægter at hente uden sha i stien" >&2
-    exit 1
-fi
-BASE="https://raw.githubusercontent.com/${REPO}/${TR_SHA}"
-REV_URL="${BASE}/revision.txt"
-RPM_URL="${BASE}/skrynja-1-test.aarch64.rpm"
-TAR_URL="${BASE}/skrynja-1-test.tar.gz"
-echo "Artefakter fra test-rpm commit ${TR_SHA}"
+TR_SHA=""
 TMP="/tmp/skrynja-1-test"
 APP_DIR="$HOME/skrynja-1-test-app"
 LOG="/tmp/skrynja-1-app.log"
@@ -56,6 +46,27 @@ hent() {
 rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
+
+# Hent test-rpm's commit-sha først — med fejldiagnose (HTTP-fejl vs netværk, som hent())
+if ! curl -sfSL --connect-timeout 10 -m 30 -o tr_sha.json "https://api.github.com/repos/${REPO}/commits/test-rpm"; then
+    rc=$?
+    if [ "$rc" -eq 22 ]; then
+        echo "FEJL: HTTP-fejl fra API (f.eks. 403 rate limit — 60 req/time uden token — eller 404)" >&2
+    else
+        echo "FEJL: netværk/time-out ved API-kald (curl exit $rc)" >&2
+    fi
+    exit 1
+fi
+TR_SHA=$(sed -n 's/.*"sha"[ ]*:[ ]*"\([0-9a-f]\{40\}\)".*/\1/p' tr_sha.json | head -n 1)
+if [ -z "$TR_SHA" ]; then
+    echo "FEJL: API-svar uden fuldt sha — nægter at hente uden sha i stien" >&2
+    exit 1
+fi
+BASE="https://raw.githubusercontent.com/${REPO}/${TR_SHA}"
+REV_URL="${BASE}/revision.txt"
+RPM_URL="${BASE}/skrynja-1-test.aarch64.rpm"
+TAR_URL="${BASE}/skrynja-1-test.tar.gz"
+echo "Artefakter fra test-rpm commit ${TR_SHA}"
 
 echo "Henter revision først, så artefakter knyttes til den ..."
 hent revision.txt "$REV_URL" 30
@@ -85,27 +96,28 @@ if command -v tar >/dev/null 2>&1; then
         if [ "$rc" -ne 0 ]; then
             echo "ADVARSEL: kunne ikke hente tar.gz.sha256 (curl exit $rc) — falder tilbage til verificeret RPM" >&2
         elif sha256sum -c skrynja-1-test.tar.gz.sha256; then
-            tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"
-            ARTEFAKT="skrynja-1-test.tar.gz"
+            if tar -xzf skrynja-1-test.tar.gz -C "$APP_DIR"; then
+                ARTEFAKT="skrynja-1-test.tar.gz"
+            else
+                echo "ADVARSEL: tar kunne ikke pakke ud — falder tilbage til verificeret RPM" >&2
+            fi
         else
             echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2
             exit 1
         fi
     fi
 fi
-if [ ! -d "$APP_DIR/usr" ]; then
-    if [ "$ARTEFAKT" != "skrynja-1-test.tar.gz" ] && command -v bsdtar >/dev/null 2>&1; then
-        bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
-    elif [ "$ARTEFAKT" != "skrynja-1-test.tar.gz" ] && command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
-        (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
-    else
-        echo "FEJL: hverken tar.gz-payload, bsdtar eller rpm2cpio+cpio kunne bruges" >&2
-        exit 1
-    fi
-fi
 BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
 if [ ! -x "$BIN" ]; then
-    echo "FEJL: $BIN ikke fundet efter udpakning"
+    # test på den binære fil, ikke på kataloget — et afbrudt tar kan efterlade et halvt træ
+    if command -v bsdtar >/dev/null 2>&1; then
+        bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
+    elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
+        (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
+    fi
+fi
+if [ ! -x "$BIN" ]; then
+    echo "FEJL: $BIN ikke fundet efter udpakning (tar.gz + RPM prøvet)"
     exit 1
 fi
 
@@ -119,9 +131,10 @@ rm -f "$VERDICT"
 : > "$LOG" 2>/dev/null || true   # truncér log, så rapporten kun viser denne kørsel
 nohup "$BIN" --selvtest >/dev/null 2>&1 &
 APP_PID=$!
+# NB: wait nedenfor virker kun fordi APP_PID er et direkte barn af denne skal — behold spawn-linjen direkte
 i=0
 while [ $i -lt 30 ]; do
-    if [ -f "$VERDICT" ]; then
+    if grep -q '^VERDICT=.*$' "$VERDICT" 2>/dev/null; then
         break
     fi
     if ! kill -0 $APP_PID 2>/dev/null; then
@@ -133,11 +146,7 @@ while [ $i -lt 30 ]; do
     i=$((i + 1))
 done
 kill $APP_PID 2>/dev/null || true
-i=0
-while kill -0 $APP_PID 2>/dev/null && [ $i -lt 5 ]; do
-    sleep 1
-    i=$((i + 1))
-done
+wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
 kill -9 $APP_PID 2>/dev/null || true
 if [ ! -f "$VERDICT" ]; then
     echo "FEJL: intet verdict efter 60s — seneste app-log:"
