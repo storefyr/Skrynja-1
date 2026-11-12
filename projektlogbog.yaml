@@ -87,3 +87,7 @@ kørsler:
     dato: 2026-11-12
     revision: c82aa02009e96145cc43ab35b6512bee6e547c7e
     resultat: PASS (exit 0) — tool_calls=1, outputs=1 (deterministisk probe), artefakt_commit/fil/sha256 i kendelse; revision=-felt ikke synligt i den indsatte udskrift, men koden på c82aa02 skriver det før artefakt_commit (git show c82aa02:eksekver_test.sh linje 176) — næste kørsel bekræfter; dette er første kørsel efter ki_quicks gennemgang, så «ikke målt på enheden endnu» i verdict_fil kan nu afløses ved denne PASS
+  selvtest_2dbb3b6:
+    dato: 2026-11-12
+    revision: 2dbb3b6cf9376468a77a147aa800232b27236f74
+    resultat: PASS (exit 0) — outputs=1 fra deterministisk probe, alle felter grønne; kendelsen bar revision=2dbb3b6… (gammelt feltnavn) + artefakt_commit/fil/sha256 — telefonens klon stod på 1733a53 ved start, pull nåede 2dbb3b6 undervejs, men uden exec-genstart (først i 89ce768) kørte kørslen den gamle scriptudgave; byg_revision= og script_revision: forventes først ved næste kørsel
