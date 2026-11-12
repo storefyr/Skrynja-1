@@ -91,3 +91,7 @@ kørsler:
     dato: 2026-11-12
     revision: 2dbb3b6cf9376468a77a147aa800232b27236f74
     resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar revision=2dbb3b6… + artefakt_commit/fil/sha256; feltnavnet revision= identificerer den kørende scriptudgave som ≤ c82aa02 (byg_revision= kom først i 1733a53) — målt via feltnavnet, ikke rekonstrueret; byg_revision= og script_revision: fandtes ikke i den udgave, så de to felter var fraværende (ikke grønne); forventes ved næste kørsel hvor scriptet selv genstarter efter pull
+  selvtest_b45759d:
+    dato: 2026-11-12
+    revision: b45759d145631a555462c06aa64babc84c96d89d
+    resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar byg_revision= OG script_revision= OG script_revision_ved_start=, alle = b45759d… (første kørsel hvor alle tre står); artefakt_commit/fil/sha256 også med; åbent_punkt_15 dermed lukket i praksis (ikke kun i kode)
