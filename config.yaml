@@ -203,6 +203,10 @@ anti_mønstre:
       metode: prøveslot-navn med ø (selvtest_verdict_ved_agentdød) — moc kan ikke generere metacall for ikke-ascii navne
       resultat: Enhedstests-byg fejlede i CI (kørsel 42852165999, error: selvtest_verdict_ved_agentd not declared); app-bygget fejlede ikke fordi moc kun kører på tests
       lektie: C++-identifikatorer (også prøveslot-navne) i ascii — som eksisterende prøvenavne (raekkefoelge); æøå kun i config-nøgler, filnavne og dansk tekst, aldrig i kildekode-id'er (metacall-genererede id'er går gennem moc)
+    - id: metodefejl_19
+      metode: config-nøgle skrevet som arbejdsomraade (ascii-udvanding) lige efter metodefejl_18 havde sagt at C++ er ascii — vanen slog reglen
+      resultat: guard'en fangede det ikke, fordi nøgle-regex'en ^[a-zæøå_0-9']+$ tillader ascii-bogstaver og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet
+      lektie: læs navngivningsreglen før hver ny nøgle; guard kan ikke skelne udvanding fra æøå — overvej mønster for ae/oe/aa i nøgler (med forsigtighed: ægte ord som poesi indeholder oe)
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
