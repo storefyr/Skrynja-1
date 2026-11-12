@@ -80,3 +80,7 @@ kørsler:
     dato: 2026-11-11
     revision: 9843a6c317969c6c5ca65904067fd35e5fd83b4e
     resultat: PASS (exit 0) — tool_calls=2, outputs=2 denne gang (agenten lavede to kald), ellers samme profil; artefakt_commit/fil/sha256 i kendelse; bemærk: telefonens script var ved 9843a6c, så endnu uden revision=-feltet (ligger i 81fcc4e, ikke push'et endnu)
+  selvtest_c82aa02:
+    dato: 2026-11-12
+    revision: c82aa02009e96145cc43ab35b6512bee6e547c7e
+    resultat: PASS (exit 0) — tool_calls=1, outputs=1 (deterministisk probe), artefakt_commit/fil/sha256 i kendelse; revision=-felt ikke synligt i den indsatte udskrift, men koden på c82aa02 skriver det før artefakt_commit (git show c82aa02:eksekver_test.sh linje 176) — næste kørsel bekræfter; dette er første kørsel efter ki_quicks gennemgang, så «ikke målt på enheden endnu» i verdict_fil kan nu afløses ved denne PASS
