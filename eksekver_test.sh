@@ -15,17 +15,19 @@ if command -v git >/dev/null 2>&1 && [ -d "$HOME/Skrynja-1/.git" ]; then
     S0=$(git -C "$HOME/Skrynja-1" rev-parse HEAD 2>/dev/null || echo "")
     if git -C "$HOME/Skrynja-1" pull --ff-only >/dev/null 2>&1; then
         S1=$(git -C "$HOME/Skrynja-1" rev-parse HEAD 2>/dev/null || echo "")
-        echo "script_revision: ${S1:-ukendt} (klon efter pull)"
         if [ -n "$S0" ] && [ "$S0" != "$S1" ]; then
             echo "Pull ændrede klonen — genstarter scriptet, så kørslen måler den nye udgave"
             exec sh "$0" "$@"
         fi
     else
         echo "ADVARSEL: git pull i ~/Skrynja-1 fejlede — kører muligvis forældet script" >&2
+        S1=""
     fi
 else
     echo "ADVARSEL: ~/Skrynja-1 er ikke et git-clone (eller git mangler) — kører scriptet som det ligger" >&2
+    S1=""
 fi
+echo "script_revision: ${S1:-ukendt}"
 
 REPO="storefyr/Skrynja-1"
 # Artefakter hentes via test-rpm's eget commit-sha, ikke gren-navnet — raw cacher pr. sti,
@@ -155,7 +157,7 @@ while [ $i -lt 30 ]; do
 done
 # trappe: SIGTERM, baggrundsdræber efter 5s (SIGKILL), wait høster straks når barnet dør
 kill $APP_PID 2>/dev/null || true
-( sleep 5; kill -0 $APP_PID 2>/dev/null && kill -9 $APP_PID 2>/dev/null ) &   # kill -0 først: undgå genbrugt PID
+( sleep 5; kill -9 $APP_PID 2>/dev/null ) &   # dræberen aflives når wait vender tilbage — det begrænser PID-genbrugs-vinduet (kill -0 kan ikke skelne levende fra genbrugt PID)
 KILLER=$!
 wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
 kill $KILLER 2>/dev/null || true
@@ -177,7 +179,6 @@ fi
 
 echo ""
 echo "--- selvtest-verdict (exit-kode følger PASS/FAIL) ---"
-echo "byg_revision: $REV"
 if [ -f "$VERDICT" ]; then
     ARTEFAKT_SHA=$(sha256sum "$ARTEFAKT" 2>/dev/null | cut -d' ' -f1) || true
     if [ -z "$ARTEFAKT_SHA" ]; then

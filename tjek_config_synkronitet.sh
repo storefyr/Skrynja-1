@@ -37,10 +37,12 @@ if [ -n "$bad_keys" ]; then
     fail=1
 fi
 
-# 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i sprog.udvanding_tilladt (ægte låneord) — ellers er det ascii-udvanding (metodefejl_19)
+# 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i sprog.udvanding_tilladt (ægte ord) — ellers er det ascii-udvanding (metodefejl_19)
+# NB: kun nøgler tjekkes her, ikke filnavne (kendt begrænsning). Hvidlisten læses som listeposter indtil næste nøgle på højst 3 mellemrum; blanke linjer fjernes (tom mønsterlinje ville matche alt)
+whitelist=$(sed -n '/udvanding_tilladt:/,/^[ ]\{0,3\}[^ ]/p' config.yaml | grep '^[ ]*-' | sed 's/^[ ]*-[ ]*//; s/[ ]*#.*$//' | grep .)
 tvivl=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml \
         | tr '_' '\n' | grep -E 'ae|oe|aa' | sort -u \
-        | grep -vxF -f <(sed -n '/udvanding_tilladt:/,/^[^ ]/p' config.yaml | sed -n 's/^[ ]*-[ ]*//; s/[ ]*#.*$//p') || true)
+        | grep -vxF -f <(printf '%s\n' "$whitelist") || true)
 if [ -n "$tvivl" ]; then
     echo "FAIL: nøgledele med ae/oe/aa ikke i udvanding_tilladt (stav med æøå medmindre ægte låneord):"
     printf '%s\n' "$tvivl"
