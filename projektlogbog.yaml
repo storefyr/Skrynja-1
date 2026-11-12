@@ -99,3 +99,10 @@ kørsler:
     dato: 2026-11-12
     revision: 5b84f6907e21d54edb94225ded65611adb3258d8
     resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar byg_revision=5b84f69…, script_revision=5b84f69…, script_revision_ved_start=b45759d… — altså pull flyttede klonen midt i kørslen og exec-genstarten kørte, med startværdien bevaret; artefakt_commit=aeb2ac9… svarer til test-rpm-spids (ls-remote), artefakt_fil/sha256 med; åbent_punkt_15 fuldt demonstreret
+  selvtest_68c2b42:
+    dato: 2026-11-12
+    revision: 68c2b42cfd6da362129b306ecd4275c1090511ad
+    resultat: PASS (exit 0) — R13; kendelsen adskilte fire felter med tre værdier: script_revision_ved_start=5b84f69… (før pull), script_revision=byg_revision=68c2b42… (efter pull + exec-genstart), artefakt_commit=2d000da… (test-rpm-spids, ≠ byg_revision); artefakt_fil=tar.gz, artefakt_sha256=fcd8ccb1…; slut_aarsag tom (normal afslutning, målt igen); bemærk: genoptaget=ja samtidig med session_load=fravalgt — uoverensstemmelse ført som åbent_punkt_18
+  telefon_klon_r5_r6:
+    dato: 2026-11-12
+    resultat: R5 på telefonen — efter push af b45759d: HEAD=2dbb3b6, origin/main=b45759d, status --porcelain tom (intet ugemt arbejde); R6 efter næste push — klon fulgte med via scriptets eget pull ved selvtest-kørslen (selvtest_68c2b42 viser ved_start=5b84f69 → script_revision=68c2b42)
