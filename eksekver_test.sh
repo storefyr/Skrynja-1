@@ -173,8 +173,6 @@ echo "--- vigtige linjer (tool_call/fejl) fra $LOG ---"
 if [ -f "$LOG" ]; then
     grep -v '/Silica/' "$LOG" | grep -E 'tool_call|[Ee]rror|[Ff]ejl' | tail -15 | cut -c1-400 || true
     echo "--- hele loggen: $LOG ($(wc -l < "$LOG") linjer; udskrevne linjer trunkeret til 400 tegn) ---"
-else
-    echo "(ingen log endnu)"
 fi
 
 echo ""

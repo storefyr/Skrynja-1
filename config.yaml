@@ -28,7 +28,7 @@ videnshåndtering:
   config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver; fungerer som stokastikeres persistente hukommelse på tværs af samtaler og instanser — forudsat at hver instans læser den først (se ved_genoptagelse) (sufflør 2026-11-10)
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
-  før_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse; og kør altid bash tjek_config_synkronitet.sh lokalt før commit (inventar-, nøgle- og udvandingskontrollen — samme som CI uden base-argument, hvor src/qml-synkronitet springes over)
+  før_commit: Før hver commit — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse; og kør altid bash tjek_config_synkronitet.sh lokalt før commit (inventar-, nøgle- og udvandingskontrollen — samme som CI uden base-argument, hvor src/qml-synkronitet springes over); fejler udvandingskontrollen på et ægte låneord, så tilføj ordet til udvanding_tilladt med begrundelse i commit-beskeden
   aldrig_i_depotet: Samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
   github_about: Afledt visningskopi af initialiserings_streng (som vises på GitHub-siden) — ikke normativ; opdateres når nøglen ændres
   ved_genoptagelse: ved hver samtales første besked måler stokastikeren sekunder siden seneste commit (git log -1 --format=%ct mod date +%s) og om origin ligger foran local (git ls-remote origin main mod git rev-parse main); er forskellen over 3600 sekunder eller origin foran, køres git pull --ff-only og config.yaml + projektlogbog.yaml læses før første svar — og første svar angiver hvilken revision der blev læst (git rev-parse HEAD efter pull), så en læser kan skelne frisk fra forældet — git ls-remote/fetch/push går over git-protokollen og tæller ikke i GitHubs REST-limit (60 req/time uden token, se lokal_opsætning.github_api)
@@ -211,7 +211,7 @@ anti_mønstre:
     - id: metodefejl_19
       metode: config-nøgle skrevet som arbejdsomraade (ascii-udvanding) lige efter metodefejl_18 havde sagt at C++ er ascii — vanen slog reglen
       resultat: kontrollen i tjek_config_synkronitet.sh fangede det ikke, fordi nøgle-kontrollen kun ser tegnmængden ^[a-zæøå_0-9']+$ og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet — værktøjsbegrænsningen hører ved kontrollen, ikke ved nøglen
-      lektie: læs navngivningsreglen før hver ny nøgle; en negativ liste over kendte udvandinger (arbejdsomraade, foer, naar, aendre) i kontrollen er sikrere end et ae/oe/aa-mønster (ægte ord som poesi indeholder oe)
+      lektie: læs navngivningsreglen før hver ny nøgle; kontrollen er en HVILDLISTE over tilladte låneord (udvanding_tilladt) — sikrere end en negativ liste, der kun dækker det der allerede er sket; fejler 3b på et ægte ord, tilføjes det til udvanding_tilladt med begrundelse i commit-beskeden
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
