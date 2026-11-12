@@ -47,9 +47,10 @@ rm -rf "$TMP"
 mkdir -p "$TMP"
 cd "$TMP"
 
-# Hent test-rpm's commit-sha først — med fejldiagnose (HTTP-fejl vs netværk, som hent())
-if ! curl -sfSL --connect-timeout 10 -m 30 -o tr_sha.json "https://api.github.com/repos/${REPO}/commits/test-rpm"; then
-    rc=$?
+# Hent test-rpm's commit-sha først — med fejldiagnose (HTTP-fejl vs netværk, som hent(); rc uden negation, metodefejl_15)
+rc=0
+curl -sfSL --connect-timeout 10 -m 30 -o tr_sha.json "https://api.github.com/repos/${REPO}/commits/test-rpm" || rc=$?
+if [ "$rc" -ne 0 ]; then
     if [ "$rc" -eq 22 ]; then
         echo "FEJL: HTTP-fejl fra API (f.eks. 403 rate limit — 60 req/time uden token — eller 404)" >&2
     else
@@ -110,6 +111,7 @@ fi
 BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
 if [ ! -x "$BIN" ]; then
     # test på den binære fil, ikke på kataloget — et afbrudt tar kan efterlade et halvt træ
+    ARTEFAKT="skrynja-1-test.aarch64.rpm"
     if command -v bsdtar >/dev/null 2>&1; then
         bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
     elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
@@ -134,20 +136,21 @@ APP_PID=$!
 # NB: wait nedenfor virker kun fordi APP_PID er et direkte barn af denne skal — behold spawn-linjen direkte
 i=0
 while [ $i -lt 30 ]; do
-    if grep -q '^VERDICT=.*$' "$VERDICT" 2>/dev/null; then
+    if grep -qE '^VERDICT=(PASS|FAIL)$' "$VERDICT" 2>/dev/null; then
         break
-    fi
-    if ! kill -0 $APP_PID 2>/dev/null; then
-        echo "App-processen døde før verdict — seneste app-log:"
-        tail -30 "$LOG" 2>/dev/null | cut -c1-400 || echo "(ingen log)"
-        exit 1
     fi
     sleep 2
     i=$((i + 1))
 done
+# trappe: SIGTERM, vent højst 5s, så SIGKILL, så høst med wait (kill -0 svarer også på u-høstede børn, så den bruges kun som tidsgrænse her)
 kill $APP_PID 2>/dev/null || true
-wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
+i=0
+while kill -0 $APP_PID 2>/dev/null && [ $i -lt 5 ]; do
+    sleep 1
+    i=$((i + 1))
+done
 kill -9 $APP_PID 2>/dev/null || true
+wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
 if [ ! -f "$VERDICT" ]; then
     echo "FEJL: intet verdict efter 60s — seneste app-log:"
     tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
@@ -177,7 +180,7 @@ if [ -f "$VERDICT" ]; then
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"
     awk 'length($0) > 300 { print substr($0, 1, 300) "...[trunkeret]" } length($0) <= 300 { print }' "$VERDICT"
-    if grep -q 'VERDICT=PASS' "$VERDICT"; then
+    if grep -q '^VERDICT=PASS$' "$VERDICT"; then
         exit 0
     fi
     exit 1

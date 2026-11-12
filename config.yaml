@@ -10,7 +10,7 @@ dokumentations_standard:
     nøgler: snake_case (f.eks. bundne_symboler)
     værdier: Naturligt sprog (Ortografisk korrekt)
     id'er: kategori_navn (snake_case), også filnavne og egne nøgler; aldrig enkelt bogstav eller tal; dansk ortografi (æøå); kode inden i filer er engelsk; hele ord, ingen forkortelser — undtaget produktnavne og veletablerede tekniske begreber (Qt, QML, Sailfish, GitHub, OS, SDK) samt eksisterende fil- og mappenavne (src, qml, rpm, .pro); entydige inden for kategorien — samme navn to steder er en fejl; ascii-udvanding (ae/oe/aa) tæller som fejl — skriv æøå (før, ikke foer); undtagelse: C++-identifikatorer (også prøveslot-navne) er ascii, fordi moc ikke håndterer æøå (metodefejl_18) — æøå gælder config-nøgler, filnavne og dansk tekst, ikke kildekode-id'er
-    sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth); princip: begreber uden dansk ækvivalent må bruges i nøgler og teknisk prosa — listen her er bilag, ikke regel, og vokser ikke ved hver overtrædelse; ud over (Qt, QML, Sailfish, GitHub, OS, SDK) også watchdog, fallback, chunk, wire, verdict, debounce, flash, log, payload, push, pull, token, API, URL, commit, mode, probe, diff, session, read-only, moc, runner, docker-cache, kind, job
+    sprog: dokumentation og commits dansk; kode og kommentarer engelsk; danske tekster på rent dansk uden engelske ord (blanke linjer, ikke blank lines; eneste normative kilde, ikke single point of truth); princip: begreber uden dansk ækvivalent må bruges i nøgler og teknisk prosa — listen her er bilag, ikke regel, og vokser ikke ved hver overtrædelse; ud over (Qt, QML, Sailfish, GitHub, OS, SDK) også watchdog, fallback, chunk, wire, verdict, debounce, flash, log, payload, push, pull, token, API, URL, commit, mode, probe, diff, session, read-only, moc, runner, docker-cache, kind, job, regex
   kognitiv_instruks:
     prioritet: Syntese > Ekstraktion
     støjreduktion: Maksimal
@@ -105,7 +105,7 @@ selvtest:
     gh_korrelation: "observeret 2026-11-09, årsag ikke bevist, modbevist to gange (NU! uden gh-kald; push 949d3ef uden limit) — ligner periodiske kvote-vinduer; ingen handlingsregel følger heraf i denne fil — praksis om lavt GitHub-forbrug aftales i dialogen (review ki_quick 2026-11-10)"
     github_note: "NB — dette er Mistrals limit; GitHub har sit eget (60 req/time uden token, se lokal_opsaetning.github_api)"
 
-arbejdsområde: denne stokastikers (vibe_ukendt_standardvalg) arbejdsområde er ikke persistent — nulstilling til origin/main kan ske uden varsel mellem to beskeder (målt 2026-11-11: lokal commit 27496ad forsvandt før push; kun push'et data overlever); gælder ikke nødvendigvis andre stokastikeres områder (ikke målt); risikoen ligger i ventetiden mellem commit og sufflørs push-signal, så færdige enheder bør ikke vente længe på signal
+arbejdsområde: denne stokastikers (vibe_ukendt_standardvalg) arbejdsområde er ikke varigt — et lokalt commit forsvandt mellem to runder (målt 2026-11-11: commit 27496ad væk før push; kun push'et data overlever); mekanismen bag (nulstilling til origin/main) er en slutning, ikke målt; gælder ikke nødvendigvis andre stokastikeres områder (ikke målt); risikoen ligger i ventetiden mellem commit og sufflørs push-signal, så færdige enheder bør ikke vente længe på signal
 lokal_opsaetning:
   maskiner_og_programmel: én fysisk enhed (teknisk_stack.maskiner.eneste_enhed) + CI — ingen ekstern udviklermaskine
   klient_lige_nu: Mistral Vibe Android-app på Jolla Phone 2026 (kun indtil Skrynja-1 er materialiseret); samtaler og deres navne håndteres i den app — uden for dette repos kontrol (sufflør 2026-11-08)
@@ -205,8 +205,8 @@ anti_mønstre:
       lektie: C++-identifikatorer (også prøveslot-navne) i ascii — som eksisterende prøvenavne (raekkefoelge); æøå kun i config-nøgler, filnavne og dansk tekst, aldrig i kildekode-id'er (metacall-genererede id'er går gennem moc)
     - id: metodefejl_19
       metode: config-nøgle skrevet som arbejdsomraade (ascii-udvanding) lige efter metodefejl_18 havde sagt at C++ er ascii — vanen slog reglen
-      resultat: guard'en fangede det ikke, fordi nøgle-regex'en ^[a-zæøå_0-9']+$ tillader ascii-bogstaver og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet
-      lektie: læs navngivningsreglen før hver ny nøgle; guard kan ikke skelne udvanding fra æøå — overvej mønster for ae/oe/aa i nøgler (med forsigtighed: ægte ord som poesi indeholder oe)
+      resultat: kontrollen i tjek_config_synkronitet.sh fangede det ikke, fordi nøgle-kontrollen kun ser tegnmængden ^[a-zæøå_0-9']+$ og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet — værktøjsbegrænsningen hører ved kontrollen, ikke ved nøglen
+      lektie: læs navngivningsreglen før hver ny nøgle; en negativ liste over kendte udvandinger (arbejdsomraade, foer, naar, aendre) i kontrollen er sikrere end et ae/oe/aa-mønster (ægte ord som poesi indeholder oe)
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
@@ -238,6 +238,7 @@ målt_på_wire:
   åbent_punkt_13: afgjort 2026-11-10 — to kørsler på samme revision 23f0b34 gav outputs=0 (FAIL) hhv. outputs=1 (PASS) med ellers identiske felter: klienten fanger diff/uddata når agenten sender dem, så FAIL skyldtes agentens værktøjsvalg uden content-blokke, ikke et klient-tab; besluttet 2026-11-10 (sufflør): proben gøres deterministisk med shell-kommando hvis uddata altid skal følge med (se selvtest.tilstand)
   åbent_punkt_14: scriptets ventetid på 60s = watchdog 30s efter agent-processtart + 30s buffer, men app-opstartstiden er ikke målt på enheden — mål den ved en selvtest-kørsel og sæt loftet som ulighed med den målte værdi, ikke et rundt tal (review ki_quick 2026-11-10)
   åbent_punkt_15: eksekver_test.sh kører git pull i ~/Skrynja-1 i starten af samme kørsel, hvor scriptet selv ligger — skallen kan læse resten af scriptet fra den nye fil midt i kørslen (samme fejlklasse som metodefejl_17, på kode); mulig fix — hent først og genstart scriptet (exec sh "$0"), eller flyt pull ud af scriptet (review ki_quick 2026-11-11)
+  åbent_punkt_16: scriptets kill rammer kun GUI-processen — vibe-acp er dens QProcess-barn og får intet signal; en dræbt app kan efterlade en kørende agent, som viser sig som uforklarligt forbrug, ikke som fejl (kodelæsning review ki_quick 2026-11-12; fix kunne være at dræbe procesgruppen eller bede agenten om session/cancel først — appen sender allerede session/cancel ved stop, men ikke når scriptet dræber den)
 
 operationel_implementering:
   tilstand_bestået_med_åbent_punkt: accepteret — en skive kan være bestået mens et åbent punkt står, hvis punktet kun begrænser manuel efterprøvning og ikke selvtest (review 2026-11-10)

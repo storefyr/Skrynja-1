@@ -28,7 +28,8 @@ if [ "$#" -ge 1 ]; then
     fi
 fi
 
-# 3) All config.yaml keys must be Danish orthography (æøå allowed; apostrophe allowed for id'er)
+# 3) Keys may only contain Danish letters, digits, underscore, apostrophe — spelling is NOT checked
+#    (æøå vs ae/oe/aa cannot be distinguished by a character class; see metodefejl_19)
 bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml | grep -vP "^[a-zæøå_0-9']+$" || true)
 if [ -n "$bad_keys" ]; then
     echo "FAIL: nøgler ikke på dansk ortografi:"
