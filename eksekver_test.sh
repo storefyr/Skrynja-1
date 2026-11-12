@@ -189,6 +189,7 @@ if [ -f "$VERDICT" ]; then
         exit 1
     fi
     echo "byg_revision=$REV" >> "$VERDICT"
+    echo "script_revision_ved_start=${S0:-ukendt}" >> "$VERDICT"
     echo "artefakt_commit=$TR_SHA" >> "$VERDICT"
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"

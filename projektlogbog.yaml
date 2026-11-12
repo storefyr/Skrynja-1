@@ -90,4 +90,4 @@ kørsler:
   selvtest_2dbb3b6:
     dato: 2026-11-12
     revision: 2dbb3b6cf9376468a77a147aa800232b27236f74
-    resultat: PASS (exit 0) — outputs=1 fra deterministisk probe, alle felter grønne; kendelsen bar revision=2dbb3b6… (gammelt feltnavn) + artefakt_commit/fil/sha256 — telefonens klon stod på 1733a53 ved start, pull nåede 2dbb3b6 undervejs, men uden exec-genstart (først i 89ce768) kørte kørslen den gamle scriptudgave; byg_revision= og script_revision: forventes først ved næste kørsel
+    resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar revision=2dbb3b6… + artefakt_commit/fil/sha256; feltnavnet revision= identificerer den kørende scriptudgave som ≤ c82aa02 (byg_revision= kom først i 1733a53) — målt via feltnavnet, ikke rekonstrueret; byg_revision= og script_revision: fandtes ikke i den udgave, så de to felter var fraværende (ikke grønne); forventes ved næste kørsel hvor scriptet selv genstarter efter pull

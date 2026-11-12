@@ -30,11 +30,15 @@ fi
 
 # 3) Keys may only contain Danish letters, digits, underscore, apostrophe — spelling is NOT checked
 #    (æøå vs ae/oe/aa cannot be distinguished by a character class; see metodefejl_19)
-bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml | grep -vP "^[a-zæøå_0-9']+$" || true)
-if [ -n "$bad_keys" ]; then
-    echo "FAIL: nøgler ikke på dansk ortografi:"
-    printf '%s\n' "$bad_keys"
-    fail=1
+if echo x | grep -qP 'x' 2>/dev/null; then
+    bad_keys=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml | grep -vP "^[a-zæøå_0-9']+$" || true)
+    if [ -n "$bad_keys" ]; then
+        echo "FAIL: nøgler ikke på dansk ortografi:"
+        printf '%s\n' "$bad_keys"
+        fail=1
+    fi
+else
+    echo "ADVARSEL: denne grep understøtter ikke -P — tjek 3 (nøgle-tegnesæt) springes over her; kør med GNU grep/bash (CI gør)"
 fi
 
 # 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i dokumentations_standard.navngivnings_konvention.udvanding_tilladt (ægte ord) — ellers er det ascii-udvanding (metodefejl_19)
