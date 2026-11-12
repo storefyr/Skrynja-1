@@ -72,9 +72,12 @@ for peg in $(grep -o 'se projektlogbog [a-zæøå_0-9]*' config.yaml | awk '{pri
         if [ -z "$sha" ]; then
             echo "FAIL: pegepind '$peg' står i en PASS-sætning uden sha — kan ikke kontrolleres"
             fail=1
-        elif ! grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}[0-9a-f]\{33\}"; then
-            echo "FAIL: pegepind '$peg' har anden revision i logbogen end præfikset '$sha' i samme sætning"
-            fail=1
+        elif [ ${#sha} -eq 40 ]; then
+            grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}$" \
+                || { echo "FAIL: pegepind '$peg' har anden revision i logbogen end fuldt sha '$sha' i samme sætning"; fail=1; }
+        else
+            grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}[0-9a-f]\{33\}$" \
+                || { echo "FAIL: pegepind '$peg' har anden revision i logbogen end præfikset '$sha' i samme sætning"; fail=1; }
         fi
     fi
 done
