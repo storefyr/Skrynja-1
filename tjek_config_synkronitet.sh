@@ -37,7 +37,9 @@ bad=""
 while IFS= read -r key; do
     [ -z "$key" ] && continue
     [[ "$key" =~ $re ]] || bad="$bad$key\n"
-done <<< "$bad_keys"
+done <<EOF_HK
+$bad_keys
+EOF_HK
 if [ -n "$bad" ]; then
     echo "FAIL: nøgler ikke på dansk ortografi:"
     printf '%b' "$bad"
