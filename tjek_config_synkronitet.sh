@@ -37,6 +37,16 @@ if [ -n "$bad_keys" ]; then
     fail=1
 fi
 
+# 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i sprog.udvanding_tilladt (ægte låneord) — ellers er det ascii-udvanding (metodefejl_19)
+tvivl=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml \
+        | tr '_' '\n' | grep -E 'ae|oe|aa' | sort -u \
+        | grep -vxF -f <(sed -n '/udvanding_tilladt:/,/^[^ ]/p' config.yaml | sed -n 's/^[ ]*-[ ]*//; s/[ ]*#.*$//p') || true)
+if [ -n "$tvivl" ]; then
+    echo "FAIL: nøgledele med ae/oe/aa ikke i udvanding_tilladt (stav med æøå medmindre ægte låneord):"
+    printf '%s\n' "$tvivl"
+    fail=1
+fi
+
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
