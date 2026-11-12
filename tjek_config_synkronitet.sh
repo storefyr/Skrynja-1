@@ -7,6 +7,7 @@ set -u
 cd "$(git rev-parse --show-toplevel)"
 
 fail=0
+partial=0
 
 # 1) Every tracked file must be mentioned in config.yaml (full path or basename).
 while IFS= read -r f; do
@@ -39,6 +40,7 @@ if echo x | grep -qP 'x' 2>/dev/null; then
     fi
 else
     echo "ADVARSEL: denne grep understøtter ikke -P — tjek 3 (nøgle-tegnesæt) springes over her; kør med GNU grep/bash (CI gør)"
+    partial=1
 fi
 
 # 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i dokumentations_standard.navngivnings_konvention.udvanding_tilladt (ægte ord) — ellers er det ascii-udvanding (metodefejl_19)
@@ -56,5 +58,9 @@ fi
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
+fi
+if [ "$partial" -ne 0 ]; then
+    echo "config sync check: PARTIAL (advarsel — ikke alle kontroller kunne køre)"
+    exit 2
 fi
 echo "config sync check: OK"
