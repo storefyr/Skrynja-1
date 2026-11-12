@@ -8,10 +8,18 @@
 # Requires: curl (preinstalled), bsdtar or rpm2cpio+cpio.
 set -e
 
-# Opdater scriptets eget clone først, så vi ikke kører et forældet script mod et nyt byg
+# Opdater scriptets eget clone først, så vi ikke kører et forældet script mod et nyt byg.
+# git skriver ved pull en ny fil og omdøber — den kørende skal beholder den gamle inode,
+# så uden genstart ville hele kørslen køre den gamle udgave (åbent_punkt_15, målt på c82aa02)
 if command -v git >/dev/null 2>&1 && [ -d "$HOME/Skrynja-1/.git" ]; then
+    S0=$(git -C "$HOME/Skrynja-1" rev-parse HEAD 2>/dev/null || echo "")
     if git -C "$HOME/Skrynja-1" pull --ff-only >/dev/null 2>&1; then
-        echo "Script fra lokal clone ved $(git -C "$HOME/Skrynja-1" rev-parse --short HEAD)"
+        S1=$(git -C "$HOME/Skrynja-1" rev-parse HEAD 2>/dev/null || echo "")
+        echo "script_revision: ${S1:-ukendt} (klon efter pull)"
+        if [ -n "$S0" ] && [ "$S0" != "$S1" ]; then
+            echo "Pull ændrede klonen — genstarter scriptet, så kørslen måler den nye udgave"
+            exec sh "$0" "$@"
+        fi
     else
         echo "ADVARSEL: git pull i ~/Skrynja-1 fejlede — kører muligvis forældet script" >&2
     fi
@@ -72,7 +80,8 @@ echo "Artefakter fra test-rpm commit ${TR_SHA}"
 echo "Henter revision først, så artefakter knyttes til den ..."
 hent revision.txt "$REV_URL" 30
 REV=$(cat revision.txt)
-echo "Testet revision: $REV"
+echo "$REV" | grep -qE '^[0-9a-f]{40}$' || { echo "FEJL: revision.txt indeholder ikke et fuldt sha — nægter at fortsætte" >&2; exit 1; }
+echo "byg_revision: $REV"
 
 command -v sha256sum >/dev/null 2>&1 || { echo "FEJL: sha256sum mangler — nægter at køre uverificeret artefakt (metodefejl_13)" >&2; exit 1; }
 
@@ -110,7 +119,9 @@ if command -v tar >/dev/null 2>&1; then
 fi
 BIN="$APP_DIR/usr/bin/harbour-skrynja-1"
 if [ ! -x "$BIN" ]; then
-    # test på den binære fil, ikke på kataloget — et afbrudt tar kan efterlade et halvt træ
+    # test på den binære fil, ikke på kataloget — og rent træ før RPM lægges ovenpå evt. halvt tar-træ
+    rm -rf "$APP_DIR"
+    mkdir -p "$APP_DIR"
     ARTEFAKT="skrynja-1-test.aarch64.rpm"
     if command -v bsdtar >/dev/null 2>&1; then
         bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
@@ -144,7 +155,7 @@ while [ $i -lt 30 ]; do
 done
 # trappe: SIGTERM, baggrundsdræber efter 5s (SIGKILL), wait høster straks når barnet dør
 kill $APP_PID 2>/dev/null || true
-( sleep 5; kill -9 $APP_PID 2>/dev/null ) &
+( sleep 5; kill -0 $APP_PID 2>/dev/null && kill -9 $APP_PID 2>/dev/null ) &   # kill -0 først: undgå genbrugt PID
 KILLER=$!
 wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
 kill $KILLER 2>/dev/null || true
@@ -173,7 +184,7 @@ if [ -f "$VERDICT" ]; then
         echo "FEJL: kunne ikke beregne sha256 af $ARTEFAKT" >&2
         exit 1
     fi
-    echo "revision=$REV" >> "$VERDICT"
+    echo "byg_revision=$REV" >> "$VERDICT"
     echo "artefakt_commit=$TR_SHA" >> "$VERDICT"
     echo "artefakt_fil=$ARTEFAKT" >> "$VERDICT"
     echo "artefakt_sha256=$ARTEFAKT_SHA" >> "$VERDICT"
@@ -181,5 +192,8 @@ if [ -f "$VERDICT" ]; then
     if grep -q '^VERDICT=PASS$' "$VERDICT"; then
         exit 0
     fi
+    exit 1
+else
+    echo "FEJL: kendelsesfil forsvandt mellem tjek og læsning"
     exit 1
 fi
