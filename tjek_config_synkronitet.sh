@@ -55,6 +55,21 @@ if [ -n "$tvivl" ]; then
     fail=1
 fi
 
+# 4) Pegepinde: hver "se projektlogbog <post>" skal findes som post, og postens revision skal matche sha i samme "PASS på <sha>"-sætning
+for peg in $(grep -o 'se projektlogbog [a-zæøå_0-9]*' config.yaml | awk '{print $3}'); do
+    if ! grep -q "^  ${peg}:" projektlogbog.yaml; then
+        echo "FAIL: pegepind '$peg' findes ikke som post i projektlogbog.yaml"
+        fail=1
+        continue
+    fi
+    linje=$(grep "se projektlogbog ${peg}" config.yaml | head -1)
+    sha=$(printf '%s' "$linje" | grep -o 'PASS på [0-9a-f]\{7,\}' | head -1 | grep -o '[0-9a-f]\{7,\}')
+    if [ -n "$sha" ] && ! grep -A2 "^  ${peg}:" projektlogbog.yaml | grep -q "revision: ${sha}"; then
+        echo "FAIL: pegepind '$peg' har anden revision i logbogen end 'PASS på $sha' i samme sætning"
+        fail=1
+    fi
+done
+
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
