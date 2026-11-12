@@ -39,7 +39,7 @@ fi
 
 # 3b) Nøgledele med ae/oe/aa må kun forekomme hvis de står i dokumentations_standard.navngivnings_konvention.udvanding_tilladt (ægte ord) — ellers er det ascii-udvanding (metodefejl_19)
 # NB: kun nøgler tjekkes her, ikke filnavne (kendt begrænsning). Hvidlisten læses som listeposter indtil næste nøgle på højst 5 mellemrum; blanke linjer og hale-whitespace fjernes (tom mønsterfil må give FAIL, ikke OK)
-whitelist=$(sed -n '/udvanding_tilladt:/,/^[ ]\{0,5\}[^ ]/p' config.yaml | grep '^[ ]*-' | sed 's/^[ ]*-[ ]*//; s/[ ]*#.*$//; s/[ ]*$//' | grep .)
+whitelist=$(sed -n '/^[ ]*udvanding_tilladt:/,/^[ ]\{0,5\}[^ ]/p' config.yaml | grep '^[ ]*-' | sed 's/^[ ]*-[ ]*//; s/[ ]*#.*$//; s/[ ]*$//' | grep .)
 tvivl=$(sed -n 's/^[ ]*-[ ]*\([^:]*\):.*/\1/p; s/^[ ]*\([^:]*\):.*/\1/p' config.yaml \
         | tr '_' '\n' | grep -E 'ae|oe|aa' | sort -u \
         | grep -vxF -f <(printf '%s\n' "$whitelist" | grep .) || true)

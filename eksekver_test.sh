@@ -126,8 +126,14 @@ if [ ! -x "$BIN" ]; then
     mkdir -p "$APP_DIR"
     ARTEFAKT="skrynja-1-test.aarch64.rpm"
     if command -v bsdtar >/dev/null 2>&1; then
-        bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"
-    elif command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
+        if bsdtar -xf "$TMP/skrynja-1-test.aarch64.rpm" -C "$APP_DIR"; then
+            :
+        else
+            echo "ADVARSEL: bsdtar fejlede — prøver rpm2cpio" >&2
+        fi
+    fi
+    # NB: rpm2cpio-pipelinen arver kun cpio's status — fejler rpm2cpio, kan cpio returnere 0 på tom input
+    if [ ! -x "$BIN" ] && command -v rpm2cpio >/dev/null 2>&1 && command -v cpio >/dev/null 2>&1; then
         (cd "$APP_DIR" && rpm2cpio "$TMP/skrynja-1-test.aarch64.rpm" | cpio -idm)
     fi
 fi
