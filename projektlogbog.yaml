@@ -95,3 +95,7 @@ kørsler:
     dato: 2026-11-12
     revision: b45759d145631a555462c06aa64babc84c96d89d
     resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar byg_revision= OG script_revision= OG script_revision_ved_start=, alle = b45759d… (første kørsel hvor alle tre står); artefakt_commit/fil/sha256 også med; åbent_punkt_15 dermed lukket i praksis (ikke kun i kode)
+  selvtest_5b84f69:
+    dato: 2026-11-12
+    revision: 5b84f6907e21d54edb94225ded65611adb3258d8
+    resultat: PASS (exit 0) — outputs=1 fra deterministisk probe; kendelsen bar byg_revision=5b84f69…, script_revision=5b84f69…, script_revision_ved_start=b45759d… — altså pull flyttede klonen midt i kørslen og exec-genstarten kørte, med startværdien bevaret; artefakt_commit=aeb2ac9… svarer til test-rpm-spids (ls-remote), artefakt_fil/sha256 med; åbent_punkt_15 fuldt demonstreret
