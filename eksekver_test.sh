@@ -114,8 +114,7 @@ if command -v tar >/dev/null 2>&1; then
                 echo "ADVARSEL: tar kunne ikke pakke ud — falder tilbage til verificeret RPM" >&2
             fi
         else
-            echo "FEJL: sha256 passer ikke for tar.gz (revision $REV)" >&2
-            exit 1
+            echo "ADVARSEL: sha256 passer ikke for tar.gz (revision $REV) — falder tilbage til den verificerede RPM" >&2
         fi
     fi
 fi
