@@ -142,15 +142,13 @@ while [ $i -lt 30 ]; do
     sleep 2
     i=$((i + 1))
 done
-# trappe: SIGTERM, vent højst 5s, så SIGKILL, så høst med wait (kill -0 svarer også på u-høstede børn, så den bruges kun som tidsgrænse her)
+# trappe: SIGTERM, baggrundsdræber efter 5s (SIGKILL), wait høster straks når barnet dør
 kill $APP_PID 2>/dev/null || true
-i=0
-while kill -0 $APP_PID 2>/dev/null && [ $i -lt 5 ]; do
-    sleep 1
-    i=$((i + 1))
-done
-kill -9 $APP_PID 2>/dev/null || true
+( sleep 5; kill -9 $APP_PID 2>/dev/null ) &
+KILLER=$!
 wait $APP_PID 2>/dev/null || true   # wait kan returnere 143/137 ved signal — værnet er || true, ellers dør skallen under set -e
+kill $KILLER 2>/dev/null || true
+wait $KILLER 2>/dev/null || true
 if [ ! -f "$VERDICT" ]; then
     echo "FEJL: intet verdict efter 60s — seneste app-log:"
     tail -30 "$LOG" 2>/dev/null || echo "(ingen log)"
@@ -170,7 +168,7 @@ echo ""
 echo "--- selvtest-verdict (exit-kode følger PASS/FAIL) ---"
 echo "revision: ${REV:-ukendt}"
 if [ -f "$VERDICT" ]; then
-    ARTEFAKT_SHA=$(sha256sum "$ARTEFAKT" | cut -d' ' -f1)
+    ARTEFAKT_SHA=$(sha256sum "$ARTEFAKT" 2>/dev/null | cut -d' ' -f1) || true
     if [ -z "$ARTEFAKT_SHA" ]; then
         echo "FEJL: kunne ikke beregne sha256 af $ARTEFAKT" >&2
         exit 1
@@ -183,8 +181,5 @@ if [ -f "$VERDICT" ]; then
     if grep -q '^VERDICT=PASS$' "$VERDICT"; then
         exit 0
     fi
-    exit 1
-else
-    echo "FEJL: intet verdict (uafsluttet)"
     exit 1
 fi
