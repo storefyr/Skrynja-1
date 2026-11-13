@@ -348,6 +348,7 @@ fremdrift:
   skive_konfiguration: bestået 2026-11-09 — selvtest PASS på enheden, revision 3bd9a6b (config_options=3, mode=ask sat via set_config_option); UI indstillingsmenu; CI 42564758904 grøn, 29/29 prøver
   skive_genoptagelse: bestået 2026-11-09 — to selvtest-kørsler på revision b5192b8 — første session_load=ingen, anden session_load=fallback + genoptaget=ja (QSettings-historik vist igen), PASS begge gange; efter revision 18de24d kører selvtest frisk session, så dette bevis kan ikke genskabes af selvtest — kun ved manuel prøvetur (åbent_punkt_09)
   skive_oprydning: bestået 2026-11-09 — inventar og træ er identiske i begge retninger (målt lokalt), ingen utrackede filer; håndhæves fremadrettet af tjek_config i CI på hver push
+  trin_6_status: 'igang 2026-11-13 (R360) — 17 termer under projekt_ordbog (udledt af postantal i R346); 11 definitioner læst ordret (R347, R349), 6 ikke læst; 1 opslag forsøgt (skrynja), 16 tilbage; 5 termer uden muligt opslag (R346)'
   seneste_enhedsmåling: selvtest PASS på a5ded0d 2026-11-12 (selvtest_a5ded0d/R31 — script_revision=a5ded0d ≠ byg_revision=e394164 første gang, ved_start=e394164, artefakt_commit=547cf5c; før også e394164/R23, 68c2b42/R13, 5b84f69, b45759d, 2dbb3b6 med gammelt feltnavn revision=)
 
 etiketter:
