@@ -285,6 +285,10 @@ anti_mønstre:
       metode: 'afprøvning af en indskrivningskrog mod fire prøvebeskeder i et løsrevet depot under /tmp — to skulle afvises, to godkendes'
       resultat: 'alle fire blev afvist, også de to der skulle godkendes; krogen kunne ikke skelne rigtig fra forkert; rejst som kandidat, aldrig installeret i depotet'
       lektie: 'en afprøvning må ikke godkendes, før den er vist rød mod en bevidst indført fejl og grøn mod en kendt rigtig sag; giver begge sager samme udfald, har afprøvningen ingen skelneevne, og dens beståen siger intet om det afprøvede — kun om sig selv'
+    - id: metodefejl_22
+      metode: 'en midlertidig indskrivningskrog blev bygget og afprøvet, før det blev målt, om depotet allerede havde en kontrol af udvanding — kontrollen fandtes i tjek_config_synkronitet.sh, og krogens hvidliste var en uversioneret kopi af udvanding_tilladt'
+      resultat: 'arbejdsrunder gik til at genopbygge en funktion, der lå i depotet hele tiden; krogen så kun indskrivningsbeskeder, mens depotets kontrol ser nøgler — ingen af dem dækkede den anden'
+      lektie: 'før en kontrol bygges, læses det script som config.yaml selv udpeger som håndhæver; findes funktionen, udvides den frem for at duplikeres'
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
