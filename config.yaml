@@ -58,11 +58,15 @@ inventar:
   bemærkning: inventar dækker kun main; grenen test-rpm bærer byg-artefakter (RPM, tar.gz, revision.txt og to .sha256-filer, alle i samme commit før force-push) og er bevidst ikke med (sufflør 2026-11-10)
 
 projekt_ordbog:
-  sufflør: Det menneskelige led, der guider og korrigerer maskinelle stokastikere via præcise instruktioner.
+  sufflør: Den part, der guider og korrigerer en stokastiker via præcise instruktioner; kan udfyldes af det menneskelige led (menneskelig sufflør) eller af en stokastiker i sufflerende rolle (maskinel sufflør).
+  sufflere: Løbende at følge en stokastikers arbejde og, når det er nødvendigt, tilføje supplerende bemærkninger der hjælper den videre eller styrer dens retning.
   skrynja: Nynorsk for skrøne. Symbol på den maskinelle stokastikers tendens til fiktive narrativer.
   fremkaldelse: Processen med at bringe en specifik operationel tilstand eller identitet frem i en stokastiker.
   rekursiv_orkestrering: Styringsstruktur, hvor en stokastiker instrueres i at sufflere en anden stokastiker.
-  maskinel_stokastiker: Stor sprogmodel (LLM), der opererer som eksekverende part under sufflørstyring.
+  maskinel_stokastiker: Stor sprogmodel (LLM), der opererer som eksekverende part under sufflørstyring. Kortform i løbende tekst: stokastiker. Samme part kan være maskinel sufflør i forhold til den næste instans.
+  maskinel_sufflør: Stokastiker, der i sufflerende rolle følger Stokastiker[n+1] og griber ind, når det er nødvendigt; se rekursiv_orkestrering og rekursion.
+  oprindelsesmærke: I en parentes med årstal angiver sufflør at oplysningen stammer fra det menneskelige led, stokastiker at notatet er skrevet af en maskine om sig selv, og ki_quick at den stammer fra ki_quick.
+  belægsform: I samme parentes angiver målt at påstanden er efterprøvet, og foranstillet selvtest, kodelæsning eller review hvilken form for efterprøvning der blev gjort; må nødvendigt angiver at behovet er målt.
   hårdknude: Udviklingsmæssig blindgyde eller systemisk fejl, hvor tilgangen fører til uoverstigelige problemer.
   ortografisk_krav: Krav om streng overholdelse af danske stave- og skrive-regler.
   kildekodelager: Det centrale depot for projektets kildekode, hvor versionsstyring og historik administreres.
