@@ -346,4 +346,4 @@ fremdrift:
 
 etiketter:
   formål: Tilskrivning fra ældre etiketnavne i uddata til danske navne; programstrenge er ikke etiketter og ændres ikke.
-  tilskrivning: udoer=uindskrevne; lsfjer=fjernspids; commit=indskrivning; commit-besked=indskrivningsbesked; udoutput=uddata; udoutput_linjer=uddata_linjer; gren=gren; blob=indhold; bak=sikkerhedskopi; guard_rc=tjek_afslutningskode; log_linjer=logfillinjer; sha=kontrolsum; pinnet=låst
+  tilskrivning: lsfjer=fjernspids; commit=indskrivning; commit-besked=indskrivningsbesked; udoutput=uddata; udoutput_linjer=uddata_linjer; gren=gren; blob=indhold; bak=sikkerhedskopi; guard_rc=tjek_afslutningskode; log_linjer=logfillinjer; sha=kontrolsum; pinnet=låst
