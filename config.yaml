@@ -68,7 +68,9 @@ projekt_ordbog:
   kildekodelager: Det centrale depot for projektets kildekode, hvor versionsstyring og historik administreres.
   acp_session: ACP-session (sessionId, session/new, session/load) — ikke stokastikerens samtale-session; de to betydninger må ikke forveksles i samme tekst
   sko_a: Separat repo storefyr/Sko-a (GitHub-notifikations-app) — brugt 2026-11-09 til at måle GitHub API uden token (60 req/time pr. IP, se lokal_opsætning.github_api); ligger uden for dette projekts inventar
-  vibe_ukendt_standardvalg: Midlertidigt navn for den aktuelle stokastiker i denne samtale — model kunne ikke identificeres hverken i app eller admin (sufflør 2026-11-11); omdøbes når modellen kendes
+  vibe_ukendt_model: Midlertidigt navn for den aktuelle stokastiker i denne samtale — model kunne ikke identificeres hverken i app eller admin (sufflør 2026-11-11); omdøbes når modellen kendes
+  ki_quick: Model-id i Kagis modelliste, vist som Quick; grænsefladen er Kagi Assistant; underliggende modelleverandør ikke målt (sufflør 2026-11-13; id bekræftet i kilder uden for depotet)
+  chat_dk: Grænsefladen chat.dk fra Ordbogen A/S med sprogmodellen Odin-LLM som kerne; dansk databehandling (sufflør 2026-11-13; modelnavnet læst i kilder uden for depotet)
 
 arkitektonisk_logik:
   struktur: RekursivOrkestrering (afledt visning — projekt_ordbog.rekursiv_orkestrering er normativ)
