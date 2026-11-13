@@ -344,3 +344,6 @@ fremdrift:
   skive_oprydning: bestået 2026-11-09 — inventar og træ er identiske i begge retninger (målt lokalt), ingen utrackede filer; håndhæves fremadrettet af tjek_config i CI på hver push
   seneste_enhedsmåling: selvtest PASS på a5ded0d 2026-11-12 (selvtest_a5ded0d/R31 — script_revision=a5ded0d ≠ byg_revision=e394164 første gang, ved_start=e394164, artefakt_commit=547cf5c; før også e394164/R23, 68c2b42/R13, 5b84f69, b45759d, 2dbb3b6 med gammelt feltnavn revision=)
 
+etiketter:
+  formål: Tilskrivning fra ældre etiketnavne i uddata til danske navne; programstrenge er ikke etiketter og ændres ikke.
+  tilskrivning: udoer=uindskrevne; lsfjer=fjernspids; commit=indskrivning; commit-besked=indskrivningsbesked; udoutput=uddata; udoutput_linjer=uddata_linjer; gren=gren; blob=indhold; bak=sikkerhedskopi; guard_rc=tjek_afslutningskode; log_linjer=logfillinjer; sha=kontrolsum; pinnet=låst
