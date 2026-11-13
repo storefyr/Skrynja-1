@@ -82,6 +82,13 @@ for peg in $(grep -o 'se projektlogbog [a-zæøå_0-9]*' config.yaml | awk '{pri
     fi
 done
 
+# 5) Udgåede proseord: "verdict", "prompt", "rate-limit" må ikke stå fritstående
+for w in $(sed -n 's/^  udgået: //p' config.yaml | tr ';' '\n' | cut -d= -f1); do
+    if grep -qE "(^|[^A-Za-z0-9_ÆØÅæøå-])${w}([^A-Za-z0-9_ÆØÅæøå-]|$)" projektlogbog.yaml; then
+        echo "FAIL: udgået ord '$w' står i projektlogbog.yaml"
+        fail=1
+    fi
+done
 if [ "$fail" -ne 0 ]; then
     echo "config sync check: FAILED"
     exit 1
