@@ -196,7 +196,7 @@ sufflør_protokol:
     kommandoer: Hver kommando der skal køres, står i sit eget kopierbare blok med blank linje før — også enkeltlinje-kommandoer, og også når svaret kun indeholder én; flere kommandoer i ét blok kun når de er beregnet på at køres sammen i én pipeline (sufflør 2026-11-08, skærpet 2026-11-12: altid hver sit element)
     tal_i_svar: Svar i almindeligt dansk uden udmålinger der ikke blev bedt om; rå tal (sekunder, sha'er, byte, verdict-felter, kørsels-id'er, fejltekster) bruges når de er svaret på spørgsmålet (målinger, verdict, sporbarhed) eller når sufflør siger at svaret suffleres videre til en anden stokastiker (sufflør 2026-11-10)
   ki_quick_kanal: konferering med ki_quick om commits — stokastikeren skriver en afgrænset besked mellem markørerne --- til ki_quick --- og --- /til ki_quick --- i dialogen; sufflør kopierer teksten manuelt over til ki_quick; der findes ingen direkte kanal (sufflør 2026-11-11)
-  review_først: ved konferering om nye commits lægges de på en review-gren først (git push origin main:vibe/review-ki-quick-d01e2e), så ki_quick kan læse dem sha-pinnet; main flyttes først på ki_quicks signal, og review-grenen slettes først når git ls-remote bekræfter at main bærer commits (målt nødvendigt 2026-11-12: push før gennemgang gjorde aftalt signal umuligt at holde)
+  review_først: ved konferering om nye commits lægges de på en review-gren først (git push origin main:vibe/review-<sha7>, hvor <sha7> er den korte sha for den commit der skal gennemgås), så ki_quick kan læse dem sha-pinnet; main flyttes først på ki_quicks signal, og den pågældende review-gren slettes først når git ls-remote bekræfter at main bærer commits (ki_quick 2026-11-12)
 
 anti_mønstre:
   metodiske_fejl:
