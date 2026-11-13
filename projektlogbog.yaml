@@ -11,6 +11,10 @@ samtaler:
     besked_id: ukendt (videresendt gennemgang fra ki_quick)
     resume: stokastiker mistænkte modelskift efter oplevet formåensfald — stokastikeren kan ikke verificere egen model indefra (hverken app eller admin viser den), så navnet vibe_ukendt_model blev vedtaget (se projekt_ordbog); arbejdsområdet viste sig ikke-varigt (lokal indskrivning tabt ved nulstilling — målt, se config arbejdsområde); konferering med ki_quick formaliseret (markører + manuel kopiering, config ki_quick_kanal) med review-gren først, main først på signal
 
+  samtale_skrynja1_2026-11-13:
+    besked_id: ⟨måles senere⟩
+    resume: YAML-opgave — config.yaml kunne ikke fortolkes i 11/20 blokke; ki_quick rettede uciterede værdier (12c3174, safe_load OK, 324 nøgler); guard uændret grøn; plan om ny fil forkastet til fordel for rettelse i config.yaml
+
 kørsler:
   selvtest_760bc12:
     dato: 2026-11-08
