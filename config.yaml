@@ -316,6 +316,7 @@ målt_på_wire:
   åbent_punkt_18: kendelsen bar genoptaget=ja samtidig med session_load=fravalgt under selvtest — nu målt i tre kørsler (R13/selvtest_68c2b42, R23/selvtest_e394164, R31/selvtest_a5ded0d), altså reproducerbart; filen definerer ikke hvad genoptaget måler når selvtest altid kører session/new (replayed_user=1 er kun probens ekko) — undersøg src/acpclient.cpp før nogen forklaring; ikke gættet (review ki_quick 2026-11-12)
   åbent_punkt_19: last_text indeholder probe og helt agentsvar sammenklistret uden mellemrum — nu målt i tre kørsler (R13, R23, R31); selvtest.genoptagelse påstår «last_text kun probe+svar» (målt på 18de24d) — uafgjort om sammenklistringen sker i app eller agent, ikke konkluderet (review ki_quick 2026-11-12)
   åbent_punkt_20: guard-tjek 2 (src/qml mod config) kører kun med base-argument, og CI giver base kun ved pull_request — en ændring i src/ alene kan nå main uden den kontrol (review ki_quick 2026-11-12)
+  åbent_punkt_21: vejkort for config.yaml; åbent = antal (R275)
 
 operationel_implementering:
   tilstand_bestået_med_åbent_punkt: accepteret — en skive kan være bestået mens et åbent punkt står, hvis punktet kun begrænser manuel efterprøvning og ikke selvtest (review 2026-11-10)
@@ -332,6 +333,7 @@ vejkort:
   skive_konfiguration: accept — configOptions vises og kan ændres
   skive_genoptagelse: accept — gammel samtale vises efter genstart (klient-side historik i QSettings); session/load svarer ok når mcpServers:[] medsendes (målt 2026-11-09); uden mcpServers svarer agenten -32602 — se målt_på_wire.session_load; beviset for genoptagelse (session_load=fallback + genoptaget=ja) er målt på revision b5192b8 før selvtest blev frisk-session (18de24d); session/load-grenen røres af unit-prøverne load_ok_saetter_session, load_fallback_ved_fejl og load_ok_starter_selvtest_probe (køres i CI ved hver push til main), på enheden kun ved manuel prøvetur (åbent_punkt_09)
   skive_oprydning: accept — træet indeholder ingen fil, config.yaml ikke nævner (se inventar)
+  skive_fortolkelighed: accept — yaml.safe_load uden fejl; nul kolon
 
 fremdrift:
   skive_byg: bestået 2026-11-08 — CI 42488263292 grøn (tests + aarch64 RPM; kørsels-id fra før tjek_config og publicer_test_rpm fandtes), ikoner med i RPM, installeret på enheden via eksekver_test.sh
