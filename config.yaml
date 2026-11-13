@@ -76,6 +76,7 @@ arkitektonisk_logik:
   struktur: RekursivOrkestrering (afledt visning — projekt_ordbog.rekursiv_orkestrering er normativ)
   flow: Sufflør → Stokastiker[n] → Output (afledt visning — projekt_ordbog er normativ)
   # verdensbillede — sufflørens beslutning 2026-11-12, ikke måling
+  # rækkevidde - listen dækker Vibe-stakken, Kagi Assistant og chat.dk er ikke poster
   # lager = hvor tilstanden ligger
   # myndighed = hvem der må ændre den
   # varighed = gælder samtalens afslutning / telefonens nulstilling; ansvar står ikke her — den der skriver en påstand uden måling bærer den
@@ -273,8 +274,8 @@ anti_mønstre:
       lektie: læs navngivningsreglen før hver ny nøgle; kontrollen er en hvidliste over tilladte låneord (udvanding_tilladt) — sikrere end en negativ liste, der kun dækker det der allerede er sket; fejler 3b på et ægte ord, tilføjes det til udvanding_tilladt med begrundelse i commit-beskeden
     - id: metodefejl_20
       metode: en hentning, der giver ordret samme svar i flere runder, blev brugt som bekræftelse af hvad main/gren pegede på (review ki_quick 2026-11-12 — senere målt som cache-artefakt: samme data ad ny sti gav spidsen)
-      resultat: "uafgjort" og "endepunktet fejler" blev hævdet på grundlag af en frossen kopi; fejlen lå i hentelaget, ikke i kilden
-      lektie: samme svar flere runder på samme sti måler lageret, ikke kilden — mål altid igen ad en ny sti (cache-bryder eller andet endepunkt), før svaret tæller som bekræftelse; gælder hvert enkelt API-kald — også opslag.sh og eksekver_test.sh (ét uautentificeret kald pr. kørsel)
+      resultat: "uafgjort" og "endepunktet fejler" blev hævdet på grundlag af en frossen kopi; fejlen lå i hentelaget, ikke i kilden — gentaget 2026-11-13 (R124): branches/main gav a3c377f, commits/main gav 7e98b91, mens commits/<fuldt sha> og commits?sha=main gav spidsen a277b7a; forældrekæden a277b7a→7e98b91→a3c377f afgjorde spidsen
+      lektie: samme svar flere runder på samme sti måler lageret, ikke kilden — mål altid igen ad en ny sti (cache-bryder eller andet endepunkt), før svaret tæller som bekræftelse; gælder hvert enkelt API-kald — også opslag.sh og eksekver_test.sh (ét uautentificeret kald pr. kørsel); de stier der gav spidsen 2026-11-13: git ls-remote origin refs/heads/main, git rev-parse HEAD og commits/<fuldt sha> — git-protokollen tæller ikke i REST-loftet (se ved_genoptagelse)
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
