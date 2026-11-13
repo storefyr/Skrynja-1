@@ -10,7 +10,7 @@ fail=0
 
 # 1) Every tracked file must be mentioned in config.yaml (full path or basename).
 while IFS= read -r f; do
-    if ! grep -qF -- "$f" config.yaml && ! grep -qF -- "$(basename "$f")" config.yaml; then
+    if ! grep -qFw -- "$f" config.yaml && ! grep -qFw -- "$(basename "$f")" config.yaml; then
         echo "FAIL: '$f' is not mentioned in config.yaml"
         fail=1
     fi
