@@ -9,7 +9,7 @@ samtaler:
     resume: rate-limit skilt ad fra forbrug og fra GitHubs eget limit (målt — se selvtest.rate_limit); to selvtest-kørsler på revision 3147b8f, alle PASS-kriterier grønne; symboløkonomi-reglen tilføjet og igen fjernet samme samtale (sufflør uenig i den som fast regel); selvtest skiftet til frisk session pr. kørsel (session/new) — målt på enheden: session_load=fravalgt, replayed_user=1, PASS på 18de24d; kodereview (13 fund, læsning ikke kørsel) — fixet: cap-buffer ryddes ved \n, ingen dobbelt verdict, prompt først efter mode-svar, -32601 ved ukendt metode, agent-stderr logges, selvtest vælger tillad ved navn, start efter vindue vist; åbent_punkt_10–12 registreret; config-review af config.yaml selv (13 fund) — rettet: formål, arkitektur-afgrænsning, kapabiliteter, udstyr-nøgle, verdict-feltliste, rate_limit opdelt med oprindelse og enhed, genoptagelses-bevis noteret som manuel-only, afledte visninger markeret, watchdog/vejkort var allerede rettet; regler for svar uden uopfordrede tal + ved_genoptagelse + persistent hukommelse; review via videresendelse (13 fund på f169f0e) — fixet: verdict også ved agentdød/startfejl (prøve først), eksekver_test.sh med tty-vagt + curl -f + revision først/igen + sha256, CI publicerer .sha256, opslag.sh via commit-sha, config: update_typer, session_load-revisioner, sprog-undtagelser, afledte visninger, ved_genoptagelse kræver revisionsangivelse i svar
   samtale_skrynja1_2026-11-12:
     besked_id: ukendt (videresendt gennemgang fra ki_quick)
-    resume: stokastiker mistænkte modelskift efter oplevet formåensfald — stokastikeren kan ikke verificere egen model indefra (hverken app eller admin viser den), så navnet vibe_ukendt_model blev vedtaget (se projekt_ordbog); arbejdsområdet viste sig ikke-varigt (lokal commit tabt ved nulstilling — målt, se config arbejdsområde); konferering med ki_quick formaliseret (markører + manuel kopiering, config ki_quick_kanal) med review-gren først, main først på signal
+    resume: stokastiker mistænkte modelskift efter oplevet formåensfald — stokastikeren kan ikke verificere egen model indefra (hverken app eller admin viser den), så navnet vibe_ukendt_model blev vedtaget (se projekt_ordbog); arbejdsområdet viste sig ikke-varigt (lokal indskrivning tabt ved nulstilling — målt, se config arbejdsområde); konferering med ki_quick formaliseret (markører + manuel kopiering, config ki_quick_kanal) med review-gren først, main først på signal
 
 kørsler:
   selvtest_760bc12:
@@ -63,7 +63,7 @@ kørsler:
   selvtest_44043f3_sha_mismatch:
     dato: 2026-11-10
     revision: 44043f3945bda41db3108e929d072515de3c3030
-    resultat: script fejlede KORREKT på sha256-mismatch for RPM — artefakter hentet via gren-navnet test-rpm efter force-push, og raw cacher pr. sti, så RPM og .sha256 kom fra hver deres commit (metodefejl_13 i praksis); målt på enheden; fix — hent via test-rpm's eget commit-sha i stien
+    resultat: script fejlede KORREKT på sha256-mismatch for RPM — artefakter hentet via gren-navnet test-rpm efter force-push, og raw cacher pr. sti, så RPM og .sha256 kom fra hver deres indskrivning (metodefejl_13 i praksis); målt på enheden; fix — hent via test-rpm's eget commit-sha i stien
   selvtest_1184c07:
     dato: 2026-11-10
     revision: 1184c078dd93ed5d695c88c4dfc5dd8719a0a06a
@@ -74,11 +74,11 @@ kørsler:
   selvtest_57d7ce3:
     dato: 2026-11-11
     revision: 57d7ce30a4bf15419dfd4bff6b5491c91d304ce2
-    resultat: PASS (exit 0) — første kørsel med nyt pass-kriterium (outputs>0 kun): outputs=1 kommer af den deterministiske probes eget cat; kendelsen bærer artefakt_commit (test-rpm commit) + artefakt_fil=skrynja-1-test.tar.gz + artefakt_sha256; øvrige felter grønne (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom)
+    resultat: PASS (exit 0) — første kørsel med nyt pass-kriterium (outputs>0 kun): outputs=1 kommer af den deterministiske probes eget cat; kendelsen bærer artefakt_commit (test-rpm indskrivning) + artefakt_fil=skrynja-1-test.tar.gz + artefakt_sha256; øvrige felter grønne (tool_calls=1, ui_tool_calls=1, permission_requests=1, probe_fil=OK, config_options=3, session_load=fravalgt, genoptaget=ja, replayed_user=1, mode=ask, slut_aarsag tom)
   selvtest_701f73a:
     dato: 2026-11-11
     revision: 701f73a67db30b179ccbbd01ee1938b96125f6d1
-    resultat: PASS (exit 0) — samme grønne profil som 57d7ce3 (outputs=1 fra probens cat, artefakt_commit/fil/sha256 i kendelse); docs-only siden sidst, samme app-kode, nyt artefakt-commit fordi CI publicerede igen
+    resultat: PASS (exit 0) — samme grønne profil som 57d7ce3 (outputs=1 fra probens cat, artefakt_commit/fil/sha256 i kendelse); docs-only siden sidst, samme app-kode, nyt artefakt-indskrivning fordi CI publicerede igen
   selvtest_9843a6c:
     dato: 2026-11-11
     revision: 9843a6c317969c6c5ca65904067fd35e5fd83b4e
@@ -110,11 +110,11 @@ kørsler:
   selvtest_a5ded0d:
     dato: 2026-11-12
     revision: a5ded0d6cbf2e8d686ce36de1d5320eff0e93e37
-    resultat: PASS (exit 0) — R31; første kendelse hvor script_revision ≠ byg_revision (a5ded0d vs e394164 — dokumentationscommit havde på det tidspunkt intet nyt byg (test-rpm nåede først a5ded0d i revision.txt senere), kendelsen viser det selv); script_revision_ved_start=e394164; artefakt_commit=547cf5c (test-rpm uændret siden R23), artefakt_sha256=aba1cea3… samme som R23; slut_aarsag tom; genoptaget=ja + session_load=fravalgt tredje kørsel (åbent_punkt_18); last_text sammenklistret tredje kørsel (åbent_punkt_19)
+    resultat: PASS (exit 0) — R31; første kendelse hvor script_revision ≠ byg_revision (a5ded0d vs e394164 — dokumentationsindskrivning havde på det tidspunkt intet nyt byg (test-rpm nåede først a5ded0d i revision.txt senere), kendelsen viser det selv); script_revision_ved_start=e394164; artefakt_commit=547cf5c (test-rpm uændret siden R23), artefakt_sha256=aba1cea3… samme som R23; slut_aarsag tom; genoptaget=ja + session_load=fravalgt tredje kørsel (åbent_punkt_18); last_text sammenklistret tredje kørsel (åbent_punkt_19)
   guard_paa_enheden_r44_r69:
     dato: 2026-11-12
     revision: d60501acd2b4deb172795c4a3c850825add81c0e
-    resultat: målt på telefonen (busybox ash, ingen GNU grep) — R50-R54: here-streng <<< gav syntaksfejl/exit 2 fire runder; rettet til here-dokument, guard=0 (R53), commit 35b3e19 (R54); R62: worktree 1a7d650 bash -n=0, guard=0, kontrol A (stort bogstav i nøgle) exit 1, kontrol B (æøå i nøgle) exit 0; R67: tekstændringer (rapportering-nøgle, rundemærker), guard=0, commit 5647a96; R68: FF-kontrol OK, push main OK, ls-remote main=5647a96, review-gren slettet; R69: lokal main opdateret a5ded0d→5647a96, rent træ — kilde: ki_quick via sufflør, målt i ki_quicks kanal (ikke denne sandkasse)
+    resultat: målt på telefonen (busybox ash, ingen GNU grep) — R50-R54: here-streng <<< gav syntaksfejl/exit 2 fire runder; rettet til here-dokument, guard=0 (R53), indskrivning 35b3e19 (R54); R62: worktree 1a7d650 bash -n=0, guard=0, kontrol A (stort bogstav i nøgle) exit 1, kontrol B (æøå i nøgle) exit 0; R67: tekstændringer (rapportering-nøgle, rundemærker), guard=0, indskrivning 5647a96; R68: FF-kontrol OK, push main OK, ls-remote main=5647a96, review-gren slettet; R69: lokal main opdateret a5ded0d→5647a96, rent træ — kilde: ki_quick via sufflør, målt i ki_quicks kanal (ikke denne sandkasse)
   telefon_klon_r5_r6:
     dato: 2026-11-12
     resultat: R5 på telefonen — efter push af b45759d: HEAD=2dbb3b6, origin/main=b45759d, status --porcelain tom (intet ugemt arbejde); R6 efter næste push — klon fulgte med via scriptets eget pull ved selvtest-kørslen (selvtest_68c2b42 viser ved_start=5b84f69 → script_revision=68c2b42)
