@@ -34,20 +34,14 @@ kanaler:
   vedhæftet_kopi: 'skal have målt hash mod den fil, den hævdes at gengive, før den citeres som lagerets indhold'
   sandkassen: 'ikke varig — se arbejdsområder'
 
-regler:
-    nye_filer: Skal følge denne protokol
-    opdateringer: Skal bevare token-densitet
-    se_også: videnshåndtering (sektionen længere nede)
-
 videnshåndtering:
   config_yaml: Denne fil er projektets eneste normative kilde — README peger hertil; vejkort og regler bor her; kode afledes og bevises af prøver; fungerer som stokastikeres persistente hukommelse på tværs af samtaler og instanser — forudsat at hver instans læser den først (se ved_genoptagelse) (sufflør 2026-11-10)
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
   rundemærker: R5/R6 = telefonens klon-tilstande (projektlogbog telefon_klon_r5_r6); R13/R23/R31 = selvtest-kørsler; R44-R53 = guard-fejlen på enheden (here-streng, busybox, fire runder med exit 2); R54/R62 = indskrivning og guard målt på frisk worktree; R67-R69 = tekstændring, FF-kontrol, push til main (5647a96) og lokal oprydning — alle målt på telefonen — mærker bruges kun i dialogen, derfor står målingerne også i logbogen (sufflør 2026-11-12)
   hentelag: 'en påstand om et filindhold er ikke belagt, før den er målt med git i den kanal, hvor rettelsen skal foretages — konsistente svar gennem samme hentelag måler lageret, ikke kilden (bekræftet R37 og R40, review ki_quick 2026-11-12); derfor: læs altid med fuldt sha i stien, og mål tvivlsomme svar igen ad en ny sti (cache-bryder eller git-protokollen) før de bruges'
   tilstandsforespørgsel: 'spørger suffløren om et bestemt lags tilstand, måles netop det lager i dets egen kanal, før noget siges om andre lagerers tilstand; en klon kan ikke svare på fjernlagerets vegne'
-  tilstandsforespørgsel: 'spørger suffløren om et bestemt lags tilstand, måles netop det lager i dets egen kanal, før noget siges om andre lagerers tilstand; en klon kan ikke svare på fjernlagerets vegne'
   rapportering: en påstand om repoets tilstand skal bære rundemærke og kanal; et grønt signal kræver et målt udfald i modtagerens kanal — konsistente svar gennem samme lag måler lageret, ikke kilden (målt R44-R62)
-  ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
+  ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen — kravet om kørsels-id gælder viden tilføjet fra 2026-11-14; ældre poster uden kørsels-id markeres (kørsel ⟨ukendt⟩) og gættes ikke (sufflør 2026-11-14)
   før_indskrivning: Før hver indskrivning — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse; og kør altid bash tjek_config_synkronitet.sh lokalt før indskrivning (kræver kun bash (here-dokument, aldrig here-streng <<< — busybox ash på telefonen afviser den; kun exit 0 er grønt; exit 1 = FAIL, exit 2 = syntaksfejl); uden base-argument springes src/qml-synkronitet over, samme som CI); fejler udvandingskontrollen på et ægte låneord, så tilføj ordet til udvanding_tilladt med begrundelse i indskrivningsbeskeden
   udvandingskontrol: 'udvanding af nøgler håndhæves af tjek_config_synkronitet.sh, som frasorterer nøgledele mod udvanding_tilladt; et ægte låneord tilføjes listen med begrundelse i indskrivningsbeskeden. Kontrollen omfatter kun nøgler — hverken filnavne, dansk prosa eller indskrivningsbeskeder kontrolleres, og ingen krog er koblet til depotet'
   aldrig_i_depotet: Samtale-transskripter, hemmeligheder og nøgler må aldrig i repoet; målinger uden oprindelse skrives ikke
@@ -55,6 +49,9 @@ videnshåndtering:
   ved_genoptagelse: ved hver samtales første besked måler stokastikeren sekunder siden seneste indskrivning (git log -1 --format=%ct mod date +%s) og om origin ligger foran local (git ls-remote origin main mod git rev-parse main); er forskellen over 3600 sekunder eller origin foran, køres git pull --ff-only og config.yaml + projektlogbog.yaml læses før første svar — og første svar angiver hvilken revision der blev læst (git rev-parse HEAD efter pull), så en læser kan skelne frisk fra forældet — git ls-remote/fetch/push går over git-protokollen og tæller ikke i GitHubs REST-limit (60 req/time uden token, se lokal_opsætning.github_api)
 
 regler:
+  nye_filer: Skal følge denne protokol
+  opdateringer: Skal bevare token-densitet
+  se_også: videnshåndtering (sektionen længere nede)
   qt: Kun Qt 5.6 — ingen API indført i 5.7+
   qml: QtQuick 2.0 + Sailfish.Silica 1.0; JavaScript er ES5
   arkitektur: Kun aarch64 i mål-byg (RPM); unit tests kører på CI's ubuntu-runners og tæller ikke som mål-byg
@@ -63,7 +60,6 @@ regler:
   kapabiliteter: Tom clientCapabilities — Sandboxing=Disabled er sat fra første indskrivning (se sailjail), så SailJail måles ikke i appen; hvis Sandboxing slås til senere, måles der først da, og så kan kapabiliteter udvides
   sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første indskrivning — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
   filer: Nye kildefiler registreres i .pro; nye QML-filer til install
-  lagerskelnen: 'en tilstandspåstand angiver både kanal og lager: "målt i <kanal> om <lager>"; "repoet", "lageret" og "depotet" uden lagerangivelse er en fejl — også i statusfelter som fremdrift og vejkort, hvor "målt lokalt" derfor erstattes af den målte kanal'
   lagerskelnen: 'en tilstandspåstand angiver både kanal og lager: "målt i <kanal> om <lager>"; "repoet", "lageret" og "depotet" uden lagerangivelse er en fejl — også i statusfelter som fremdrift og vejkort, hvor "målt lokalt" derfor erstattes af den målte kanal'
 
 
@@ -242,7 +238,7 @@ anti_mønstre:
       lektie: test-JSON valideres maskinelt før indskrivning
     - id: metodefejl_04
       metode: EnterKey.onClicked sat til signal-kald sendButton.clicked() som udtryk
-      resultat: QML-fejl Insufficient arguments på Qt 5.6 (app-log 2026-11-08T15:26)
+      resultat: QML-fejl Insufficient arguments på Qt 5.6 (app-log 2026-11-08T15:26) (kørsel ⟨ukendt⟩)
       lektie: en handler kalder en funktion, ikke et signal som funktionsudtryk
     - id: metodefejl_05
       metode: SDK-release valgt efter enhedens OS-version (5.2.0.20)
@@ -250,7 +246,7 @@ anti_mønstre:
       lektie: byg efter et SDK-image der faktisk findes i registret (4.5.0.18); enhedens OS er noget andet
     - id: metodefejl_06
       metode: selvtest læste uiToolCalls på view->rootObject() (vinduet) i stedet for Page
-      resultat: ui_tool_calls=-1 og VERDICT=FAIL selvom UI viste kaldet (selvtest på enhed 2026-11-08)
+      resultat: ui_tool_calls=-1 og VERDICT=FAIL selvom UI viste kaldet (selvtest på enhed 2026-11-08) (kørsel ⟨ukendt⟩)
       lektie: læs samme objekt som QML viser — findChild på side-id, ikke rootObject
     - id: metodefejl_07
       metode: 'rootObject() brugt uden #include <QQuickItem>'
@@ -258,7 +254,7 @@ anti_mønstre:
       lektie: rootObject() returnerer QQuickItem*, som skal includes før brug
     - id: metodefejl_08
       metode: C++ læste QML-state via property-opslag og parent-kæde (Item.parent stopper før vinduet; QML-id'er er fil-scopede)
-      resultat: ui_tool_calls målte -1 så 0 og selvtest FAIL, selvom UI viste kaldet (målt på enhed 2026-11-08, revision 849c36b og 81d9955)
+      resultat: ui_tool_calls målte -1 så 0 og selvtest FAIL, selvom UI viste kaldet (målt på enhed 2026-11-08, revision 849c36b og 81d9955) (kørsel ⟨ukendt⟩)
       lektie: QML kalder selv tilbage til C++ via Q_INVOKABLE (acp.uiToolCallsSeen) — mål dér, ikke i QML-træet
     - id: metodefejl_09
       metode: Qt foreach-makroen brugt i app-kode
@@ -270,27 +266,27 @@ anti_mønstre:
       lektie: fremad-deklarer frie hjælpere øverst i filen, før første klasse
     - id: metodefejl_11
       metode: git ls-files uden core.quotepath=false brugt til at generere YAML flow-lister
-      resultat: æøå-filnavne blev C-quotet med backslash-escape og gav ugyldig YAML (inventar-bygning denne session)
+      resultat: æøå-filnavne blev C-quotet med backslash-escape og gav ugyldig YAML (inventar-bygning denne session) (kørsel ⟨ukendt⟩)
       lektie: altid git -c core.quotepath=false ls-files når output skal ind i YAML eller shell
     - id: metodefejl_12
       metode: eksekver_test.sh kørt med omdirigeret output mens devel-su spørger efter kodeord
-      resultat: kodeordsprompten forsvinder og det ligner et hang (to hændelser 2026-11-09)
+      resultat: kodeordsprompten forsvinder og det ligner et hang (to hændelser 2026-11-09) (kørsel ⟨ukendt⟩)
       lektie: historisk — hændelsen involverede devel-su; scriptet kører i dag uden root og med app-uddata til /dev/null, så omdirigeringslektionen gælder ikke længere og der er ingen tty-vagt (review ki_quick 2026-11-10)
     - id: metodefejl_13
       metode: script hentet fra raw.githubusercontent.com uden sha256-tjek
-      resultat: forældet cachet udgave blev kørt to gange 2026-11-09 — også med ?v= cache-buster i query (raw cacher på stien alene)
+      resultat: forældet cachet udgave blev kørt to gange 2026-11-09 — også med ?v= cache-buster i query (raw cacher på stien alene) (kørsel ⟨ukendt⟩)
       lektie: hent med fuldt commit-sha i stien (raw.githubusercontent.com/<sha>/fil) og verificer sha256sum før kørsel
     - id: metodefejl_14
       metode: over-loftslinje afsluttet med \n ryddede ikke m_buffer i AcpFrameReader::feed
-      resultat: præfiks fra tidligere feed()-kald klæbte sig på næste gyldige linje, som blev kasseret — tavs datatab (kodelæsning review 2026-11-09; prøven rygrad_cap_rydder_praefiks tilføjet før fix, CI kører den)
+      resultat: præfiks fra tidligere feed()-kald klæbte sig på næste gyldige linje, som blev kasseret — tavs datatab (kodelæsning review 2026-11-09; prøven rygrad_cap_rydder_praefiks tilføjet før fix, CI kører den) (kørsel ⟨ukendt⟩)
       lektie: over-loftsgrenen skal også nulstille bufferen ved linjeskift — samme fejlklasse som metodefejl_02
     - id: metodefejl_15
       metode: rc=$? læst inde i then-grenen efter "if ! curl ..." — efter negation er $? altid 0, så HTTP-fejl kunne ikke skelnes fra netværksfejl
-      resultat: diagnosen var død kode — altid "netværk/time-out (curl exit 0)" (kodelæsning review ki_quick 2026-11-10)
+      resultat: diagnosen var død kode — altid "netværk/time-out (curl exit 0)" (kodelæsning review ki_quick 2026-11-10) (kørsel ⟨ukendt⟩)
       lektie: opsaml exit-koden uden negation — rc=0; cmd || rc=$? — samme fejlklasse som metodefejl_03 (konstruktion der aldrig kan antage den ene gren)
     - id: metodefejl_16
       metode: fejltekst ved tool_call_update failed læst fra content[k].content.text i stedet for content[k].text (indholdsblokken er {"type":"text","text":…})
-      resultat: errText blev tom og lastError faldt tilbage til «Værktøjskald fejlede» — prøven krævede kun ikke-tom streng og fangede det ikke (kodelæsning review ki_quick 2026-11-10)
+      resultat: errText blev tom og lastError faldt tilbage til «Værktøjskald fejlede» — prøven krævede kun ikke-tom streng og fangede det ikke (kodelæsning review ki_quick 2026-11-10) (kørsel ⟨ukendt⟩)
       lektie: læs samme felt som den nærliggende gren; prøven skal påstå selve fejlteksten, ikke kun ikke-tom
     - id: metodefejl_17
       metode: artefakter (RPM + .sha256) hentet via gren-navnet test-rpm efter force-push — raw cacher pr. sti, så de to filer kunne komme fra hver sit indskrivning
@@ -302,23 +298,23 @@ anti_mønstre:
       lektie: C++-identifikatorer (også prøveslot-navne) i ascii — som eksisterende prøvenavne (raekkefoelge); æøå kun i config-nøgler, filnavne og dansk tekst, aldrig i kildekode-id'er (metacall-genererede id'er går gennem moc)
     - id: metodefejl_19
       metode: config-nøgle skrevet som arbejdsomraade (ascii-udvanding) lige efter metodefejl_18 havde sagt at C++ er ascii — vanen slog reglen
-      resultat: kontrollen i tjek_config_synkronitet.sh fangede det ikke, fordi nøgle-kontrollen kun ser tegnmængden ^[a-zæøå_0-9']+$ og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet — værktøjsbegrænsningen hører ved kontrollen, ikke ved nøglen
+      resultat: kontrollen i tjek_config_synkronitet.sh fangede det ikke, fordi nøgle-kontrollen kun ser tegnmængden ^[a-zæøå_0-9']+$ og ikke kan skelne før/foer; fejlen blev fanget af sufflør, ikke af værktøjet — værktøjsbegrænsningen hører ved kontrollen, ikke ved nøglen (kørsel ⟨ukendt⟩)
       lektie: læs navngivningsreglen før hver ny nøgle; kontrollen er en hvidliste over tilladte låneord (udvanding_tilladt) — sikrere end en negativ liste, der kun dækker det der allerede er sket; fejler 3b på et ægte ord, tilføjes det til udvanding_tilladt med begrundelse i indskrivningsbeskeden
     - id: metodefejl_20
       metode: 'en hentning, der giver ordret samme svar i flere runder, blev brugt som bekræftelse af hvad main/gren pegede på (review ki_quick 2026-11-12 — senere målt som cache-artefakt: samme data ad ny sti gav spidsen)'
-      resultat: '"uafgjort" og "endepunktet fejler" blev hævdet på grundlag af en frossen kopi; fejlen lå i hentelaget, ikke i kilden — gentaget 2026-11-13 (R124): branches/main gav a3c377f, commits/main gav 7e98b91, mens commits/<fuldt sha> og commits?sha=main gav spidsen a277b7a; forældrekæden a277b7a→7e98b91→a3c377f afgjorde spidsen'
+      resultat: '"uafgjort" og "endepunktet fejler" blev hævdet på grundlag af en frossen kopi; fejlen lå i hentelaget, ikke i kilden — gentaget 2026-11-13 (R124): branches/main gav a3c377f, commits/main gav 7e98b91, mens commits/<fuldt sha> og commits?sha=main gav spidsen a277b7a; forældrekæden a277b7a→7e98b91→a3c377f afgjorde spidsen (kørsel ⟨ukendt⟩)'
       lektie: 'samme svar flere runder på samme sti måler lageret, ikke kilden — mål altid igen ad en ny sti (cache-bryder eller andet endepunkt), før svaret tæller som bekræftelse; gælder hvert enkelt API-kald — også opslag.sh og eksekver_test.sh (ét uautentificeret kald pr. kørsel); de stier der gav spidsen 2026-11-13: git ls-remote origin refs/heads/main, git rev-parse HEAD og commits/<fuldt sha> — git-protokollen tæller ikke i REST-loftet (se ved_genoptagelse)'
     - id: metodefejl_21
       metode: 'afprøvning af en indskrivningskrog mod fire prøvebeskeder i et løsrevet depot under /tmp — to skulle afvises, to godkendes'
-      resultat: 'alle fire blev afvist, også de to der skulle godkendes; krogen kunne ikke skelne rigtig fra forkert; rejst som kandidat, aldrig installeret i depotet'
+      resultat: 'alle fire blev afvist, også de to der skulle godkendes; krogen kunne ikke skelne rigtig fra forkert; rejst som kandidat, aldrig installeret i depotet (kørsel ⟨ukendt⟩)'
       lektie: 'en afprøvning må ikke godkendes, før den er vist rød mod en bevidst indført fejl og grøn mod en kendt rigtig sag; giver begge sager samme udfald, har afprøvningen ingen skelneevne, og dens beståen siger intet om det afprøvede — kun om sig selv'
     - id: metodefejl_22
       metode: 'en midlertidig indskrivningskrog blev bygget og afprøvet, før det blev målt, om depotet allerede havde en kontrol af udvanding — kontrollen fandtes i tjek_config_synkronitet.sh, og krogens hvidliste var en uversioneret kopi af udvanding_tilladt'
-      resultat: 'arbejdsrunder gik til at genopbygge en funktion, der lå i depotet hele tiden; krogen så kun indskrivningsbeskeder, mens depotets kontrol ser nøgler — ingen af dem dækkede den anden'
+      resultat: 'arbejdsrunder gik til at genopbygge en funktion, der lå i depotet hele tiden; krogen så kun indskrivningsbeskeder, mens depotets kontrol ser nøgler — ingen af dem dækkede den anden (kørsel ⟨ukendt⟩)'
       lektie: 'før en kontrol bygges, læses det script som config.yaml selv udpeger som håndhæver; findes funktionen, udvides den frem for at duplikeres'
     - id: metodefejl_23
       metode: 'to lagre behandlet som ét: origin/main og origin/test-rpm blev citeret som GitHub-tilstand, mens kun telefonens klon var målt'
-      resultat: 'et spørgsmål om fjernlageret blev besvaret med klonens data'
+      resultat: 'et spørgsmål om fjernlageret blev besvaret med klonens data (kørsel ⟨ukendt⟩)'
       lektie: 'kanal og lager skal angives side om side; en korrekt kanaletiket fanger ikke fejlen, hvis referencen er klonens'
   systemiske_hårdknuder:
     - id: hårdknude_01
