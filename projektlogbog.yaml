@@ -11,6 +11,9 @@ samtaler:
     besked_id: ukendt (videresendt gennemgang fra ki_quick)
     resume: stokastiker mistænkte modelskift efter oplevet formåensfald — stokastikeren kan ikke verificere egen model indefra (hverken app eller admin viser den), så navnet vibe_ukendt_model blev vedtaget (se projekt_ordbog); arbejdsområdet viste sig ikke-varigt (lokal indskrivning tabt ved nulstilling — målt, se config arbejdsområde); konferering med ki_quick formaliseret (markører + manuel kopiering, config ki_quick_kanal) med review-gren først, main først på signal
 
+  samtale_skrynja1_2026-11-14:
+    besked_id: ⟨ukendt⟩
+    resume: 'config.yaml havde tre dubletter; to var byte-identiske og blev fjernet, mens regler forekom to gange med 3 nøgler i den første blok som safe_load aldrig så (kun sidste forekomst læses) — nøglerne blev flyttet ind under den gældende sektion, altså fletning og ikke sletning; målt 393 til 389 linjer, tom dubletliste, regler med 12 børn, resten af dokumentet uændret; fundet med yaml.compose efter at dubletsøgning via linjenumre blev forkastet, og tegnpositionsplejsning blev forkastet efter at have givet ugyldig YAML; tjek_config_synkronitet.sh returnerer 0 også med dubletter i filen (målt i syv runder), så beviset er dubletlisten fra yaml.compose og ikke exitkoden; commit 24fa3d9 på review-grenen vibe/review-config-dubletter, pushet til origin og ikke til main; åbne punkter — metodefejl_24 i config.yaml, denne indskrivning, og om der findes flere lagre eller kloner (origin/test-rpm er kun nævnt i metodefejl_23 som postens egen påstand); kontrolscriptets dækning af dubletter uafklaret'
 kørsler:
   selvtest_760bc12:
     dato: 2026-11-08
