@@ -20,7 +20,21 @@ dokumentations_standard:
     støjreduktion: Maksimal
     mode: System-konfiguration
     compliance_metode: 'Ved baseline-trigger ("Sørg for strengt at efterleve config.yaml"), anvend kontekst_mapping fra kontrol_matrix.'
-  dokumentations_regler:
+  dokumentations_kanaler:
+  lukket_liste: 'fjernlageret, telefonens_klon, sandkassen, vedhæftet_kopi, ci_kørselslog; en oprindelse der ikke står her, må ikke angives som kanal'
+  fjernlageret: 'måles kun med git ls-remote eller en frisk klon; origin/<gren> i en klon er klonens billede og må ikke citeres som fjernlagerets tilstand'
+  telefonens_klon: 'origin/* er lokale referencer; deres alder er ikke målt, medmindre hentetidspunktet er målt'
+  vedhæftet_kopi: 'skal have målt hash mod den fil, den hævdes at gengive, før den citeres som lagerets indhold'
+  sandkassen: 'ikke varig — se arbejdsområder'
+
+kanaler:
+  lukket_liste: 'fjernlageret, telefonens_klon, sandkassen, vedhæftet_kopi, ci_kørselslog; en oprindelse der ikke står her, må ikke angives som kanal'
+  fjernlageret: 'måles kun med git ls-remote eller en frisk klon; origin/<gren> i en klon er klonens billede og må ikke citeres som fjernlagerets tilstand'
+  telefonens_klon: 'origin/* er lokale referencer; deres alder er ikke målt, medmindre hentetidspunktet er målt'
+  vedhæftet_kopi: 'skal have målt hash mod den fil, den hævdes at gengive, før den citeres som lagerets indhold'
+  sandkassen: 'ikke varig — se arbejdsområder'
+
+regler:
     nye_filer: Skal følge denne protokol
     opdateringer: Skal bevare token-densitet
     se_også: videnshåndtering (sektionen længere nede)
@@ -30,6 +44,8 @@ videnshåndtering:
   projektlogbog: Projektets hændelser (kørsler, samtaler) logges i projektlogbog.yaml med id (kategori_navn); hver ny samtale får straks en indgang med første besked-id som anker; id'er er kun henvisninger, ikke viden
   rundemærker: R5/R6 = telefonens klon-tilstande (projektlogbog telefon_klon_r5_r6); R13/R23/R31 = selvtest-kørsler; R44-R53 = guard-fejlen på enheden (here-streng, busybox, fire runder med exit 2); R54/R62 = indskrivning og guard målt på frisk worktree; R67-R69 = tekstændring, FF-kontrol, push til main (5647a96) og lokal oprydning — alle målt på telefonen — mærker bruges kun i dialogen, derfor står målingerne også i logbogen (sufflør 2026-11-12)
   hentelag: 'en påstand om et filindhold er ikke belagt, før den er målt med git i den kanal, hvor rettelsen skal foretages — konsistente svar gennem samme hentelag måler lageret, ikke kilden (bekræftet R37 og R40, review ki_quick 2026-11-12); derfor: læs altid med fuldt sha i stien, og mål tvivlsomme svar igen ad en ny sti (cache-bryder eller git-protokollen) før de bruges'
+  tilstandsforespørgsel: 'spørger suffløren om et bestemt lags tilstand, måles netop det lager i dets egen kanal, før noget siges om andre lagerers tilstand; en klon kan ikke svare på fjernlagerets vegne'
+  tilstandsforespørgsel: 'spørger suffløren om et bestemt lags tilstand, måles netop det lager i dets egen kanal, før noget siges om andre lagerers tilstand; en klon kan ikke svare på fjernlagerets vegne'
   rapportering: en påstand om repoets tilstand skal bære rundemærke og kanal; et grønt signal kræver et målt udfald i modtagerens kanal — konsistente svar gennem samme lag måler lageret, ikke kilden (målt R44-R62)
   ny_viden: Stokastikere skriver væsentlig ny viden (målte fakta, beslutninger, metodefejl med kørsels-id) i denne fil i samme arbejdsgang — ikke kun i dialogen
   før_indskrivning: Før hver indskrivning — blev der målt noget nyt (kørsel, enhed, CI)? Så ind i denne fil først, med oprindelse; og kør altid bash tjek_config_synkronitet.sh lokalt før indskrivning (kræver kun bash (here-dokument, aldrig here-streng <<< — busybox ash på telefonen afviser den; kun exit 0 er grønt; exit 1 = FAIL, exit 2 = syntaksfejl); uden base-argument springes src/qml-synkronitet over, samme som CI); fejler udvandingskontrollen på et ægte låneord, så tilføj ordet til udvanding_tilladt med begrundelse i indskrivningsbeskeden
@@ -47,6 +63,8 @@ regler:
   kapabiliteter: Tom clientCapabilities — Sandboxing=Disabled er sat fra første indskrivning (se sailjail), så SailJail måles ikke i appen; hvis Sandboxing slås til senere, måles der først da, og så kan kapabiliteter udvides
   sailjail: "[X-Sailjail] Sandboxing=Disabled i .desktop fra første indskrivning — ellers er agentstien ikke nåbar (målt runde 7 i forgængeren)"
   filer: Nye kildefiler registreres i .pro; nye QML-filer til install
+  lagerskelnen: 'en tilstandspåstand angiver både kanal og lager: "målt i <kanal> om <lager>"; "repoet", "lageret" og "depotet" uden lagerangivelse er en fejl — også i statusfelter som fremdrift og vejkort, hvor "målt lokalt" derfor erstattes af den målte kanal'
+  lagerskelnen: 'en tilstandspåstand angiver både kanal og lager: "målt i <kanal> om <lager>"; "repoet", "lageret" og "depotet" uden lagerangivelse er en fejl — også i statusfelter som fremdrift og vejkort, hvor "målt lokalt" derfor erstattes af den målte kanal'
 
 
 inventar:
@@ -298,6 +316,10 @@ anti_mønstre:
       metode: 'en midlertidig indskrivningskrog blev bygget og afprøvet, før det blev målt, om depotet allerede havde en kontrol af udvanding — kontrollen fandtes i tjek_config_synkronitet.sh, og krogens hvidliste var en uversioneret kopi af udvanding_tilladt'
       resultat: 'arbejdsrunder gik til at genopbygge en funktion, der lå i depotet hele tiden; krogen så kun indskrivningsbeskeder, mens depotets kontrol ser nøgler — ingen af dem dækkede den anden'
       lektie: 'før en kontrol bygges, læses det script som config.yaml selv udpeger som håndhæver; findes funktionen, udvides den frem for at duplikeres'
+    - id: metodefejl_23
+      metode: 'to lagre behandlet som ét: origin/main og origin/test-rpm blev citeret som GitHub-tilstand, mens kun telefonens klon var målt'
+      resultat: 'et spørgsmål om fjernlageret blev besvaret med klonens data'
+      lektie: 'kanal og lager skal angives side om side; en korrekt kanaletiket fanger ikke fejlen, hvis referencen er klonens'
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
