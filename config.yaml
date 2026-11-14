@@ -316,6 +316,10 @@ anti_mønstre:
       metode: 'to lagre behandlet som ét: origin/main og origin/test-rpm blev citeret som GitHub-tilstand, mens kun telefonens klon var målt'
       resultat: 'et spørgsmål om fjernlageret blev besvaret med klonens data (kørsel ⟨ukendt⟩)'
       lektie: 'kanal og lager skal angives side om side; en korrekt kanaletiket fanger ikke fejlen, hvis referencen er klonens'
+    - id: metodefejl_24
+      metode: 'tre dubletter målt med linjebaseret heuristik, før compose blev taget i brug'
+      resultat: 'tjek_config_synkronitet.sh returnerede 0 gennem forløbet, mens filen havde tre dubletter'
+      lektie: 'en grøn kontrol er ikke bevis for fravær af dubletter; beviset er dubletlisten fra yaml.compose'
   systemiske_hårdknuder:
     - id: hårdknude_01
       beskrivelse: Afvisnings-loop i forgængeren storefyr/Skrynja (målt runde 12c-12f) — cancelled stoppede ikke agenten; 9x request_permission, 7x cancelled, 14 unikke toolCallIds
