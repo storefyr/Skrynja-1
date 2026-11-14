@@ -19,6 +19,7 @@ dokumentations_standard:
     prioritet: Syntese > Ekstraktion
     støjreduktion: Maksimal
     mode: System-konfiguration
+    compliance_metode: 'Ved baseline-trigger ("Sørg for strengt at efterleve config.yaml"), anvend kontekst_mapping fra kontrol_matrix.'
   dokumentations_regler:
     nye_filer: Skal følge denne protokol
     opdateringer: Skal bevare token-densitet
@@ -198,6 +199,14 @@ sufflør_protokol:
     tal_i_svar: Svar i almindeligt dansk uden udmålinger der ikke blev bedt om; rå tal (sekunder, sha'er, byte, verdict-felter, kørsels-id'er, fejltekster) bruges når de er svaret på spørgsmålet (målinger, verdict, sporbarhed) eller når sufflør siger at svaret suffleres videre til en anden stokastiker (sufflør 2026-11-10)
   ki_quick_kanal: konferering med ki_quick om indskrivninger — stokastikeren skriver en afgrænset besked mellem markørerne --- til ki_quick --- og --- /til ki_quick --- i dialogen; sufflør kopierer teksten manuelt over til ki_quick; der findes ingen direkte kanal (sufflør 2026-11-11)
   review_først: ved konferering om nye indskrivninger lægges de på en review-gren først (git push origin main:vibe/review-<sha7>, hvor <sha7> er den korte sha for den indskrivning der skal gennemgås), så ki_quick kan læse dem sha-pinnet; main flyttes først på ki_quicks signal, og den pågældende review-gren slettes først når git ls-remote bekræfter at main bærer indskrivninger (ki_quick 2026-11-12)
+
+kontrol_matrix:
+  baseline: "Sørg for strengt at efterleve config.yaml"
+  kontekst_mapping:
+    kode: "Fokus: anti_mønstre + inventar + navngivningsregler"
+    tekst: "Fokus: sprog + ascii-udvanding + dokumentations_regler"
+    arkitektur: "Fokus: kognitiv_instruks (Syntese > Ekstraktion) + støjreduktion"
+    generelt: "Fokus: overholdelse af alle normative kilder"
 
 anti_mønstre:
   metodiske_fejl:
